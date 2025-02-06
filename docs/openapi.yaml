@@ -1,0 +1,11 @@
+GET workshop
+POST workshop
+PATCH workshop/{id} (schedule and agenda fields, so long as status is Pending)
+PATCH workshop/{id}/start (Status Pending to Active, Current Exercise = 0)
+POST workshop/{id}/message (add message to current exercise, get reply, process bot instructions if provided)
+POST workshop/{id}/observation (add observation to observations)
+PATCH workshop/{id}/observations (update list of observations after de-dup, etc.)
+PATCH workshop/{id}/next (advance current exercise, if last Status to Completed)
+
+GET exercises
+GET exercise/{name}

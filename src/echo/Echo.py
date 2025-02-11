@@ -4,7 +4,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Bot(discord.Client):
-    def __init__(self, intents):
+    def __init__(self):
+        intents = discord.Intents.default()
+        intents.message_content = True
         super().__init__(intents=intents)
         self.event_handlers = {}
 

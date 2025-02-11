@@ -40,17 +40,13 @@ app.register_blueprint(create_exercise_routes(), url_prefix='/api/exercise')
 app.register_blueprint(create_workshop_routes(), url_prefix='/api/workshop')
 
 # Initialize Discord Bot
-intents = discord.Intents.default()
-intents.message_content = True
-bot = Bot(discord.Client(intents=intents))
+bot = Bot(__name__)
 
 # Register Discord Event Handlers
 from src.handlers.fran_handlers import create_fran_handlers
-from src.handlers.workshop_handlers import create_workshop_handlers
 from src.services.workshop_services import WorkshopServices
 activeWorkshops = WorkshopServices.getActiveWorkshops()
-bot.register_handlers(create_fran_handlers(), channel=config.FRAN_CHANNEL_NAME)
-bot.register_handlers(create_workshop_handlers(), channels=activeWorkshops)
+bot.register_handlers(create_fran_handlers(activeWorkshops))
 
 # Define a signal handler for SIGTERM and SIGINT
 def handle_exit(signum, frame):
@@ -65,6 +61,7 @@ def handle_exit(signum, frame):
 signal.signal(signal.SIGTERM, handle_exit)
 signal.signal(signal.SIGINT, handle_exit)
 
-# Expose the app object for Gunicorn
+# Start the bot and Expose the app object for Gunicorn
 if __name__ == "__main__":
+    bot.run()
     app.run(host='0.0.0.0', port=config.FRAN_API_PORT)

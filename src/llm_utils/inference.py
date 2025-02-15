@@ -2,15 +2,13 @@ import logging
 import ollama
 
 class Inference:
-    model = ""
     
-    def __init__(self, model):
-        # get model name
-        # load model
-        self.model = 'llama3.2:latest'
+    def __init__(self):
+        # Nothing to do here yet
         return
         
     @staticmethod
-    def chat(self, messages):
-        response = ollama.chat(model=self.model, messages=messages)
+    def chat(self, model, messages):
+        response = ollama.chat(model=model, messages=messages)
         return response
+    

@@ -15,32 +15,16 @@ yaml: request_body
 ```
 When a message is seen, the action is executed, and the response is written back to the Chat where it originated. 
 
-
+## Separation of Concerns
 /src
 | /server.py - Initialize the server, Discord client, Inference client, And database connections
-| /config/config.py - Implements, global configuration values
-| /echo/Echo.py - Echo flask-like chat agent framework
+| /config - Implements, global configuration values, to be extracted to stage0_api_utils private package
+| /echo/Echo.py - Echo flask-like chat agent framework, to be extracted to Echo public package
 | /agents - ChatBot Agent handlers
-| | /config_agent.py
-| | /chain_agent.py
-| | /exercise_agent.py
-| | /workshop_agent.py
-| |
 | /routes - Http Event handlers
-| | /config_routes.py
-| | /chain_routes.py
-| | /exercise_routes.py
-| | /workshop_routes.py
-| |
-| /services - Business logic, supports agents/routes, uses io_utils
-| | /chain_services.py
-| | /exercise_services.py
-| | /workshop_services.py
-| |
-| /flask_utils - Flask helpers
-| /llm_utils - LLM Wrapper
-| /mongo_utils - Simple Mongo IO Wrapper
+| /services - Business logic, supports agents/routes, uses *_utils
+| /flask_utils - Flask helpers, to be extracted to stage0_api_utils private package
+| /llm_utils - LLM Wrapper, to be extracted to stage0_api_utils private package
+| /mongo_utils - Simple Mongo IO Wrapper, to be extracted to stage0_api_utils private package
 |
-/models - ollama model files
-| /Fran.modelfile - Generalist design thinking model
-| /Fran.{exercise}.modelfile - Specialized model for exercise specific conversations.
+/Fran.modelfile - Generalist design thinking model

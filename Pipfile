@@ -3,6 +3,15 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[scripts]
+local = "sh -c 'PYTHONPATH=$(pwd)/src python3 -m server'"
+start = "sh -c 's0 down && s0 up mongodb && pipenv run local'"
+test = "python -m unittest discover -s ./src -p '*.test*.py'"
+stepci = "stepci run ./test/stepci.yaml"
+load = "stepci run ./test/stepci.yaml --loadtest"
+build = "docker build --tag ghcr.io/agile-learning-institute/stage0_fran:latest ."
+container = "sh -c 's0 down && pipenv run build && s0 up curriculum-api'"
+
 [packages]
 discord = "*"
 python-dotenv = "*"

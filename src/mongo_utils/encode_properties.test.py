@@ -2,7 +2,7 @@ import unittest
 from bson import ObjectId
 from datetime import datetime
 
-from mentorhub_utils.mongo_utils.encode_properties import encode_document
+from encode_properties import encode_document
 
 class TestEncodeProperties(unittest.TestCase):
 

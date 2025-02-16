@@ -9,6 +9,155 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 paths:
+  /api/bots/:
+    get:
+      summary: Get a list of stage0 Bots
+      operationId: get_bots
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Names'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              example:
+                error: "Internal server error. Please try again later."
+  /api/bot/{id}:
+    get:
+      summary: Get a bot by Name
+      description: Get the bot
+      operationId: get_bot
+      parameters:
+        - name: id
+          in: path
+          description: ID of Bot
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bot'
+        '500':
+          description: A Processing Error occurred
+    patch:
+      summary: Update a Bot 
+      description: Update the Bot
+      operationId: update_bot
+      parameters:
+        - name: id
+          in: path
+          description: ID of the Bot to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Bot
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Bot'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bot'
+        '500':
+          description: A Processing Error occurred
+  /api/bot/{id}/channels:
+    get:
+      summary: Get channels
+      description: Get a list of active channels
+      operationId: get_channels
+      parameters:
+        - name: id
+          in: path
+          description: ID of the Bot to update
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                description: list of active channel IDs
+                type: array
+                items:
+                  type: string
+        '500':
+          description: A Processing Error occurred
+  /api/bot/{id}/channel/{channel_id}:
+    post:
+      summary: Add a channel
+      description: Add a channel to this bots channel list
+      operationId: add_channel
+      parameters:
+        - name: id
+          in: path
+          description: ID of the Bot to update
+          required: true
+          schema:
+            type: string
+        - name: channel_id
+          in: path
+          description: Discord Token of Bot
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                description: list of active channel IDs
+                type: array
+                items:
+                  type: string
+        '500':
+          description: A Processing Error occurred
+    delete:
+      summary: Remove a channel from a bot (typically called on channel delete events)
+      description: Remove Channel
+      operationId: remove_channel
+      parameters:
+        - name: id
+          in: path
+          description: ID of the bot to update
+          required: true
+          schema:
+            type: string
+        - name: channel_id
+          in: path
+          description: Discord Token of Bot
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                description: list of active channel IDs
+                type: array
+                items:
+                  type: string
+        '500':
+          description: A Processing Error occurred
+
   /api/chains/:
     get:
       summary: Get a list of Exercise Chains (workshop templates)
@@ -19,20 +168,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Chains'
+                $ref: '#/components/schemas/Names'
         '500':
           description: Internal Server Error
           content:
             application/json:
               example:
                 error: "Internal server error. Please try again later."
-  /api/chain/{name}:
+  /api/chain/{id}:
     get:
-      summary: Get a exercise chain by Name
+      summary: Get a exercise chain by ID
       description: Get the chain
       operationId: get_chain
       parameters:
-        - name: name
+        - name: id
           in: path
           description: Name of the chain
           required: true
@@ -47,6 +196,97 @@ paths:
                 $ref: '#/components/schemas/Chain'
         '500':
           description: A Processing Error occurred
+
+  /api/conversations/:
+    get:
+      summary: Get a list of Conversations 
+      operationId: get_conversations
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Names'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              example:
+                error: "Internal server error. Please try again later."
+  /api/conversation/{channel_id}:
+    get:
+      summary: Get a conversation by Channel ID, create the conversation if it does not exist.
+      description: Get the Conversation
+      operationId: get_conversation
+      parameters:
+        - name: channel_id
+          in: path
+          description: ID of the Channel where the conversation is taking place
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+        '500':
+          description: A Processing Error occurred
+    patch:
+      summary: Update a Conversation 
+      description: Update the Conversation
+      operationId: update_conversation
+      parameters:
+        - name: channel_id
+          in: path
+          description: ID of the channel where the conversation is taking place
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Conversation
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Conversation'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+        '500':
+          description: A Processing Error occurred
+  /api/conversation/{channel_id}/message:
+    post:
+      summary: Add a message
+      description: Add a message to this conversation
+      operationId: add_message
+      parameters:
+        - name: channel_id
+          in: path
+          description: ID of the Channel where the conversation is taking place to update
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                description: The list of Messages in the Conversation after processing
+                type: array 
+                items: 
+                  type: string
+        '500':
+          description: A Processing Error occurred
+
   /api/exercises/:
     get:
       summary: Get a list of Design Thinking Exercises you can use in a workshop
@@ -57,22 +297,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Exercises'
+                $ref: '#/components/schemas/Names'
         '500':
           description: Internal Server Error
           content:
             application/json:
               example:
                 error: "Internal server error. Please try again later."
-  /api/exercise/{name}:
+  /api/exercise/{id}:
     get:
-      summary: Get a exercise by Name
+      summary: Get a exercise by ID
       description: Get the Exercise
       operationId: get_exercise
       parameters:
-        - name: name
+        - name: id
           in: path
-          description: Name of the exercise
+          description: ID of the exercise
           required: true
           schema:
             type: string
@@ -85,6 +325,7 @@ paths:
                 $ref: '#/components/schemas/Exercise'
         '500':
           description: A Processing Error occurred
+
   /api/workshops/:
     get:
       summary: Get a list of Workshops that match the query
@@ -102,7 +343,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Workshops'
+                $ref: '#/components/schemas/Names'
         '500':
           description: Internal Server Error
           content:
@@ -118,7 +359,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/New_Workshop'
+              $ref: '#/components/schemas/Workshop'
       responses:
         '200':
           description: Successful response
@@ -180,7 +421,6 @@ paths:
                 $ref: '#/components/schemas/Workshop'
         '500':
           description: A Processing Error occurred
- 
   /api/workshop/{id}/start:
     post:
       summary: Start a workshop
@@ -196,25 +436,6 @@ paths:
       summary: Start the next exercise
       description: Increment current_exercise, check limit
       operationId: next_exercise
-      responses:
-        '200':
-          description: Successful operation
-        '500':
-          description: A Processing Error occurred
-  /api/workshop/{id}/message:
-    post:
-      summary: Add a message the the messages of the current exercise. 
-      description: Add the message to the list, use LLM to generate reply, update messages doc, return reply.
-      operationId: add_message
-      responses:
-        '200':
-          description: Successful operation
-        '500':
-          description: A Processing Error occurred
-    patch:
-      summary: Update list of messages
-      description: Update the full list of messages
-      operationId: patch_messages
       responses:
         '200':
           description: Successful operation
@@ -260,6 +481,218 @@ paths:
                 $ref: '#/components/schemas/Config'     
 components:
   schemas:
+    Names:
+      description: A list of ID/Name values
+      type: array
+      items:
+        type: object
+        properties:
+          _id:
+            description: A Unique ID
+            type: string
+          name: 
+            description: A Name
+            type: string
+    Bot:
+      description: A Stage0 Bot
+      type: object
+      properties:
+        _id:
+          description: The unique identifier for a Bot
+          type: string
+        status:
+          description: Status
+          enum:
+            - Active
+            - Archived
+          type: string
+        name:
+          description: Bot short name (Fran, Sam, Json
+          pattern: ^[^\s]{0,32}$
+          type: string
+        description:
+          description: Bot Description
+          pattern: ^[ -~]{0,256}$
+          type: string
+        channels:
+          description: List of Discord Channel ID values
+          items:
+            pattern: ^[^\s]{0,32}$
+            type: string
+          type: array
+        last_saved:
+          description: Last Saved breadcrumb
+          properties:
+            fromIp:
+              description: Http Request remote IP address
+              type: string
+            byUser:
+              description: UUID Of User
+              type: string
+            atTime:
+              description: The date-time when last updated
+              type: string
+            correlationId:
+              description: The logging correlation ID of the update transaction
+              type: string
+          additionalProperties: false
+          type: object
+      additionalProperties: false
+    Chain:
+      description: A Chain of Exercises - a Template for a Workshop
+      properties:
+        _id:
+          description: The unique identifier for a Chain
+          type: string
+        status:
+          description: Status
+          enum:
+            - Active
+            - Archived
+          type: string
+        name:
+          description: Chain short name, like Kickoff or Retrospective
+          pattern: ^[^\s]{0,32}$
+          type: string
+        exercises:
+          description: List of Exercise IDs
+          items:
+            type: string
+          type: array
+        last_saved:
+          description: Last Saved breadcrumb
+          properties:
+            fromIp:
+              description: Http Request remote IP address
+              type: string
+            byUser:
+              description: UUID Of User
+              type: string
+            atTime:
+              description: The date-time when last updated
+              type: string
+            correlationId:
+              description: The logging correlation ID of the update transaction
+              type: string
+          additionalProperties: false
+          type: object
+      required:
+        - _id
+        - name
+        - exercises
+        - last_saved
+      additionalProperties: false
+      type: object
+    Conversation:
+      title: Conversation
+      description: An exercise conducted during a stage0 Design Workshop, with observations
+      type: object
+      properties:
+        _id:
+          description: The unique identifier for a conversation mongo document
+          type: string
+        status:
+          description: The unique identifier for a conversation mongo document
+          enum:
+            - Active
+            - Archived
+          type: string
+        channel_id:
+          description: The Discord channel_id this conversation is taking place in
+          pattern: ^[^\s]{0,32}$
+          type: string
+        version:
+          description: Either 'latest' or the date the conversation was archived
+          pattern: ^[^\s]{0,32}$
+          type: string
+        conversation:
+          description: Messages in the conversation
+          items:
+            type: string
+          type: array
+        last_saved:
+          description: Last Saved breadcrumb
+          properties:
+            fromIp:
+              description: Http Request remote IP address
+              type: string
+            byUser:
+              description: UUID Of User
+              type: string
+            atTime:
+              description: The date-time when last updated
+              type: string
+            correlationId:
+              description: The logging correlation ID of the update transaction
+              type: string
+          additionalProperties: false
+          type: object
+      required:
+        - _id
+        - status
+        - channel_id
+        - version
+        - conversation
+        - last_saved
+      additionalProperties: false
+    Exercise: 
+      description: A design thinking exercise
+      type: object
+      properties:
+        _id:
+          description: The unique identifier for a Exercise
+          type: string
+        status:
+          description: Status
+          enum:
+            - Active
+            - Archived
+          type: string
+        name:
+          description: name
+          pattern: ^[ -~]{0,256}$
+          type: string
+        description:
+          description: description
+          type: string
+        duration:
+          description: duration in minutes
+          minimum: 0
+          type: number
+        observe_instructions:
+          description: observation exercise instructions
+          type: string
+        reflect_instructions:
+          description: reflect exercise instructions
+          type: string
+        make_instructions:
+          description: make exercise instructions
+          type: string
+        last_saved:
+          description: Last Saved breadcrumb
+          properties:
+            fromIp:
+              description: Http Request remote IP address
+              type: string
+            byUser:
+              description: UUID Of User
+              type: string
+            atTime:
+              description: The date-time when last updated
+              type: string
+            correlationId:
+              description: The logging correlation ID of the update transaction
+              type: string
+          additionalProperties: false
+          type: object
+      required:
+        - _id
+        - name
+        - last_saved
+      additionalProperties: false
+
+    Channels:
+      description: A list of channel IDs
     Workshop:
       description: A record of a specific design thinking workshop.
       type: object
@@ -374,68 +807,6 @@ components:
           type: array
           items:
             type: string
-    Chains:
-      description: A List of Exercise Chains (workshop templates)
-      type: array
-      items:
-        type: object
-        properties:
-          "_id": 
-            description: The unique ID of the chain
-            type: string
-          "name":
-            description: The unique short name of the chain
-            type: string
-    Chain:
-      description: A List of Exercises (workshop template)
-      type: object
-      properties:
-        "_id":
-          description: Unique Identifier of this Chain
-          type: string
-        "name": 
-          description: The name of the Chain
-          type: string
-        "exercises":
-          description: List of Exercise Names (in Exercises)
-          type: array
-          items:
-            type: string
-    Exercises:
-      description: A list of available design thinking exercises
-      type: array
-      items:
-        type: object
-        properties:
-          "_id": 
-            description: The unique ID of the exercise
-            type: string
-          "name":
-            description: The unique short name of the exercise
-            type: string
-    Exercise: 
-      description: A design thinking exercise that is conducted as a step in a design thinking workshop
-        Each exercise is conducted in a multi-person chat, and will consist of three activities, Observe, Reflect, Make
-      type: object
-      properties:
-        "name":
-          description: name
-          type: string
-        "description":
-          description: description 
-          type: string
-        "duration":
-          description: duration
-          type: string
-        "observe_instructions":
-          description: observation exercise instructions
-          type: string
-        "reflect_instructions":
-          description: reflect exercise instructions
-          type: string
-        "make_instructions":
-          description: make exercise instructions
-          type: string
     Config:
       type: object
       properties:

@@ -31,15 +31,22 @@ class BotServices:
         bot = mongo.get_document(config.CHAIN_COLLECTION_NAME, bot_id)
         return bot
     
-bots = [
-    {
-        "name":"",
-        "description":"",
-        "introduction":"",
-        "exercises": [
-            
-        ]    
-    },
-    {},
-    {}
-]    
+    @staticmethod
+    async def update_bot(bot_id, token, breadcrumb, data):
+        """Update the specified workshop"""        
+        BotServices._check_user_access(token)
+        config = Config.get_instance()
+        mongo = MongoIO.get_instance()
+        data.last_saved = breadcrumb
+        workshop = await mongo.update_document(config.BOT_COLLECTION_NAME, bot_id, data)
+        return workshop
+
+    @staticmethod
+    def get_active_channels(discord_token, token):
+        """Get the specified bot"""
+        BotServices._check_user_access(token)
+        config = Config.get_instance()
+        mongo = MongoIO.get_instance()
+        match = {"discord_token": discord_token}
+        bots = mongo.get_documents(config.BOT_COLLECTION_NAME, match)
+        return bots[0]

@@ -48,7 +48,7 @@ from src.services.bot_services import BotServices
 activeChannels = BotServices.get_active_channels(config.STAGE0_FRAN_TOKEN)
 bot = Echo(__name__, activeChannels)
 
-# Register Discord Event Handlers
+# Register Discord Agents
 from agents.bot_agent import create_bot_agent
 from agents.chain_agent import create_chain_agent
 from agents.config_agent import create_config_agent
@@ -78,5 +78,5 @@ signal.signal(signal.SIGINT, handle_exit)
 
 # Start the bot and Expose the app object for Gunicorn
 if __name__ == "__main__":
-    bot.run(config.DISCORD_TOKEN)
+    bot.run(config.DISCORD_FRAN_TOKEN)
     app.run(host='0.0.0.0', port=config.FRAN_API_PORT)

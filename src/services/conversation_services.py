@@ -4,7 +4,7 @@ import logging
 from src.mongo_utils.mongo_io import MongoIO
 logger = logging.getLogger(__name__)
 
-class conversationServices:
+class ConversationServices:
 
     @staticmethod 
     def _check_user_access(token):

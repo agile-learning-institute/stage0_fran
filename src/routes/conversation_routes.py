@@ -12,7 +12,7 @@ def create_conversation_routes():
     conversation_routes = Blueprint('conversation_routes', __name__)
 
     # GET /api/conversations - Return a list of conversations that match query
-    @conversation_routes.route('s', methods=['GET'])
+    @conversation_routes.route('', methods=['GET'])
     def get_conversations():
         try:
             token = create_token()

@@ -8,14 +8,13 @@ logger = logging.getLogger(__name__)
 
 def create_bot_agent(bot):
     """ Registers event handlers and commands for the Fran home channel. """
-
     @bot.action(action_name="get_bot", 
                 description="", 
-                arguments_schema="",
-                outputs_schema="")
+                arguments_schema={},
+                outputs_schema={})
     async def get_bot(arguments):
         """  """
-        try
+        try:
             await bot = BotServices.get_bot(arguments._id)
             return bot
         except Exception as e:

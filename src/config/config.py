@@ -27,6 +27,7 @@ class Config:
             self.CHAIN_COLLECTION_NAME = ''
             self.WORKSHOP_COLLECTION_NAME = ''
             self.EXERCISE_COLLECTION_NAME = ''
+            self.VERSION_COLLECTION_NAME = ''
             self.ELASTIC_INDEX_NAME = ''
             self.DISCORD_TOKEN = ''
             self.FRAN_CHANNEL_NAME = ''
@@ -45,14 +46,15 @@ class Config:
                 "CHAIN_COLLECTION_NAME": "chains",
                 "WORKSHOP_COLLECTION_NAME": "workshops",
                 "EXERCISE_COLLECTION_NAME": "exercises",
+                "VERSION_COLLECTION_NAME": "msmCurrentVersions",
                 "ELASTIC_INDEX_NAME": "stage0",
             }
             self.config_ints = {
                 "FRAN_API_PORT": "8580",
                 "SEARCH_API_PORT": "8581",
             }
-            self.config_string_secrets = {
-                "MONGO_CONNECTION_STRING": "mongodb://mongodb:27017/?replicaSet=rs0",
+            self.config_string_secrets = {  
+                "MONGO_CONNECTION_STRING": "mongodb://root:example@localhost:27017/?tls=false&directConnection=true",
             }
             self.config_json_secrets = {
                 "ELASTIC_CLIENT_OPTIONS": '{"node":"http://localhost:9200"}',
@@ -115,6 +117,11 @@ class Config:
         })
         return value
 
+    # Add a custom enumerator to the enumerators list
+    def add_enumerator(self, enumerations):
+        self.enumerators.update(enumerations)
+        return
+    
     # Serializer
     def to_dict(self, token):
         """Convert the Config object to a dictionary with the required fields."""

@@ -24,11 +24,7 @@ class MongoIO:
     def configure(self, enumerators_collection_key):
         """Initialize Config values for Versions and Enumerators"""
         self.config = Config.get_instance()
-        self._connect()
-        self._load_versions()
-        self._load_enumerators(enumerators_collection_key)
-        
-    def _connect(self):
+
         """Connect to MongoDB."""
         try:
             self.client = MongoClient(self.config.MONGO_CONNECTION_STRING, serverSelectionTimeoutMS=2000, socketTimeoutMS=5000)
@@ -53,53 +49,6 @@ class MongoIO:
             logger.fatal(f"Failed to disconnect from MongoDB: {e} - exiting")
             sys.exit(1) # fail fast 
       
-    def _load_versions(self):
-        """Load the versions collection into memory."""
-        try:
-            versions_collection_name = self.config.VERSION_COLLECTION_NAME
-            self.config.versions = self.get_documents(versions_collection_name)
-            print(f"Versions: {self.config.versions}")
-
-            logger.info(f"{len(self.config.versions)} Versions Loaded.")
-        except Exception as e:
-            logger.fatal(f"Failed to get or load versions: {e} - exiting")
-            sys.exit(1) # fail fast 
-
-    def _load_enumerators(self, enumerators_collection_key):
-        """Load the enumerators collection into memory."""
-        if len(self.config.versions) == 0:
-            logger.fatal("No Versions to load Enumerators from - exiting")
-            sys.exit(1) # fail fast 
-        
-        try: 
-            # Get the enumerators version from the curriculum version number.
-            version_strings = [version['currentVersion'].split('.').pop() or "0" 
-                for version in self.config.versions if version['collectionName'] == enumerators_collection_key]
-            the_version_string = version_strings.pop() if version_strings else "0"
-            the_version = int(the_version_string)
-
-            # Query the database            
-            
-            enumerators_collection_name = self.config.ENUMERATORS_COLLECTION_NAME
-            match = { "version": the_version }
-            enumerations = self.get_documents(enumerators_collection_name, match)
-    
-            # Fail Fast if not found - critical error
-            if not enumerations:
-                logger.fatal(f"Enumerators not found for version: {self.config.ENUMERATORS_COLLECTION_NAME}:{the_version_string}")
-                sys.exit(1) # fail fast 
-    
-            # Fail Fast if too many are found - it should be 1 document
-            if len(enumerations) != 1:
-                logger.fatal(f"{len(enumerations)} ! Too many Enumerators found for version: {the_version_string}")
-                sys.exit(1) # fail fast 
-    
-            self.config.enumerators = enumerations[0]['enumerators']
-            logger.info(f"{len(enumerations)} Enumerators Loaded.")
-        except Exception as e:
-            logger.fatal(f"Failed to get or load enumerators: {e} - exiting")
-            sys.exit(1) # fail fast 
-
     def get_documents(self, collection_name, match=None, project=None, sort_by=None):
         """
         Retrieve a list of documents based on a match, projection, and optional sorting.

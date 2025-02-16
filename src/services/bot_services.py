@@ -42,7 +42,7 @@ class BotServices:
         return workshop
 
     @staticmethod
-    def get_active_channels(discord_token, token):
+    def get_channels(discord_token, token):
         """Get the specified bot"""
         BotServices._check_user_access(token)
         config = Config.get_instance()
@@ -50,3 +50,11 @@ class BotServices:
         match = {"discord_token": discord_token}
         bots = mongo.get_documents(config.BOT_COLLECTION_NAME, match)
         return bots[0]
+
+    @staticmethod
+    def add_channel(bot_id, token, breadcrumb, channel_id):
+        """Add the channel to the specified bot"""
+
+    @staticmethod
+    def remove_channel(bot_id, token, breadcrumb, channel_id):
+        """Get the specified bot"""

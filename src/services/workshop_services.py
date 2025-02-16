@@ -74,3 +74,23 @@ class WorkshopServices:
         data.last_saved = breadcrumb
         workshop = await mongo.update_document(config.WORKSHOP_COLLECTION_NAME, workshop_id, data)
         return workshop
+
+    @staticmethod
+    async def start_workshop(workshop_id, token, breadcrumb):
+        """Update the specified workshop Status to Active, record start time"""        
+        return
+    
+    @staticmethod
+    async def advance_workshop(workshop_id, token, breadcrumb):
+        """Advance the Status of the Workshop, if complete, record end time"""        
+        return
+
+    @staticmethod
+    async def add_observation(workshop_id, token, breadcrumb, observation):
+        """Advance the Status of the Workshop, if complete, record end time"""        
+        return
+
+    @staticmethod
+    async def update_observations(workshop_id, token, breadcrumb, observation):
+        """Update the whole observations list"""
+        return

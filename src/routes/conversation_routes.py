@@ -1,6 +1,6 @@
 from flask_utils.breadcrumb import create_breadcrumb
 from flask_utils.token import create_token
-from services.conversation_services import conversationServices
+from services.conversation_services import ConversationServices
 
 import logging
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ def create_conversation_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             query = request.args.get('query') or ""
-            conversations = conversationServices.get_conversations(query, token)
+            conversations = ConversationServices.get_conversations(query, token)
             logger.info(f"Get conversation Success {breadcrumb}")
             return jsonify(conversations), 200
         except Exception as e:
@@ -31,7 +31,7 @@ def create_conversation_routes():
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            conversation = conversationServices.get_conversation(channel_id, token)
+            conversation = ConversationServices.get_conversation(channel_id, token)
             logger.info(f"Get conversation Success {breadcrumb}")
             return jsonify(conversation), 200
         except Exception as e:
@@ -45,7 +45,7 @@ def create_conversation_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             patch_data = request.get_json()
-            conversation = conversationServices.update_conversation(channel_id, token, breadcrumb, patch_data)
+            conversation = ConversationServices.update_conversation(channel_id, token, breadcrumb, patch_data)
             logger.info(f"Update conversation Successful {breadcrumb}")
             return jsonify(conversation), 200
         except Exception as e:
@@ -59,7 +59,7 @@ def create_conversation_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             message = request.json
-            conversation = conversationServices.add_message(channel_id, token, breadcrumb, message)
+            conversation = ConversationServices.add_message(channel_id, token, breadcrumb, message)
             logger.info(f"Update conversation Successful {breadcrumb}")
             return jsonify(conversation), 200
         except Exception as e:

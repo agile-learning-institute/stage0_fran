@@ -44,9 +44,9 @@ app.register_blueprint(create_exercise_routes(), url_prefix='/api/exercise')
 app.register_blueprint(create_workshop_routes(), url_prefix='/api/workshop')
 
 # Initialize Discord Bot
-from services.bot_services import BotServices
-channels = BotServices.getActiveChannels(config.DISCORD_TOKEN)
-bot = Echo(__name__, channels)
+from src.services.bot_services import BotServices
+activeChannels = BotServices.get_active_channels(config.STAGE0_FRAN_TOKEN)
+bot = Echo(__name__, activeChannels)
 
 # Register Discord Event Handlers
 from agents.bot_agent import create_bot_agent
@@ -56,8 +56,6 @@ from agents.conversation_agent import create_conversation_agent
 from agents.exercise_agent import create_exercise_agent
 from agents.workshop_agent import create_workshop_agent
 
-from src.services.bot_services import BotServices
-activeChannels = BotServices.get_bot(config.BOT_NAME)
 bot.register_agent(create_bot_agent(), agent_prefix="bot")
 bot.register_agent(create_chain_agent(), agent_prefix="chain")
 bot.register_agent(create_config_agent(), agent_prefix="config")

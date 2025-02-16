@@ -30,16 +30,3 @@ class ChainServices:
         mongo = MongoIO.get_instance()
         chain = mongo.get_document(config.CHAIN_COLLECTION_NAME, chain_id)
         return chain
-    
-chains = [
-    {
-        "name":"",
-        "description":"",
-        "introduction":"",
-        "exercises": [
-            
-        ]    
-    },
-    {},
-    {}
-]    

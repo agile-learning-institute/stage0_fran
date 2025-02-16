@@ -37,19 +37,5 @@ def create_exercise_routes():
             logger.warning(f"Get Exercise Error has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
 
-    # PATCH /api/exercise/{id} - Update a exercise
-    @exercise_routes.route('/<string:id>', methods=['PATCH'])
-    def update_exercise(id):
-        try:
-            token = create_token()
-            breadcrumb = create_breadcrumb(token)
-            patch_data = request.get_json()
-            exercise = ExerciseServices.update_exercise(id, token, breadcrumb, patch_data)
-            logger.info(f"Update exercise Successful {breadcrumb}")
-            return jsonify(exercise), 200
-        except Exception as e:
-            logger.warning(f"A processing error occurred {e}")
-            return jsonify({"error": "A processing error occurred"}), 500
-        
     # Ensure the Blueprint is returned correctly
     return exercise_routes

@@ -25,27 +25,41 @@ def create_conversation_routes():
             logger.warning(f"Get conversation Error has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
-    # GET /api/conversation/id - Return a specific conversation
-    @conversation_routes.route('/<string:id>', methods=['GET'])
-    def get_conversation(id):
+    # GET /api/conversation/channel_id - Return a specific conversation
+    @conversation_routes.route('/<string:channel_id>', methods=['GET'])
+    def get_conversation(channel_id):
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            conversation = conversationServices.get_conversation(id, token)
+            conversation = conversationServices.get_conversation(channel_id, token)
             logger.info(f"Get conversation Success {breadcrumb}")
             return jsonify(conversation), 200
         except Exception as e:
             logger.warning(f"Get conversation Error has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
 
-    # PATCH /api/conversation/{id} - Update a conversation
-    @conversation_routes.route('/<string:id>', methods=['PATCH'])
-    def update_conversation(id):
+    # PATCH /api/conversation/{channel_id} - Update a conversation
+    @conversation_routes.route('/<string:channel_id>', methods=['PATCH'])
+    def update_conversation(channel_id):
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             patch_data = request.get_json()
-            conversation = conversationServices.update_conversation(id, token, breadcrumb, patch_data)
+            conversation = conversationServices.update_conversation(channel_id, token, breadcrumb, patch_data)
+            logger.info(f"Update conversation Successful {breadcrumb}")
+            return jsonify(conversation), 200
+        except Exception as e:
+            logger.warning(f"A processing error occurred {e}")
+            return jsonify({"error": "A processing error occurred"}), 500
+        
+    # POST /api/conversation/{channel_id}/message - Update a conversation
+    @conversation_routes.route('/<string:channel_id>/message', methods=['POST'])
+    def add_message(channel_id):
+        try:
+            token = create_token()
+            breadcrumb = create_breadcrumb(token)
+            message = request.json
+            conversation = conversationServices.add_message(channel_id, token, breadcrumb, message)
             logger.info(f"Update conversation Successful {breadcrumb}")
             return jsonify(conversation), 200
         except Exception as e:

@@ -51,8 +51,8 @@ def create_bot_routes():
             logger.warning(f"A processing error occurred {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
-    # GET /api/bot/{id}/channel/ - Get Active Channels
-    @bot_routes.route('/<string:id>/channel', methods=['GET'])
+    # GET /api/bot/{id}/channels - Get Active Channels
+    @bot_routes.route('/<string:id>/channels', methods=['GET'])
     def get_channels(id):
         try:
             token = create_token()
@@ -65,7 +65,7 @@ def create_bot_routes():
             return jsonify({"error": "A processing error occurred"}), 500
 
     # POST /api/bot{id}/channel/{channel_id} - Add a channel
-    @bot_routes.route('/<string:id>/channel/<string:channel_id>', methods=['PATCH'])
+    @bot_routes.route('/<string:id>/channel/<string:channel_id>', methods=['POST'])
     def add_channel(id, channel_id):
         try:
             token = create_token()
@@ -77,8 +77,8 @@ def create_bot_routes():
             logger.warning(f"A processing error occurred {e}")
             return jsonify({"error": "A processing error occurred"}), 500
 
-    # DELETE /api/bot{id}/channel/{channel_id} - Remove a channel
-    @bot_routes.route('/<string:id>/channel/<string:channel_id>', methods=['PATCH'])
+    # DELETE /api/bot/{id}/channel/{channel_id} - Remove a channel
+    @bot_routes.route('/<string:id>/channel/<string:channel_id>', methods=['DELETE'])
     def remove_channel(id, channel_id):
         try:
             token = create_token()

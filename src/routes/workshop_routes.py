@@ -51,5 +51,61 @@ def create_workshop_routes():
             logger.warning(f"A processing error occurred {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
+    # POST /api/workshop/{id}/start - Update a workshop
+    @workshop_routes.route('/<string:id>/start', methods=['POST'])
+    def start_workshop(id):
+        try:
+            token = create_token()
+            breadcrumb = create_breadcrumb(token)
+            patch_data = request.get_json()
+            workshop = WorkshopServices.start_workshop(id, token, breadcrumb, patch_data)
+            logger.info(f"Start workshop Successful {breadcrumb}")
+            return jsonify(workshop), 200
+        except Exception as e:
+            logger.warning(f"A processing error occurred {e}")
+            return jsonify({"error": "A processing error occurred"}), 500
+        
+    # POST /api/workshop/{id}/next - Update a workshop
+    @workshop_routes.route('/<string:id>/next', methods=['POST'])
+    def advance_workshop(id):
+        try:
+            token = create_token()
+            breadcrumb = create_breadcrumb(token)
+            patch_data = request.get_json()
+            workshop = WorkshopServices.advance_workshop(id, token, breadcrumb, patch_data)
+            logger.info(f"Advance workshop Successful {breadcrumb}")
+            return jsonify(workshop), 200
+        except Exception as e:
+            logger.warning(f"A processing error occurred {e}")
+            return jsonify({"error": "A processing error occurred"}), 500
+        
+    # POST /api/workshop/{id}/observation - Update a workshop
+    @workshop_routes.route('/<string:id>/observation', methods=['POST'])
+    def add_observation(id):
+        try:
+            token = create_token()
+            breadcrumb = create_breadcrumb(token)
+            patch_data = request.get_json()
+            workshop = WorkshopServices.advance_workshop(id, token, breadcrumb, patch_data)
+            logger.info(f"Add observation to workshop Successful {breadcrumb}")
+            return jsonify(workshop), 200
+        except Exception as e:
+            logger.warning(f"A processing error occurred {e}")
+            return jsonify({"error": "A processing error occurred"}), 500
+        
+    # PATCH /api/workshop/{id}/observation - Update a workshop
+    @workshop_routes.route('/<string:id>/observation', methods=['PATCH'])
+    def add_observation(id):
+        try:
+            token = create_token()
+            breadcrumb = create_breadcrumb(token)
+            patch_data = request.get_json()
+            workshop = WorkshopServices.update_workshop_observations(id, token, breadcrumb, patch_data)
+            logger.info(f"Update workshop observations Successful {breadcrumb}")
+            return jsonify(workshop), 200
+        except Exception as e:
+            logger.warning(f"A processing error occurred {e}")
+            return jsonify({"error": "A processing error occurred"}), 500
+        
     # Ensure the Blueprint is returned correctly
     return workshop_routes

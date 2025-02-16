@@ -24,7 +24,7 @@ def create_chain_routes():
             logger.warning(f"Get Chain Error has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
-    # GET /api/chain/id - Return a specific chain
+    # GET /api/chain/{id} - Return a specific chain
     @chain_routes.route('/<string:id>', methods=['GET'])
     def get_Chain(id):
         try:
@@ -35,20 +35,6 @@ def create_chain_routes():
             return jsonify(chain), 200
         except Exception as e:
             logger.warning(f"Get Chain Error has occurred: {e}")
-            return jsonify({"error": "A processing error occurred"}), 500
-
-    # PATCH /api/chain/{id} - Update a chain
-    @chain_routes.route('/<string:id>', methods=['PATCH'])
-    def update_chain(id):
-        try:
-            token = create_token()
-            breadcrumb = create_breadcrumb(token)
-            patch_data = request.get_json()
-            chain = ChainServices.update_chain(id, token, breadcrumb, patch_data)
-            logger.info(f"Update Chain Successful {breadcrumb}")
-            return jsonify(chain), 200
-        except Exception as e:
-            logger.warning(f"A processing error occurred {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
     # Ensure the Blueprint is returned correctly

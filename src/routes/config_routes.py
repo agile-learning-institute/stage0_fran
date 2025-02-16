@@ -1,10 +1,10 @@
-import logging
-
-logger = logging.getLogger(__name__)
-
 from flask import Blueprint, jsonify
-from src.flask_utils import create_breadcrumb, create_token
+from src.flask_utils.breadcrumb import create_breadcrumb
+from src.flask_utils.token import create_token
 from src.config.config import Config
+
+import logging
+logger = logging.getLogger(__name__)
 
 # Define the Blueprint for config routes
 def create_config_routes():
@@ -12,7 +12,7 @@ def create_config_routes():
     config = Config.get_instance()
     
     # GET /api/config - Return the current configuration as JSON
-    @config_routes.route('/', methods=['GET'])
+    @config_routes.route('', methods=['GET'])
     def get_config():
         try:
             # Return the JSON representation of the config object

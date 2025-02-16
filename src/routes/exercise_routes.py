@@ -1,4 +1,5 @@
-from src.flask_utils import create_breadcrumb, create_token
+from src.flask_utils.breadcrumb import create_breadcrumb
+from src.flask_utils.token import create_token
 from src.services.exercise_services import ExerciseServices
 
 import logging
@@ -11,7 +12,7 @@ def create_exercise_routes():
     exercise_routes = Blueprint('exercise_routes', __name__)
 
     # GET /api/exercises - Return a list of exercises that match query
-    @exercise_routes.route('s', methods=['GET'])
+    @exercise_routes.route('', methods=['GET'])
     def get_exercises():
         try:
             token = create_token()

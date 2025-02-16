@@ -1,4 +1,5 @@
-from src.flask_utils import create_breadcrumb, create_token
+from src.flask_utils.breadcrumb import create_breadcrumb
+from src.flask_utils.token import create_token
 from src.services.bot_services import BotServices
 
 import logging
@@ -11,7 +12,7 @@ def create_bot_routes():
     bot_routes = Blueprint('bot_routes', __name__)
 
     # GET /api/bots - Return a list of bots that match query
-    @bot_routes.route('s', methods=['GET'])
+    @bot_routes.route('', methods=['GET'])
     def get_bots():
         try:
             token = create_token()
@@ -31,6 +32,7 @@ def create_bot_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             bot = BotServices.get_bot(id, token)
+            logger.info(f"Got Bot: {bot}")
             logger.info(f"Get bot Success {breadcrumb}")
             return jsonify(bot), 200
         except Exception as e:
@@ -46,6 +48,7 @@ def create_bot_routes():
             patch_data = request.get_json()
             bot = BotServices.update_bot(id, token, breadcrumb, patch_data)
             logger.info(f"Update bot Successful {breadcrumb}")
+            logger.info(f"Got bot {bot}")
             return jsonify(bot), 200
         except Exception as e:
             logger.warning(f"A processing error occurred {e}")
@@ -64,7 +67,7 @@ def create_bot_routes():
             logger.warning(f"A processing error occurred {e}")
             return jsonify({"error": "A processing error occurred"}), 500
 
-    # POST /api/bot{id}/channel/{channel_id} - Add a channel
+    # POST /api/bot/{id}/channel/{channel_id} - Add a channel
     @bot_routes.route('/<string:id>/channel/<string:channel_id>', methods=['POST'])
     def add_channel(id, channel_id):
         try:

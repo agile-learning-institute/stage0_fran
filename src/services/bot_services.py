@@ -12,7 +12,7 @@ class BotServices:
         return # No access control implemented yet
 
     @staticmethod
-    def get_bots(token):
+    def get_bots(query, token):
         """Get a list of bot names and ids"""
         BotServices._check_user_access(token)
         config = Config.get_instance()

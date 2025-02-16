@@ -1,4 +1,5 @@
-from src.flask_utils import create_breadcrumb, create_token
+from src.flask_utils.breadcrumb import create_breadcrumb
+from src.flask_utils.token import create_token
 from src.services.chain_services import ChainServices
 
 import logging
@@ -10,8 +11,8 @@ from flask import Blueprint, Response, jsonify, request
 def create_chain_routes():
     chain_routes = Blueprint('chain_routes', __name__)
 
-    # GET /api/chains - Return a list of chains that match query
-    @chain_routes.route('s', methods=['GET'])
+    # GET /api/chain - Return a list of chains that match query
+    @chain_routes.route('', methods=['GET'])
     def get_chains():
         try:
             token = create_token()

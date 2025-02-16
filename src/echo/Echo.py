@@ -3,26 +3,19 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class Bot(discord.Client):
+class Echo(discord.Client):
     def __init__(self):
         intents = discord.Intents.default()
         intents.message_content = True
         super().__init__(intents=intents)
         self.event_handlers = {}
 
-    def register_handler(self, event_name, handler):
+    def register_agent(self, create_agent):
         """ Register a new event handler """
-        if event_name not in self.event_handlers:
-            self.event_handlers[event_name] = []
-        
-        self.event_handlers[event_name].append(handler)
-        logger.info(f"Registered handler {handler.__name__} for event '{event_name}'")
+        return
 
-    async def on_event(self, event_name, *args, **kwargs):
-        """ Dispatch event to all registered handlers """
-        if event_name in self.event_handlers:
-            for handler in self.event_handlers[event_name]:
-                await handler(*args, **kwargs)
+    async def on_event(self, message, *args, **kwargs):
+        return
 
     async def on_ready(self):
         await self.on_event("on_ready")

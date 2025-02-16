@@ -6,7 +6,7 @@ from src.services.workshop_services import WorkshopServices
 
 logger = logging.getLogger(__name__)
 
-def create_fran_handlers(bot):
+def create_exercise_agent(bot):
     """ Registers event handlers and commands for the Fran home channel. """
 
     @bot.tree.command(name="create_workshop", description="Create a new design-thinking workshop.")

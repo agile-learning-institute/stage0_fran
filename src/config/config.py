@@ -30,9 +30,8 @@ class Config:
             self.EXERCISE_COLLECTION_NAME = ''
             self.VERSION_COLLECTION_NAME = ''
             self.ELASTIC_INDEX_NAME = ''
-            self.DISCORD_TOKEN = ''
-            self.BOT_TOKEN = ''
-            self.FRAN_CHANNEL_NAME = ''
+            self.DISCORD_FRAN_TOKEN = ''
+            self.STAGE0_FRAN_TOKEN = ''
             self.FRAN_MODEL_NAME = ''
             self.FRAN_API_PORT = 0
             self.SEARCH_API_PORT = 0
@@ -51,6 +50,7 @@ class Config:
                 "EXERCISE_COLLECTION_NAME": "exercises",
                 "VERSION_COLLECTION_NAME": "msmCurrentVersions",
                 "ELASTIC_INDEX_NAME": "stage0",
+                "FRAN_MODEL_NAME": "Fran"
             }
             self.config_ints = {
                 "FRAN_API_PORT": "8580",
@@ -58,8 +58,8 @@ class Config:
             }
             self.config_string_secrets = {  
                 "MONGO_CONNECTION_STRING": "mongodb://root:example@localhost:27017/?tls=false&directConnection=true",
-                "STAGE0_FRAN_BOT_TOKEN": "BBB000000000000000000001",
-                "DISCORD_TOKEN": ""
+                "STAGE0_FRAN_TOKEN": "BBB000000000000000000001",
+                "DISCORD_FRAN_TOKEN": ""
             }
             self.config_json_secrets = {
                 "ELASTIC_CLIENT_OPTIONS": '{"node":"http://localhost:9200"}',

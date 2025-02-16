@@ -24,12 +24,14 @@ class Config:
             self.CONFIG_FOLDER = ''
             self.LOGGING_LEVEL = ''
             self.MONGO_DB_NAME = ''
+            self.BOT_COLLECTION_NAME = ''
             self.CHAIN_COLLECTION_NAME = ''
             self.WORKSHOP_COLLECTION_NAME = ''
             self.EXERCISE_COLLECTION_NAME = ''
             self.VERSION_COLLECTION_NAME = ''
             self.ELASTIC_INDEX_NAME = ''
             self.DISCORD_TOKEN = ''
+            self.BOT_TOKEN = ''
             self.FRAN_CHANNEL_NAME = ''
             self.FRAN_MODEL_NAME = ''
             self.FRAN_API_PORT = 0
@@ -43,6 +45,7 @@ class Config:
                 "CONFIG_FOLDER": "./",
                 "LOGGING_LEVEL": "INFO", 
                 "MONGO_DB_NAME": "stage0",
+                "BOT_COLLECTION_NAME": "bots",
                 "CHAIN_COLLECTION_NAME": "chains",
                 "WORKSHOP_COLLECTION_NAME": "workshops",
                 "EXERCISE_COLLECTION_NAME": "exercises",
@@ -55,6 +58,8 @@ class Config:
             }
             self.config_string_secrets = {  
                 "MONGO_CONNECTION_STRING": "mongodb://root:example@localhost:27017/?tls=false&directConnection=true",
+                "STAGE0_FRAN_BOT_TOKEN": "BBB000000000000000000001",
+                "DISCORD_TOKEN": ""
             }
             self.config_json_secrets = {
                 "ELASTIC_CLIENT_OPTIONS": '{"node":"http://localhost:9200"}',

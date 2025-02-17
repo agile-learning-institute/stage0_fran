@@ -44,8 +44,8 @@ def create_conversation_routes():
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            patch_data = request.get_json()
-            conversation = ConversationServices.update_conversation(channel_id, token, breadcrumb, patch_data)
+            data = request.get_json()
+            conversation = ConversationServices.update_conversation(channel_id, token, breadcrumb, data)
             logger.info(f"Update conversation Successful {breadcrumb}")
             return jsonify(conversation), 200
         except Exception as e:

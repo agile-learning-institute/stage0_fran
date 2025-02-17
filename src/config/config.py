@@ -23,9 +23,13 @@ class Config:
             self.BUILT_AT = ''
             self.CONFIG_FOLDER = ''
             self.LOGGING_LEVEL = ''
+            self.LATEST_VERSION = ''
+            self.ACTIVE_STATUS = ''
+            self.ARCHIVED_STATUS = ''
             self.MONGO_DB_NAME = ''
             self.BOT_COLLECTION_NAME = ''
             self.CHAIN_COLLECTION_NAME = ''
+            self.CONVERSATION_COLLECTION_NAME = ''
             self.WORKSHOP_COLLECTION_NAME = ''
             self.EXERCISE_COLLECTION_NAME = ''
             self.VERSION_COLLECTION_NAME = ''
@@ -43,9 +47,13 @@ class Config:
                 "BUILT_AT": "LOCAL",
                 "CONFIG_FOLDER": "./",
                 "LOGGING_LEVEL": "INFO", 
+                "LATEST_VERSION": "latest",
+                "ACTIVE_STATUS": "active",
+                "ARCHIVED_STATUS": "archived",
                 "MONGO_DB_NAME": "stage0",
                 "BOT_COLLECTION_NAME": "bots",
                 "CHAIN_COLLECTION_NAME": "chains",
+                "CONVERSATION_COLLECTION_NAME": "conversations",
                 "WORKSHOP_COLLECTION_NAME": "workshops",
                 "EXERCISE_COLLECTION_NAME": "exercises",
                 "VERSION_COLLECTION_NAME": "msmCurrentVersions",

@@ -15,11 +15,11 @@ class WorkshopServices:
 
     @staticmethod
     async def get_workshops(query, token):
-        """Get a list of workshops that match query"""
+        """Get a list of workshops that have name that matches the provided query"""
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
-        match = None
+        match = {"name": {"$regex": query}} if query else None
         project = {"_id":1, "name": 1}
         workshops = await mongo.get_documents(config.EXERCISE_COLLECTION_NAME, match, project)
         return workshops
@@ -34,6 +34,23 @@ class WorkshopServices:
         return workshop
 
     @staticmethod
+    async def _create_exercises(chain):
+        """Create a list of exercises based on the chain"""    
+        
+        def _create_exercise(exercise_id):
+            """Create a single exercises based on the exercise ID"""
+            return {
+                "exercise_id": exercise_id,
+                "conversation_id": {},
+                "status": "Pending",
+                "observations": []
+            }
+        
+        exercises = []
+        for exercise_id in chain: exercises.append(_create_exercise(exercise_id))
+        return exercises
+
+    @staticmethod
     async def create_workshop(chain_id, users, token, breadcrumb):
         """Create a new workshop based on the chain"""    
         WorkshopServices._check_user_access(token)
@@ -42,11 +59,22 @@ class WorkshopServices:
 
         # Build a workshop and create the mongo document
         chain = ChainServices.get_chain(chain_id, token)
+        exercises = WorkshopServices.create_exercises(chain.exercises)
         workshop = {
-            "status": "scheduled",
-            "users": users,
-            "exercises": chain.exercises,
-            "last_saved": breadcrumb,
+            "status": "Pending",
+            "channel_id": {},
+            "channel_name": {},
+            "category": {},
+            "guild": {},
+            "purpose": {},
+            "when": {},
+            "current_exercise": {},
+            "exercises": {            
+                "status": "Pending",
+                "users": users,
+                "exercises": exercises,
+                "last_saved": breadcrumb,
+            }
         }
         workshop_id = await mongo.create_document(config.WORKSHOP_COLLECTION_NAME, workshop)
         workshop = await WorkshopServices.get_workshop(workshop_id, token)

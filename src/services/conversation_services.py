@@ -50,7 +50,7 @@ class ConversationServices:
         ConversationServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
-        match = {"name": {"$regex": query}}
+        match = {"name": {"$regex": query}} if query else None
         project = {"_id":1, "name":1}
         conversations = mongo.get_documents(config.CONVERSATION_COLLECTION_NAME, match, project)
         return conversations
@@ -62,6 +62,17 @@ class ConversationServices:
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
         conversation = mongo.get_document(config.CONVERSATION_COLLECTION_NAME, _id)
+        return conversation
+    
+    @staticmethod
+    def add_conversation(data, token, breadcrumb):
+        """Create a new conversation"""
+        ConversationServices._check_user_access(token)
+        config = Config.get_instance()
+        mongo = MongoIO.get_instance()
+        data["last_saved"] = breadcrumb
+        conversation_id = mongo.create_document(config.CONVERSATION_COLLECTION_NAME, data)
+        conversation = ConversationServices.get_conversation(conversation_id, token)
         return conversation
     
     @staticmethod

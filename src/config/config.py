@@ -26,6 +26,8 @@ class Config:
             self.LATEST_VERSION = ''
             self.ACTIVE_STATUS = ''
             self.ARCHIVED_STATUS = ''
+            self.PENDING_STATUS = ''
+            self.COMPLETED_STATUS = ''
             self.MONGO_DB_NAME = ''
             self.BOT_COLLECTION_NAME = ''
             self.CHAIN_COLLECTION_NAME = ''
@@ -50,6 +52,8 @@ class Config:
                 "LATEST_VERSION": "latest",
                 "ACTIVE_STATUS": "active",
                 "ARCHIVED_STATUS": "archived",
+                "PENDING_STATUS": "pending",
+                "COMPLETED_STATUS": "completed",
                 "MONGO_DB_NAME": "stage0",
                 "BOT_COLLECTION_NAME": "bots",
                 "CHAIN_COLLECTION_NAME": "chains",

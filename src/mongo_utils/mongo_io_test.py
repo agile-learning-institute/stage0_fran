@@ -12,8 +12,9 @@ class TestMongoIO(unittest.TestCase):
     def setUp(self):
         self.config = Config.get_instance()
         self.test_id = "eeee00000000000000009999"
-        self.test_collection_name = "bots"
-        
+        self.test_collection_name = self.config.BOT_COLLECTION_NAME
+        self.test_bot = {"status":"Active","name":"Test","description":"A Test Bot","channels":[],"last_saved":{"fromIp":"","byUser":"","atTime":datetime(2025, 1, 1, 12, 34, 56),"correlationId":""}}
+
         MongoIO._instance = None
         mongo_io = MongoIO.get_instance()
         mongo_io.configure(self.test_collection_name)
@@ -36,22 +37,10 @@ class TestMongoIO(unittest.TestCase):
 
         self.assertIsInstance(self.config.enumerators, dict)
 
-    def test_CRUD_document(self):
+    def test_CR_document(self):
         # Create a Test Document
-        test_data = {
-            "status": "Active",
-            "name": "Test",
-            "description": "A Test Bot",
-            "channels": [],
-            "last_saved": {
-                  "fromIp": "",
-                  "byUser": "",
-                  "atTime": datetime(2025, 1, 1, 12, 34, 56),
-                  "correlationId": ""
-                } 
-        }
         mongo_io = MongoIO.get_instance()
-        self.test_id = mongo_io.create_document(self.test_collection_name, test_data)
+        self.test_id = mongo_io.create_document(self.test_collection_name, self.test_bot)
         id_str = str(self.test_id)
         
         self.assertEqual(id_str, str(self.test_id))
@@ -59,16 +48,101 @@ class TestMongoIO(unittest.TestCase):
         # Retrieve the document
         document = mongo_io.get_document(self.test_collection_name, id_str)
         self.assertIsInstance(document, dict)
-        self.assertEqual(document, test_data)
+        self.assertEqual(document, self.test_bot)
         
-        # Update the document
-        test_update = {
-            "description": "A New test value"
-        }
-        document = mongo_io.update_document(self.test_collection_name, id_str, test_update)
+    def test_CRU_document(self):
+        # Create a Test Document
+        mongo_io = MongoIO.get_instance()
+        self.test_id = mongo_io.create_document(self.test_collection_name, self.test_bot)
+        id_str = str(self.test_id)
+
+        # Update the document with set data
+        test_update = {"description": "A New test value"}
+        document = mongo_io.update_document(self.test_collection_name, id_str, set_data=test_update)
         self.assertIsInstance(document, dict)
         self.assertEqual(document["description"], "A New test value")
         
+    def test_add_to_set_document(self):
+        # Create a Test Document
+        mongo_io = MongoIO.get_instance()
+        self.test_id = mongo_io.create_document(self.test_collection_name, self.test_bot)
+        id_str = str(self.test_id)
+
+        # Add a channel
+        test_add_to_set = {"channels": "channel1"}
+        document = mongo_io.update_document(self.test_collection_name, id_str, add_to_set_data=test_add_to_set)
+        self.assertIsInstance(document, dict)
+        self.assertIsInstance(document["channels"], list)
+        self.assertEqual(len(document["channels"]), 1)
+        self.assertEqual(document["channels"][0], "channel1")
+
+        # Re-Add a channel (should no-op)
+        document = mongo_io.update_document(self.test_collection_name, id_str, add_to_set_data=test_add_to_set)
+        self.assertIsInstance(document, dict)
+        self.assertIsInstance(document["channels"], list)
+        self.assertEqual(len(document["channels"]), 1)
+        self.assertEqual(document["channels"][0], "channel1")
+
+        # Add another channel
+        test_add_to_set = {"channels": "channel2"}
+        document = mongo_io.update_document(self.test_collection_name, id_str, add_to_set_data=test_add_to_set)
+        self.assertIsInstance(document, dict)
+        self.assertIsInstance(document["channels"], list)
+        self.assertEqual(len(document["channels"]), 2)
+        self.assertEqual(document["channels"][0], "channel1")
+        self.assertEqual(document["channels"][1], "channel2")
+
+    def test_push_document(self):
+        # Create a Test Document
+        mongo_io = MongoIO.get_instance()
+        self.test_id = mongo_io.create_document(self.test_collection_name, self.test_bot)
+        id_str = str(self.test_id)
+
+        # Add a channel
+        push_data = {"channels": "channel1"}
+        document = mongo_io.update_document(self.test_collection_name, id_str, push_data=push_data)
+        self.assertIsInstance(document, dict)
+        self.assertIsInstance(document["channels"], list)
+        self.assertEqual(len(document["channels"]), 1)
+        self.assertEqual(document["channels"][0], "channel1")
+
+        # Re-Add a channel (should add duplicate)
+        document = mongo_io.update_document(self.test_collection_name, id_str, push_data=push_data)
+        self.assertIsInstance(document, dict)
+        self.assertIsInstance(document["channels"], list)
+        self.assertEqual(len(document["channels"]), 2)
+        self.assertEqual(document["channels"][0], "channel1")
+        self.assertEqual(document["channels"][1], "channel1")
+
+        # Add another channel
+        test_add_to_set = {"channels": "channel2"}
+        document = mongo_io.update_document(self.test_collection_name, id_str, add_to_set_data=test_add_to_set)
+        self.assertIsInstance(document, dict)
+        self.assertIsInstance(document["channels"], list)
+        self.assertEqual(len(document["channels"]), 3)
+        self.assertEqual(document["channels"][0], "channel1")
+        self.assertEqual(document["channels"][1], "channel1")
+        self.assertEqual(document["channels"][2], "channel2")
+
+    def test_pull_from_document(self):
+        # Create a Test Document
+        mongo_io = MongoIO.get_instance()
+        self.test_id = mongo_io.create_document(self.test_collection_name, self.test_bot)
+        id_str = str(self.test_id)
+
+        # Add some channels
+        test_add_to_set = {"channels": "channel1"}
+        document = mongo_io.update_document(self.test_collection_name, id_str, add_to_set_data=test_add_to_set)
+        test_add_to_set = {"channels": "channel2"}
+        document = mongo_io.update_document(self.test_collection_name, id_str, add_to_set_data=test_add_to_set)
+
+        # Remove channel1
+        test_pull = {"channels": "channel1"}
+        document = mongo_io.update_document(self.test_collection_name, id_str, pull_data=test_pull)
+        self.assertIsInstance(document, dict)
+        self.assertIsInstance(document["channels"], list)
+        self.assertEqual(len(document["channels"]), 1)
+        self.assertEqual(document["channels"][0], "channel2")
         
     def test_order_by_ASCENDING(self):
         mongo_io = MongoIO.get_instance()

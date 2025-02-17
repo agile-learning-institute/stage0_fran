@@ -81,6 +81,52 @@ class MongoIO:
             logger.error(f"Failed to get documents from collection '{collection_name}': {e}")
             raise
                 
+    def update_document(self, collection_name, document_id, set_data=None, push_data=None, add_to_set_data=None, pull_data=None):
+        """
+        Update a document in the specified collection with optional set, push, add_to_set, and pull operations.
+
+        Args:
+            collection_name (str): Name of the collection to update.
+            document_id (str): ID of the document to update.
+            set_data (dict, optional): Fields to update or set. Defaults to None.
+            push_data (dict, optional): Fields to push items into arrays. Defaults to None.
+            add_to_set_data (dict, optional): Fields to add unique items to arrays. Defaults to None.
+            pull_data (dict, optional): Fields to remove items from arrays. Defaults to None.
+
+        Returns:
+            dict: The updated document if successful, otherwise None.
+        """
+        if not self.connected:
+            return None
+
+        try:
+            document_collection = self.db.get_collection(collection_name)
+            document_object_id = ObjectId(document_id)
+
+            match = {"_id": document_object_id}
+
+            # Build the update pipeline
+            pipeline = {}
+            if set_data:
+                pipeline["$set"] = set_data
+            if push_data:
+                pipeline["$push"] = push_data
+            if add_to_set_data:
+                pipeline["$addToSet"] = add_to_set_data
+            if pull_data:
+                pipeline["$pull"] = pull_data
+
+            updated = document_collection.update_one(match, pipeline)
+
+            if updated.matched_count == 0:
+                raise Exception(f"Document Not Found {document_id}")
+
+        except Exception as e:
+            logger.error(f"Failed to update document: {e}")
+            raise
+
+        return self.get_document(collection_name, document_id)
+
     def get_document(self, collection_name, document_id):
         """Retrieve a document by ID."""
         if not self.connected: return None
@@ -106,27 +152,6 @@ class MongoIO:
         except Exception as e:
             logger.error(f"Failed to create document: {e}")
             raise   
-
-    def update_document(self, collection_name, document_id, data):
-        """Update a encounter."""
-        if not self.connected: return None
-
-        try:
-            document_collection = self.db.get_collection(collection_name)
-            document_object_id = ObjectId(document_id)
-            
-            match = {"_id": document_object_id}
-            pipeline = {"$set": data}            
-            updated_count = document_collection.update_one(match, pipeline)
-            
-            if updated_count == 0:
-                raise f"Document Not Found {document_id}"
-        
-        except Exception as e:
-            logger.error(f"Failed to update document: {e}")
-            raise 
-
-        return self.get_document(collection_name, document_id)
 
     def delete_document(self, collection_name, document_id):
         """Delete a document."""

@@ -12,23 +12,23 @@ class BotServices:
         return # No access control implemented yet
 
     @staticmethod
-    def get_bots(query, token):
+    async def get_bots(query, token):
         """Get a list of bot names and ids"""
         BotServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
-        match = {}
-        project = {"_id":1, "name":1}
-        bots = mongo.get_documents(config.CHAIN_COLLECTION_NAME, match, project)
+        match = None
+        project = {"_id":1, "name":1, "description": 1}
+        bots = await mongo.get_documents(config.BOT_COLLECTION_NAME, match, project)
         return bots
 
     @staticmethod
-    def get_bot(bot_id, token):
+    async def get_bot(bot_id, token):
         """Get the specified bot"""
         BotServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
-        bot = mongo.get_document(config.CHAIN_COLLECTION_NAME, bot_id)
+        bot = await mongo.get_document(config.BOT_COLLECTION_NAME, bot_id)
         return bot
     
     @staticmethod
@@ -37,24 +37,39 @@ class BotServices:
         BotServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
-        data.last_saved = breadcrumb
-        workshop = await mongo.update_document(config.BOT_COLLECTION_NAME, bot_id, data)
-        return workshop
+        data["last_saved"] = breadcrumb
+        bot = await mongo.update_document(config.BOT_COLLECTION_NAME, bot_id, set_data=data)
+        return bot
 
     @staticmethod
-    def get_channels(discord_token, token):
+    async def get_channels(bot_id, token):
         """Get the specified bot"""
         BotServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
-        match = {"discord_token": discord_token}
-        bots = mongo.get_documents(config.BOT_COLLECTION_NAME, match)
-        return bots[0]
+        bot = await mongo.get_document(config.BOT_COLLECTION_NAME, bot_id)
+        return bot["channels"]
 
     @staticmethod
-    def add_channel(bot_id, token, breadcrumb, channel_id):
+    async def add_channel(bot_id, token, breadcrumb, channel_id):
         """Add the channel to the specified bot"""
+        BotServices._check_user_access(token)
+        config = Config.get_instance()
+        mongo = MongoIO.get_instance()
+        set_data = { "last_saved": breadcrumb},
+        add_to_set = { "channels": channel_id }
+
+        bot = await mongo.update_document(config.BOT_COLLECTION_NAME, bot_id, set_data=set_data, add_to_set_data=add_to_set)
+        return bot["channels"]
 
     @staticmethod
-    def remove_channel(bot_id, token, breadcrumb, channel_id):
+    async def remove_channel(bot_id, token, breadcrumb, channel_id):
         """Get the specified bot"""
+        BotServices._check_user_access(token)
+        config = Config.get_instance()
+        mongo = MongoIO.get_instance()
+        set_data = { "last_saved": breadcrumb},
+        pull_from_set = { "channels": channel_id }
+
+        bot = await mongo.update_document(config.BOT_COLLECTION_NAME, bot_id, set_data=set_data, pull_data=pull_from_set)
+        return bot["channels"]

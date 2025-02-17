@@ -17,28 +17,28 @@ class WorkshopServices:
         return # No RBAC implemented yet
 
     @staticmethod
-    async def get_workshops(query, token):
+    def get_workshops(query, token):
         """Get a list of workshops that have name that matches the provided query"""
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
         match = {"name": {"$regex": query}} if query else None
         project = {"_id":1, "name": 1}
-        workshops = await mongo.get_documents(config.EXERCISE_COLLECTION_NAME, match, project)
+        workshops = mongo.get_documents(config.EXERCISE_COLLECTION_NAME, match, project)
         return workshops
 
     @staticmethod
-    async def get_workshop(workshop_id, token):
+    def get_workshop(workshop_id, token):
         """Get the specified workshop"""
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
-        workshop = await mongo.get_document(config.EXERCISE_COLLECTION_NAME, workshop_id)
+        workshop = mongo.get_document(config.EXERCISE_COLLECTION_NAME, workshop_id)
         return workshop
 
 
     @staticmethod
-    async def add_workshop(chain_id, data, token, breadcrumb):
+    def add_workshop(chain_id, data, token, breadcrumb):
         """Create a new workshop based on the provided chain of exercise and workshop data"""
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()
@@ -73,22 +73,22 @@ class WorkshopServices:
         data["exercises"] = exercises
         data["last_saved"] = breadcrumb
 
-        workshop_id = await mongo.create_document(config.WORKSHOP_COLLECTION_NAME, data)
-        workshop = await WorkshopServices.get_workshop(workshop_id, token)
+        workshop_id = mongo.create_document(config.WORKSHOP_COLLECTION_NAME, data)
+        workshop = WorkshopServices.get_workshop(workshop_id, token)
         return workshop
     
     @staticmethod
-    async def update_workshop(workshop_id, data, token, breadcrumb):
+    def update_workshop(workshop_id, data, token, breadcrumb):
         """Update the specified workshop"""        
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
         data["last_saved"] = breadcrumb
-        workshop = await mongo.update_document(config.WORKSHOP_COLLECTION_NAME, workshop_id, data)
+        workshop = mongo.update_document(config.WORKSHOP_COLLECTION_NAME, workshop_id, data)
         return workshop
 
     @staticmethod
-    async def start_workshop(workshop_id, token, breadcrumb):
+    def start_workshop(workshop_id, token, breadcrumb):
         """Update the specified workshop Status to Active, record start time"""
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()
@@ -98,15 +98,15 @@ class WorkshopServices:
                 "from": datetime.now()
             }
         }
-        return await WorkshopServices.update_workshop(workshop_id, data, token, breadcrumb)
+        return WorkshopServices.update_workshop(workshop_id, data, token, breadcrumb)
     
     @staticmethod
-    async def add_observation(workshop_id, token, breadcrumb, observation):
+    def add_observation(workshop_id, token, breadcrumb, observation):
         """Add an observation to the observations list"""
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
         set_data = {"last_saved": breadcrumb}
         push_data = {"observations": observation}        
-        await mongo.update_document(config.WORKSHOP_COLLECTION_NAME, workshop_id, set_data=set_data, push_data=push_data)
+        mongo.update_document(config.WORKSHOP_COLLECTION_NAME, workshop_id, set_data=set_data, push_data=push_data)
         return

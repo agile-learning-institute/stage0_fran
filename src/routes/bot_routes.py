@@ -60,7 +60,7 @@ def create_bot_routes():
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            channels = BotServices.get_channels(id, token, breadcrumb)
+            channels = BotServices.get_channels(id, breadcrumb)
             logger.info(f"Get Channels from Bot Successful {breadcrumb}")
             return jsonify(channels), 200
         except Exception as e:

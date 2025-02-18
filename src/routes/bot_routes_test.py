@@ -139,7 +139,7 @@ class TestBotRoutes(unittest.TestCase):
         self.assertEqual(response.json, channels)
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_get_channels.assert_called_once_with("bot1", mock_token, mock_breadcrumb)
+        mock_get_channels.assert_called_once_with("bot1", mock_breadcrumb)
 
     @patch('src.routes.bot_routes.create_token')
     @patch('src.routes.bot_routes.create_breadcrumb')

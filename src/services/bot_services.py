@@ -38,6 +38,7 @@ class BotServices:
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
         data["last_saved"] = breadcrumb
+        logger.info(f"Last Saved: {data["last_saved"]}")
         bot = mongo.update_document(config.BOT_COLLECTION_NAME, bot_id, set_data=data)
         return bot
 
@@ -56,7 +57,7 @@ class BotServices:
         BotServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
-        set_data = { "last_saved": breadcrumb},
+        set_data = { "last_saved": breadcrumb}
         add_to_set = { "channels": channel_id }
 
         bot = mongo.update_document(config.BOT_COLLECTION_NAME, bot_id, set_data=set_data, add_to_set_data=add_to_set)
@@ -68,7 +69,7 @@ class BotServices:
         BotServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
-        set_data = { "last_saved": breadcrumb},
+        set_data = { "last_saved": breadcrumb}
         pull_from_set = { "channels": channel_id }
 
         bot = mongo.update_document(config.BOT_COLLECTION_NAME, bot_id, set_data=set_data, pull_data=pull_from_set)

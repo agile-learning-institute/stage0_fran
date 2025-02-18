@@ -1,10 +1,9 @@
-import logging
 import sys
 from bson import ObjectId 
 from pymongo import MongoClient
 from src.config.config import Config
 
-logging.basicConfig(level=logging.INFO)
+import logging
 logger = logging.getLogger(__name__)
 
 # TODO: - Refactor to use connection pooling
@@ -18,10 +17,10 @@ class MongoIO:
             cls._instance.connected = False
             cls._instance.client = None
             cls._instance.db = None
-            cls._instance.config = Config.get_instance()
+            cls._instance.configure()
         return cls._instance
 
-    def configure(self, enumerators_collection_key):
+    def configure(self):
         """Initialize Config values for Versions and Enumerators"""
         self.config = Config.get_instance()
 
@@ -39,7 +38,7 @@ class MongoIO:
 
     def disconnect(self):
         """Disconnect from MongoDB."""
-        if not self.connected: return
+        if not self.connected: raise Exception("disconnect when mongo not connected")
             
         try:
             if self.client:
@@ -62,14 +61,13 @@ class MongoIO:
         Returns:
             list: List of documents matching the query.
         """
-        if not self.connected:
-            return None
+        if not self.connected: raise Exception("get_documents when Mongo Not Connected")
 
         # Default match and projection
         match = match or {}
         project = project or None
         sort_by = sort_by or None
-
+        logger.warning(f"Finding: {match}")
         try:
             collection = self.db.get_collection(collection_name)
             cursor = collection.find(match, project)
@@ -96,8 +94,7 @@ class MongoIO:
         Returns:
             dict: The updated document if successful, otherwise None.
         """
-        if not self.connected:
-            return None
+        if not self.connected: raise Exception("update_document when Mongo Not Connected")
 
         try:
             document_collection = self.db.get_collection(collection_name)
@@ -130,7 +127,7 @@ class MongoIO:
 
     def get_document(self, collection_name, document_id):
         """Retrieve a document by ID."""
-        if not self.connected: return None
+        if not self.connected: raise Exception("get_document when Mongo Not Connected")
 
         try:
             # Get the document
@@ -144,7 +141,7 @@ class MongoIO:
 
     def create_document(self, collection_name, document):
         """Create a curriculum by ID."""
-        if not self.connected: return None
+        if not self.connected: raise Exception("create_document when Mongo Not Connected")
         
         try:
             document_collection = self.db.get_collection(collection_name)
@@ -156,7 +153,7 @@ class MongoIO:
 
     def delete_document(self, collection_name, document_id):
         """Delete a document."""
-        if not self.connected: return None
+        if not self.connected: raise Exception("delete_document when Mongo Not Connected")
 
         try:
             document_collection = self.db[collection_name]

@@ -1,6 +1,6 @@
 # stage0_fran
 
-This repository contains the API that supports the user interface for creating, conducting, and recording Design Thinking workshops for stage0. This API is also served as a collection of chat agents through a discord chat-bot framework. 
+This repository contains the API that supports the user interface for creating, conducting, and recording Design Thinking workshops for stage0. This API is also served as a chat agent through a discord chat-bot framework. 
 
 See [The OpenAPI](./docs/index.html) for information on the API and Data Structures Used. 
 
@@ -16,75 +16,151 @@ yaml: request_body
 When a message is seen, the action is executed, and the response is written back to the Chat where it originated. 
 
 ## Separation of Concerns
+
+### Code designed to be extracted to a utils class.
 /src
-| /server.py - Initialize the server, Discord client, Inference client, And database connections
-| /config - Implements, global configuration values, to be extracted to stage0_api_utils private package
-| /echo/Echo.py - Echo flask-like chat agent framework, to be extracted to Echo public package
+| /config - Implements, global configuration values
+| /flask_utils - Flask helpers
+| /llm_utils - LLM Wrapper
+| /mongo_utils - Simple Mongo IO Wrapper
+
+### Code designed to be extracted to a Echo class.
+/src
+| /echo/Echo.py - Echo flask-like chat agent framework
+
+### Code specific to the API
+/src
+| /server.py - Initialize the server, connect to backing services
 | /agents - ChatBot Agent handlers
 | /routes - Http Event handlers
 | /services - Business logic, supports agents/routes, uses *_utils
-| /flask_utils - Flask helpers, to be extracted to stage0_api_utils private package
-| /llm_utils - LLM Wrapper, to be extracted to stage0_api_utils private package
-| /mongo_utils - Simple Mongo IO Wrapper, to be extracted to stage0_api_utils private package
-|
-/Fran.modelfile - Generalist design thinking model
+
+# Supported pipenv commands
+- ``pipenv run local`` run the server locally in dev mode
+- ``pipenv run start`` restart the backing database and run locally *TODO
+- ``pipenv run test`` run unittest testing
+- ``pipenv run stepci`` run stepci testing
+- ``pipenv run build`` build container locally 
+- ``pipenv run container`` build and run container
 
 # Testing with ``curl``
 
-## Testing Observability endpoints
+## Observability endpoints
+
+#### Config 
 ```sh
 curl http://localhost:8580/api/config
-
+```
+#### Health 
+```sh
 curl http://localhost:8580/api/health
 ```
 
 ## Testing /api/bot endpoints 
+
+#### Get a List all Active of Bots
 ```sh
-curl http://localhost:8580/api/config
-
 curl http://localhost:8580/api/bot  
-
+```
+#### Get a single Bot
+```sh
 curl http://localhost:8580/api/bot/bbb000000000000000000001
-
+```
+#### Update a single Bot
+```sh
 curl -X PATCH http://localhost:8580/api/bot/bbb000000000000000000001 \
      -H "Content-Type: application/json" \
      -d '{"description":"A New Description"}'
-
+```
+#### Get a list of active channels the bot is participating in
+```sh
 curl http://localhost:8580/api/bot/bbb000000000000000000001/get_channels 
-
+```
+#### Add a channel to the actives channel list
+```sh
 curl -X POST http://localhost:8580/api/bot/bbb000000000000000000001/channel/DISCORD_CHANNEL_NAME
-
+```
+#### Remove a channel from the active channels list
+```sh
 curl -X DELETE http://localhost:8580/api/bot/bbb000000000000000000001/channel/DISCORD_CHANNEL_NAME
 ```
 
 ## Testing /api/chain endpoints with curl
+
+#### Get a list of all Exercise Chains
 ```sh
 curl http://localhost:8580/api/chain
-
+```
+#### Get a single Exercise Chain
+```sh
 curl http://localhost:8580/api/chain/a00000000000000000000001
-
-curl -X PATCH http://localhost:8580/api/conversation/c00000000000000000000001 \
-     -H "Content-Type: application/json" \
-     -d '{"name":"DISCORD_CHANNEL_ID"}'    
-
-
 ```
 
-## Testing /api/chain endpoints with curl
+## Conversation Endpoints
+
+#### Get a list of conversations by channel name regex
 ```sh
 curl http://localhost:8580/api/conversation
-
+```
+#### Get a single Conversation Chain
+```sh
 curl http://localhost:8580/api/conversation/c00000000000000000000001
-
+```
+#### Add a message to a conversation
+```sh
 curl -X POST http://localhost:8580/api/conversation/DISCORD_CHANNEL_ID/message \
      -H "Content-Type: text/plain" \
      -d "This is a new message"
 ```
 
 ## Testing /api/exercise endpoints with curl
+
+#### Get a list of all active exercises
 ```sh
 curl http://localhost:8580/api/exercise
-
+```
+#### Get a single exercise
+```sh
 curl http://localhost:8580/api/exercise/b00000000000000000000001
+```
 
+## Testing Workshop endpoints with curl
+
+#### Get a list of all active workshops by workshop name regex
+```sh
+curl "http://localhost:8580/api/workshop"
+```
+#### Get a list of workshops by workshop name regex
+```sh
+curl "http://localhost:8580/api/workshop?query=^p"
+```
+#### Get a specific workshop
+```sh
+curl "http://localhost:8580/api/workshop/000000000000000000000001"
+```
+#### Add a new Workshop
+```sh
+curl -X POST http://localhost:8580/api/workshop/new/a00000000000000000000001 \
+     -H "Content-Type: application/json" \
+     -d '{"name":"Super Duper Workshop"}'
+```
+#### Update a workshop
+```sh
+curl -X PATCH http://localhost:8580/api/workshop/000000000000000000000001 \
+     -H "Content-Type: application/json" \
+     -d '{"name":"Updated Workshop Name"}'
+```
+#### Start a workshop - Status to active
+```sh
+curl -X PATCH http://localhost:8580/api/workshop/000000000000000000000001/start
+```
+#### Advance to the next exercise in the workshop
+```sh
+curl -X POST http://localhost:8580/api/workshop/000000000000000000000001/next
+```
+#### Add an observation to the current exercise
+```sh
+curl -X POST http://localhost:8580/api/workshop/000000000000000000000001/observation \
+     -H "Content-Type: application/json" \
+     -d '{"name":"Observation1"}'
 ```

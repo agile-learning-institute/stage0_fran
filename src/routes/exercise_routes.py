@@ -1,6 +1,6 @@
-from src.flask_utils.breadcrumb import create_breadcrumb
-from src.flask_utils.token import create_token
-from src.services.exercise_services import ExerciseServices
+from flask_utils.breadcrumb import create_breadcrumb
+from flask_utils.token import create_token
+from services.exercise_services import ExerciseServices
 
 import logging
 logger = logging.getLogger(__name__)

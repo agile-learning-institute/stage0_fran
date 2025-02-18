@@ -1,12 +1,13 @@
 from datetime import datetime, timezone
+
+from bson import ObjectId
 from config.config import Config
 from mongo_utils.mongo_io import MongoIO
 from services.chain_services import ChainServices
-import discord
+from src.services.conversation_services import ConversationServices
+# import discord
 
 import logging
-
-from src.services.conversation_services import ConversationServices
 logger = logging.getLogger(__name__)
 
 class WorkshopServices:
@@ -24,7 +25,7 @@ class WorkshopServices:
         mongo = MongoIO.get_instance()
         match = {"name": {"$regex": query}} if query else None
         project = {"_id":1, "name": 1}
-        workshops = mongo.get_documents(config.EXERCISE_COLLECTION_NAME, match, project)
+        workshops = mongo.get_documents(config.WORKSHOP_COLLECTION_NAME, match=match, project=project)
         return workshops
 
     @staticmethod
@@ -33,7 +34,7 @@ class WorkshopServices:
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
-        workshop = mongo.get_document(config.EXERCISE_COLLECTION_NAME, workshop_id)
+        workshop = mongo.get_document(config.WORKSHOP_COLLECTION_NAME, workshop_id)
         return workshop
 
 
@@ -47,24 +48,16 @@ class WorkshopServices:
         
         def _create_exercise(exercise_id):
             """Create a single exercises based on the exercise ID"""
-            new_conversation_data = {
-                "status": config.ACTIVE_STATUS,
-                "version": config.LATEST_VERSION,
-                "conversation": [],
-                "last_saved": breadcrumb
-            }
-            new_conversation = ConversationServices.add_conversation(new_conversation_data, token, breadcrumb)
             new_exercise = {
-                "exercise_id": exercise_id,
-                "conversation_id": new_conversation["_id"],
                 "status": config.PENDING_STATUS,
+                "exercise_id": exercise_id,
                 "observations": []
             }
             return new_exercise
             
         # Build the list of exercises
         exercises = []
-        for exercise_id in chain: 
+        for exercise_id in chain["exercises"]: 
             exercises.append(_create_exercise(exercise_id))
 
         # Build the new Workshop document        
@@ -74,7 +67,7 @@ class WorkshopServices:
         data["last_saved"] = breadcrumb
 
         workshop_id = mongo.create_document(config.WORKSHOP_COLLECTION_NAME, data)
-        workshop = WorkshopServices.get_workshop(workshop_id, token)
+        workshop = WorkshopServices.get_workshop(workshop_id, token) 
         return workshop
     
     @staticmethod
@@ -84,7 +77,9 @@ class WorkshopServices:
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
         data["last_saved"] = breadcrumb
-        workshop = mongo.update_document(config.WORKSHOP_COLLECTION_NAME, workshop_id, data)
+        logger.warning(f"Ready to update with {data}")
+        
+        workshop = mongo.update_document(config.WORKSHOP_COLLECTION_NAME, workshop_id, set_data=data)
         return workshop
 
     @staticmethod
@@ -131,7 +126,9 @@ class WorkshopServices:
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
+        workshop = WorkshopServices.get_workshop(workshop_id, token)
+        index = workshop["current_exercise"]
         set_data = {"last_saved": breadcrumb}
-        push_data = {"observations": observation}        
-        mongo.update_document(config.WORKSHOP_COLLECTION_NAME, workshop_id, set_data=set_data, push_data=push_data)
-        return
+        push_data = {f"exercises.{index}.observations": observation}        
+        workshop = mongo.update_document(config.WORKSHOP_COLLECTION_NAME, workshop_id, set_data=set_data, push_data=push_data)
+        return workshop

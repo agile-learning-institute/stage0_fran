@@ -2,13 +2,14 @@ import sys
 import signal
 from flask import Flask
 from echo.Echo import Echo
-from src.mongo_utils import mongo_io
-from src.flask_utils.ejson_encoder import MongoJSONEncoder
+from flask_utils.ejson_encoder import MongoJSONEncoder
 from prometheus_flask_exporter import PrometheusMetrics
 
-# Initialize Config
+# Initialize Singletons
 from src.config.config import Config
+from src.mongo_utils.mongo_io import MongoIO
 config = Config.get_instance()
+mongo = MongoIO.get_instance()
 # Future - load Versions and Enumerators
 
 # Initialize Logging
@@ -17,8 +18,6 @@ logging.basicConfig(level=config.LOGGING_LEVEL)
 logger = logging.getLogger(__name__)
 
 # Initialize Database Connection, and load one-time data
-mongo = mongo_io.MongoIO.get_instance()
-mongo.configure(config.WORKSHOP_COLLECTION_NAME)
 
 # Initialize Flask App
 app = Flask(__name__)

@@ -3,7 +3,6 @@ import json
 from pathlib import Path
 
 import logging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class Config:
@@ -53,7 +52,7 @@ class Config:
                 "ACTIVE_STATUS": "active",
                 "ARCHIVED_STATUS": "archived",
                 "PENDING_STATUS": "pending",
-                "COMPLETED_STATUS": "completed",
+                "COMPLETED_STATUS": "complete",
                 "MONGO_DB_NAME": "stage0",
                 "BOT_COLLECTION_NAME": "bots",
                 "CHAIN_COLLECTION_NAME": "chains",
@@ -155,5 +154,7 @@ class Config:
         """Get the singleton instance of the Config class."""
         if Config._instance is None:
             Config()
+            
+        # logger.log("Config Initializing")
         return Config._instance
         

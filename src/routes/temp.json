@@ -1,16 +1,51 @@
-A processing error occurred Modifiers operate on fields but we found type array instead. For example: {$mod: {<field>: ...
-    }
-} not {$set: [
-        { last_saved: { atTime: new Date(1739899165323), byUser: "aaaa00000000000000000001", fromIp: "127.0.0.1", correlationId: "7c5b5539-7940-4db4-a37b-dbdf05494a4d"
-            }
-        }
-    ]
-}, full error: {'index': 0, 'code': 9, 'errmsg': 'Modifiers operate on fields but we found type array instead. For example: {$mod: {<field>: ...
-        }
-    } not {$set: [
-            { last_saved: { atTime: new Date(1739899165323), byUser: "aaaa00000000000000000001", fromIp: "127.0.0.1", correlationId: "7c5b5539-7940-4db4-a37b-dbdf05494a4d"
+{
+    "_id": "000000000000000000000001",
+    "category": "",
+    "channel_id": "",
+    "current_exercise": 1,
+    "exercises": [
+        {
+            "duration": {
+                "from": "2025-01-02 12:10:00",
+                "to": "2025-01-02 12:15:00"
+            },
+            "exercise_id": "b00000000000000000000003",
+            "observations": [
+                {},
+                {},
+                {
+                    "name": "Observation1"
                 }
-            }
-        ]
-    }'
+            ],
+            "status": "complete"
+        },
+        {
+            "duration": {
+                "from": "2025-01-02 12:10:00",
+                "to": "2025-01-02 12:15:00"
+            },
+            "exercise_id": "b00000000000000000000004",
+            "observations": [
+                {},
+                {},
+                {
+                    "name": "Observation1"
+                }
+            ],
+            "status": "pending"
+        }
+    ],
+    "guild": "",
+    "last_saved": {
+        "atTime": "2025-02-18 22:30:56.227000",
+        "byUser": "aaaa00000000000000000001",
+        "correlationId": "d9342078-a445-47be-99b0-90e91528dfe5",
+        "fromIp": "127.0.0.1"
+    },
+    "name": "WorkshopName1",
+    "purpose": "",
+    "status": "active",
+    "when": {
+        "from": "2025-02-18 22:30:17.542000"
+    }
 }

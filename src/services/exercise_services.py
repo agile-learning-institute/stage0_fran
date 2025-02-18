@@ -19,7 +19,7 @@ class ExerciseServices:
         mongo = MongoIO.get_instance()
         match = None
         project = {"_id":1, "name":1}
-        exercises = mongo.get_documents(config.EXERCISE_COLLECTION_NAME, match, project)
+        exercises = mongo.get_documents(config.EXERCISE_COLLECTION_NAME, match=match, project=project)
         return exercises
 
     @staticmethod

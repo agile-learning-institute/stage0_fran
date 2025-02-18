@@ -86,8 +86,8 @@ class TestWorkshopRoutes(unittest.TestCase):
 
     @patch('src.routes.workshop_routes.create_token')
     @patch('src.routes.workshop_routes.create_breadcrumb')
-    @patch('src.routes.workshop_routes.WorkshopServices.create_workshop', new_callable=MagicMock)
-    def test_add_workshop_success(self, mock_create_workshop, mock_create_breadcrumb, mock_create_token):
+    @patch('src.routes.workshop_routes.WorkshopServices.add_workshop', new_callable=MagicMock)
+    def test_add_workshop_success(self, mock_add_workshop, mock_create_breadcrumb, mock_create_token):
         """Test POST /api/workshop for successful response."""
         # Arrange
         mock_token = {"user_id": "mock_user"}
@@ -95,7 +95,7 @@ class TestWorkshopRoutes(unittest.TestCase):
         mock_breadcrumb = {"breadcrumb": "mock_breadcrumb"}
         mock_create_breadcrumb.return_value = mock_breadcrumb
         mock_workshop = {"id": "workshop1", "name": "Test Workshop"}
-        mock_create_workshop.return_value = mock_workshop
+        mock_add_workshop.return_value = mock_workshop
         new_workshop = {"foo":"bar"}
 
         # Act
@@ -106,16 +106,16 @@ class TestWorkshopRoutes(unittest.TestCase):
         self.assertEqual(response.json, mock_workshop)
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_create_workshop.assert_called_once_with(new_workshop, mock_token)
+        mock_add_workshop.assert_called_once_with(new_workshop, mock_token)
 
     @patch('src.routes.workshop_routes.create_token')
     @patch('src.routes.workshop_routes.create_breadcrumb')
-    @patch('src.routes.workshop_routes.WorkshopServices.create_workshop')
-    def test_add_workshop_failure(self, mock_create_workshop, mock_create_breadcrumb, mock_create_token):
+    @patch('src.routes.workshop_routes.WorkshopServices.add_workshop')
+    def test_add_workshop_failure(self, mock_add_workshop, mock_create_breadcrumb, mock_create_token):
         """Test POST /api/workshop when an exception is raised."""
         mock_create_token.return_value = {"user_id": "mock_user"}
         mock_create_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
-        mock_create_workshop.side_effect = Exception("Database error")
+        mock_add_workshop.side_effect = Exception("Database error")
         new_workshop = {"foo":"bar"}
 
         response = self.client.post('/api/workshop', json=new_workshop)
@@ -267,43 +267,6 @@ class TestWorkshopRoutes(unittest.TestCase):
         mock_create_token.return_value = {"user_id": "mock_user"}
         mock_create_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
         mock_add_observation.side_effect = Exception("Database error")
-
-        response = self.client.post('/api/workshop/workshop1/observation')
-
-        self.assertEqual(response.status_code, 500)
-        self.assertEqual(response.json, {"error": "A processing error occurred"})
-
-    @patch('src.routes.workshop_routes.create_token')
-    @patch('src.routes.workshop_routes.create_breadcrumb')
-    @patch('src.routes.workshop_routes.WorkshopServices.update_observations', new_callable=MagicMock)
-    def test_update_observations_success(self, mock_update_observations, mock_create_breadcrumb, mock_create_token):
-        """Test PATCH /api/workshop/{id}/observation for successful response."""
-        # Arrange
-        mock_token = {"user_id": "mock_user"}
-        mock_create_token.return_value = mock_token
-        mock_breadcrumb = {"breadcrumb": "mock_breadcrumb"}
-        mock_create_breadcrumb.return_value = mock_breadcrumb
-        mock_observations = [{"foo": "bar"},{"foo": "bang"},{"foo": "bat"}]
-        mock_update_observations.return_value = mock_observations
-
-        # Act
-        response = self.client.patch('/api/workshop/workshop1/observation', json=mock_observations)
-
-        # Assert
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json, mock_observations)
-        mock_create_token.assert_called_once()
-        mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_update_observations.assert_called_once_with("workshop1", mock_token, mock_breadcrumb, mock_observations)
-
-    @patch('src.routes.workshop_routes.create_token')
-    @patch('src.routes.workshop_routes.create_breadcrumb')
-    @patch('src.routes.workshop_routes.WorkshopServices.update_observations', new_callable=MagicMock)
-    def test_update_observations_failure(self, mock_update_observations, mock_create_breadcrumb, mock_create_token):
-        """Test PATCH /api/workshop/{id}/observation when an exception is raised."""
-        mock_create_token.return_value = {"user_id": "mock_user"}
-        mock_create_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
-        mock_update_observations.side_effect = Exception("Database error")
 
         response = self.client.post('/api/workshop/workshop1/observation')
 

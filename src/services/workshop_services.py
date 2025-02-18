@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from config.config import Config
 from mongo_utils.mongo_io import MongoIO
 from services.chain_services import ChainServices
@@ -95,10 +95,35 @@ class WorkshopServices:
         data = {
             "status": config.ACTIVE_STATUS,
             "when": {
-                "from": datetime.now()
+                "from": datetime.now(timezone.utc)
             }
         }
         return WorkshopServices.update_workshop(workshop_id, data, token, breadcrumb)
+
+    @staticmethod
+    def advance_workshop(id, token, breadcrumb):
+        """Advance a workshop to the next current exercise"""
+        WorkshopServices._check_user_access(token)
+        config = Config.get_instance()
+        mongo = MongoIO.get_instance()
+        workshop = mongo.get_document(config.WORKSHOP_COLLECTION_NAME, id)
+        index = workshop["current_exercise"]
+        next_index = index + 1
+        set_data = {"last_saved": breadcrumb}
+        
+        if workshop["status"] != config.ACTIVE_STATUS:
+            raise Exception(f"Workshop status {workshop['status']} is not Active")
+
+        set_data[f"exercises.{index}.status"] = config.COMPLETED_STATUS
+
+        if next_index >= len(workshop["exercises"]):
+            set_data["status"] = config.COMPLETED_STATUS
+            
+        else:
+            set_data["current_exercise"] = next_index
+            set_data[f"exercises.{next_index}.status"] = config.PENDING_STATUS
+        
+        return mongo.update_document(config.WORKSHOP_COLLECTION_NAME, id, set_data=set_data)
     
     @staticmethod
     def add_observation(workshop_id, token, breadcrumb, observation):

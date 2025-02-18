@@ -1,12 +1,14 @@
 import unittest
 from unittest.mock import patch, MagicMock, MagicMock
-from src.services.workshop_services import WorkshopServices
+from datetime import datetime, timezone
+from config.config import Config
+from services.workshop_services import WorkshopServices
 
 class TestWorkshopServices(unittest.IsolatedAsyncioTestCase):
 
     @patch('src.services.workshop_services.MongoIO.get_instance')
     @patch('src.services.workshop_services.Config.get_instance')
-    async def test_get_workshops(self, mock_config, mock_mongo):
+    def test_get_workshops(self, mock_config, mock_mongo):
         mock_mongo_instance = MagicMock()
         mock_mongo.return_value = mock_mongo_instance
         mock_config.return_value = MagicMock()
@@ -20,7 +22,7 @@ class TestWorkshopServices(unittest.IsolatedAsyncioTestCase):
 
     @patch('src.services.workshop_services.MongoIO.get_instance')
     @patch('src.services.workshop_services.Config.get_instance')
-    async def test_get_workshop(self, mock_config, mock_mongo):
+    def test_get_workshop(self, mock_config, mock_mongo):
         mock_mongo_instance = MagicMock()
         mock_mongo.return_value = mock_mongo_instance
         mock_config.return_value = MagicMock()
@@ -34,7 +36,7 @@ class TestWorkshopServices(unittest.IsolatedAsyncioTestCase):
     @patch('src.services.workshop_services.ChainServices.get_chain')
     @patch('src.services.workshop_services.ConversationServices.add_conversation')
     @patch('src.services.workshop_services.Config.get_instance')
-    async def test_add_workshop(self, mock_config, mock_add_conversation, mock_get_chain, mock_mongo):
+    def test_add_workshop(self, mock_config, mock_add_conversation, mock_get_chain, mock_mongo):
         mock_config_instance = MagicMock()
         mock_config.return_value = mock_config_instance
         mock_mongo_instance = MagicMock()
@@ -53,7 +55,7 @@ class TestWorkshopServices(unittest.IsolatedAsyncioTestCase):
 
     @patch('src.services.workshop_services.MongoIO.get_instance')
     @patch('src.services.workshop_services.Config.get_instance')
-    async def test_update_workshop(self, mock_config, mock_mongo):
+    def test_update_workshop(self, mock_config, mock_mongo):
         mock_mongo_instance = MagicMock()
         mock_mongo.return_value = mock_mongo_instance
         mock_config.return_value = MagicMock()
@@ -66,16 +68,121 @@ class TestWorkshopServices(unittest.IsolatedAsyncioTestCase):
         result = WorkshopServices.update_workshop("ws1", data, token, breadcrumb)
         self.assertEqual(result["updated"], True)
 
-    @patch('src.services.workshop_services.WorkshopServices.update_workshop')
-    async def test_start_workshop(self, mock_update_workshop):
-        mock_update_workshop.return_value = {"_id": "ws1", "status": "active"}
+    @patch('src.services.workshop_services.MongoIO.get_instance')
+    def test_start_workshop(self, mock_get_instance):
+        config = Config.get_instance()
+        mock_mongo_instance = mock_get_instance.return_value
+        expected_data = {
+            "status": config.ACTIVE_STATUS,
+            "when": {"from": datetime.now(timezone.utc)}
+        }
+        expected_data["last_saved"] = {"timestamp": "now"}
+        token = {"user_id": "test_user"}
+        breadcrumb = {"timestamp": "now"}
+        mock_mongo_instance.update_document.return_value = {"_id": "ws1", "status": config.ACTIVE_STATUS}
+
+        result = WorkshopServices.start_workshop("ws1", token, breadcrumb)
+
+        self.assertEqual(result["status"], config.ACTIVE_STATUS)
+        mock_mongo_instance.update_document.assert_called_once()
+
+    def _assert_update(self, mock_get_instance, current_workshop, expected_update, token, breadcrumb):
+        # Create the instance mock and attach it to the return value
+        mock_mongo_instance = mock_get_instance.return_value
+        mock_mongo_instance.get_document.return_value = current_workshop
+        mock_mongo_instance.update_document.return_value = {"_id": "ws1", "updated": True}
+
+        # Execute
+        result = WorkshopServices.advance_workshop("ws1", token, breadcrumb)
+
+        # Validate
+        self.assertEqual(result["updated"], True)
+        mock_mongo_instance.update_document.assert_called_once()
+        _, kwargs = mock_mongo_instance.update_document.call_args
+        self.assertEqual(kwargs["set_data"], expected_update)
+
+    @patch('src.services.workshop_services.MongoIO.get_instance')
+    def test_advance_workshop_starting(self, mock_get_instance):
+        # Setup Test Data
+        config = Config.get_instance()
+        token = {"user_id": "test_user"}
+        breadcrumb = {"timestamp": "now"}
+        current_workshop = {
+            "_id": "ws1",
+            "status": config.ACTIVE_STATUS,
+            "current_exercise": 0,
+            "exercises": [{"status": config.ACTIVE_STATUS}, {"status": config.PENDING_STATUS}, {"status": config.PENDING_STATUS}]
+        }
+        expected_update = {
+            "last_saved": breadcrumb,
+            "exercises.0.status": config.COMPLETED_STATUS,
+            "current_exercise": 1,
+            "exercises.1.status": config.PENDING_STATUS
+        }
+        self._assert_update(mock_get_instance, current_workshop, expected_update, token, breadcrumb)
+
+    @patch('src.services.workshop_services.MongoIO.get_instance')
+    def test_advance_workshop_progress(self, mock_get_instance):
+        # Setup Test Data
+        config = Config.get_instance()
+        token = {"user_id": "test_user"}
+        breadcrumb = {"timestamp": "now"}
+        current_workshop = {
+            "_id": "ws1",
+            "status": config.ACTIVE_STATUS,
+            "current_exercise": 1,
+            "exercises": [{"status": config.COMPLETED_STATUS}, {"status": config.ACTIVE_STATUS}, {"status": config.PENDING_STATUS}]
+        }
+        expected_update = {
+            "last_saved": breadcrumb,
+            "exercises.1.status": config.COMPLETED_STATUS,
+            "current_exercise": 2,
+            "exercises.2.status": config.PENDING_STATUS
+        }
+        self._assert_update(mock_get_instance, current_workshop, expected_update, token, breadcrumb)
+        
+    @patch('src.services.workshop_services.MongoIO.get_instance')
+    def test_advance_workshop_finish(self, mock_get_instance):
+        # Setup Test Data
+        config = Config.get_instance()
+        token = {"user_id": "test_user"}
+        breadcrumb = {"timestamp": "now"}
+        current_workshop = {
+            "_id": "ws1",
+            "status": config.ACTIVE_STATUS,
+            "current_exercise": 2,
+            "exercises": [{"status": config.COMPLETED_STATUS}, {"status": config.COMPLETED_STATUS}, {"status": config.ACTIVE_STATUS}]
+        }
+        expected_update = {
+            "last_saved": breadcrumb,
+            "status": config.COMPLETED_STATUS,
+            "exercises.2.status": config.COMPLETED_STATUS,
+        }
+        self._assert_update(mock_get_instance, current_workshop, expected_update, token, breadcrumb)
+
+    @patch('src.services.workshop_services.MongoIO.get_instance')
+    def test_advance_workshop_not_active(self, mock_mongo):
+        mock_mongo_instance = MagicMock()
+        mock_mongo.return_value = mock_mongo_instance
+
+        from config.config import Config
+        config = Config.get_instance()
+
+        mock_mongo_instance.get_document.return_value = {
+            "_id": "ws1",
+            "current_exercise": 0,
+            "status": "inactive",
+            "exercises": [{"status": config.PENDING_STATUS}]
+        }
 
         token = {"user_id": "test_user"}
         breadcrumb = {"timestamp": "now"}
 
-        result = WorkshopServices.start_workshop("ws1", token, breadcrumb)
-        self.assertEqual(result["status"], "active")
+        with self.assertRaises(Exception) as context:
+            WorkshopServices.advance_workshop("ws1", token, breadcrumb)
 
+        self.assertEqual(str(context.exception), "Workshop status inactive is not Active")
+      
     @patch('src.services.workshop_services.MongoIO.get_instance')
     @patch('src.services.workshop_services.Config.get_instance')
     def test_add_observation(self, mock_config, mock_mongo):

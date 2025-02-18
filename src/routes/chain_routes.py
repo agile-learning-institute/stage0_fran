@@ -18,7 +18,7 @@ def create_chain_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             query = request.args.get('query') or ""
-            chains = ChainServices.get_chains(query, token)
+            chains = ChainServices.get_chains(token)
             logger.info(f"Get Chain Success {breadcrumb}")
             return jsonify(chains), 200
         except Exception as e:

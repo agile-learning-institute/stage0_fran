@@ -11,14 +11,13 @@ from flask import Blueprint, Response, jsonify, request
 def create_conversation_routes():
     conversation_routes = Blueprint('conversation_routes', __name__)
 
-    # GET /api/conversations - Return a list of conversations that match query
+    # GET /api/conversations - Return a list of latest active conversations
     @conversation_routes.route('', methods=['GET'])
     def get_conversations():
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            query = request.args.get('query') or ""
-            conversations = ConversationServices.get_conversations(query, token)
+            conversations = ConversationServices.get_conversations(token)
             logger.info(f"Get conversation Success {breadcrumb}")
             return jsonify(conversations), 200
         except Exception as e:
@@ -58,7 +57,7 @@ def create_conversation_routes():
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            message = request.json
+            message = request.data.decode('utf-8')
             conversation = ConversationServices.add_message(channel_id, token, breadcrumb, message)
             logger.info(f"Update conversation Successful {breadcrumb}")
             return jsonify(conversation), 200

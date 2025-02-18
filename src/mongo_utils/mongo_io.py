@@ -81,7 +81,7 @@ class MongoIO:
             logger.error(f"Failed to get documents from collection '{collection_name}': {e}")
             raise
                 
-    def update_document(self, collection_name, document_id, set_data=None, push_data=None, add_to_set_data=None, pull_data=None):
+    def update_document(self, collection_name, document_id=None, match=None, set_data=None, push_data=None, add_to_set_data=None, pull_data=None):
         """
         Update a document in the specified collection with optional set, push, add_to_set, and pull operations.
 
@@ -101,9 +101,10 @@ class MongoIO:
 
         try:
             document_collection = self.db.get_collection(collection_name)
-            document_object_id = ObjectId(document_id)
 
-            match = {"_id": document_object_id}
+            if match is None: 
+                document_object_id = ObjectId(document_id)
+                match = {"_id": document_object_id}
 
             # Build the update pipeline
             pipeline = {}

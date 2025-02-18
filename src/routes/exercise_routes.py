@@ -11,14 +11,14 @@ from flask import Blueprint, Response, jsonify, request
 def create_exercise_routes():
     exercise_routes = Blueprint('exercise_routes', __name__)
 
-    # GET /api/exercises - Return a list of exercises that match query
+    # GET /api/exercise - Return a list of exercises that match query
     @exercise_routes.route('', methods=['GET'])
     def get_exercises():
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             query = request.args.get('query') or ""
-            exercises = ExerciseServices.get_exercises(query, token)
+            exercises = ExerciseServices.get_exercises(token)
             logger.info(f"Get Exercise Success {breadcrumb}")
             return jsonify(exercises), 200
         except Exception as e:

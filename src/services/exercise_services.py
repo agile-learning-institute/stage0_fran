@@ -13,7 +13,7 @@ class ExerciseServices:
 
     @staticmethod
     def get_exercises(token):
-        """Get a list of chains that match query"""
+        """Get a list of all exercises"""
         ExerciseServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()

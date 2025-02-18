@@ -1,0 +1,16 @@
+A processing error occurred Modifiers operate on fields but we found type array instead. For example: {$mod: {<field>: ...
+    }
+} not {$set: [
+        { last_saved: { atTime: new Date(1739899165323), byUser: "aaaa00000000000000000001", fromIp: "127.0.0.1", correlationId: "7c5b5539-7940-4db4-a37b-dbdf05494a4d"
+            }
+        }
+    ]
+}, full error: {'index': 0, 'code': 9, 'errmsg': 'Modifiers operate on fields but we found type array instead. For example: {$mod: {<field>: ...
+        }
+    } not {$set: [
+            { last_saved: { atTime: new Date(1739899165323), byUser: "aaaa00000000000000000001", fromIp: "127.0.0.1", correlationId: "7c5b5539-7940-4db4-a37b-dbdf05494a4d"
+                }
+            }
+        ]
+    }'
+}

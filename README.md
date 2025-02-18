@@ -28,3 +28,63 @@ When a message is seen, the action is executed, and the response is written back
 | /mongo_utils - Simple Mongo IO Wrapper, to be extracted to stage0_api_utils private package
 |
 /Fran.modelfile - Generalist design thinking model
+
+# Testing with ``curl``
+
+## Testing Observability endpoints
+```sh
+curl http://localhost:8580/api/config
+
+curl http://localhost:8580/api/health
+```
+
+## Testing /api/bot endpoints 
+```sh
+curl http://localhost:8580/api/config
+
+curl http://localhost:8580/api/bot  
+
+curl http://localhost:8580/api/bot/bbb000000000000000000001
+
+curl -X PATCH http://localhost:8580/api/bot/bbb000000000000000000001 \
+     -H "Content-Type: application/json" \
+     -d '{"description":"A New Description"}'
+
+curl http://localhost:8580/api/bot/bbb000000000000000000001/get_channels 
+
+curl -X POST http://localhost:8580/api/bot/bbb000000000000000000001/channel/DISCORD_CHANNEL_NAME
+
+curl -X DELETE http://localhost:8580/api/bot/bbb000000000000000000001/channel/DISCORD_CHANNEL_NAME
+```
+
+## Testing /api/chain endpoints with curl
+```sh
+curl http://localhost:8580/api/chain
+
+curl http://localhost:8580/api/chain/a00000000000000000000001
+
+curl -X PATCH http://localhost:8580/api/conversation/c00000000000000000000001 \
+     -H "Content-Type: application/json" \
+     -d '{"name":"DISCORD_CHANNEL_ID"}'    
+
+
+```
+
+## Testing /api/chain endpoints with curl
+```sh
+curl http://localhost:8580/api/conversation
+
+curl http://localhost:8580/api/conversation/c00000000000000000000001
+
+curl -X POST http://localhost:8580/api/conversation/DISCORD_CHANNEL_ID/message \
+     -H "Content-Type: text/plain" \
+     -d "This is a new message"
+```
+
+## Testing /api/exercise endpoints with curl
+```sh
+curl http://localhost:8580/api/exercise
+
+curl http://localhost:8580/api/exercise/b00000000000000000000001
+
+```

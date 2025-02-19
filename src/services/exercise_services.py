@@ -17,7 +17,7 @@ class ExerciseServices:
         ExerciseServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
-        match = None
+        match = { "status": config.ACTIVE_STATUS}
         project = {"_id":1, "name":1}
         exercises = mongo.get_documents(config.EXERCISE_COLLECTION_NAME, match=match, project=project)
         return exercises

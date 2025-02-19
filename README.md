@@ -4,13 +4,7 @@ This repository contains the API and Discord Chatbot that supports the user inte
 
 See [The OpenAPI](./docs/index.html) doc for information on the API and Data Structures Used. 
 
-# Echo
-
-Echo is a chat-bot agent framework, inspired in syntax by Flask, that maps simple chat messages following the ``Agent/Action`` syntax onto your code in the same way Flask maps HTTP events onto your code. This framework is used to support a Discord App which acts as an agent proxy. Any channels that the Discord App is active on are monitored for messages that match an Echo Command in the form of
-```
-Agent/Action/{"input":"arguments"}
-```
-Where the input arguments match the actions input message schema. When a message is seen, the action is executed, and the response is written back to the Chat where it originated. 
+This system uses the [Echo] package to expose agent actions in a discord chat conversation.
 
 # Separation of Concerns
 

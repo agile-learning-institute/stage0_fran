@@ -1,50 +1,106 @@
-import discord
 import logging
-from discord import app_commands
-from src.services.chain_services import ChainServices
-from src.services.workshop_services import WorkshopServices
+from echo import Blueprint
+from echo_utils.breadcrumb import create_breadcrumb
+from echo_utils.token import create_token
+from services.exercise_services import ExerciseServices
 
 logger = logging.getLogger(__name__)
 
-def create_exercise_agent(bot):
+def create_exercise_agent():
     """ Registers event handlers and commands for the Fran home channel. """
+    exercise_agent = Blueprint('conversation_agent', __name__)
+    
+    @exercise_agent.action(action_name="get_exercises", 
+                description="Return a list of active exercises", 
+                arguments_schema={},
+                outputs_schema={
+                    "description": "List of name and id's of all exercises",
+                    "type": "array",
+                    "items": {
+                        "type":"object",
+                        "properties": {
+                            "_id": {
+                                "description": "",
+                                "type": "unique identifier",
+                            },
+                            "name": {
+                                "description": "",
+                                "type": "string",
+                            },
+                        }
+                    }
+                })
+    async def get_exercises(arguments):
+        """ Slash command to get a list of all active exercises"""
+        try:
+            token = create_token()
+            breadcrumb = create_breadcrumb(token)
+            exercises = ExerciseServices.get_exercises(token)
+            logger.info(f"Get Exercise Success {breadcrumb}")
+            return exercises
+        except Exception as e:
+            logger.warning(f"Get Exercise Action Error has occurred: {e}")
+            return "A processing error occurred"
 
-    @bot.tree.command(name="create_workshop", description="Create a new design-thinking workshop.")
-    async def create_workshop(interaction: discord.Interaction):
-        """ Slash command to create a new workshop. Opens a modal for input. """
-        # Fetch available workshop chains from the service
-        chains = ChainServices.get_chains()
-        chain_options = [discord.SelectOption(label=chain.name, value=chain._id) for chain in chains]
-
-        # Create a modal form for user input
-        class WorkshopModal(discord.ui.Modal, title="Create Workshop"):
-            chain = discord.ui.Select(
-                placeholder="Select a workshop chain...",
-                options=chain_options
-            )
-            users = discord.ui.TextInput(
-                label="Invite users (comma-separated @mentions)",
-                placeholder="@user1, @user2",
-                required=True
-            )
-
-            async def on_submit(self, interaction: discord.Interaction):
-                # Extract user inputs
-                token = {} # Need a bot token
-                breadcrumb = {} # Need a bot breadcrumb
-                chain_id = self.chain.values[0]
-                user_mentions = self.users.value.split(",")
-                guild = interaction.guild
-                category = discord.utils.get(guild.categories, name="workshops")  
-
-                # Create a workshop document and Channel
-                workshop = WorkshopServices.create_workshop(chain_id, user_mentions, token, breadcrumb)
-                channel = WorkshopServices.create_channel(workshop, guild, category)
-                await interaction.response.send_message(f"Workshop **{workshop._id}** created in {channel.mention}!", ephemeral=True)
-
-        # Show the modal when the command is executed
-        await interaction.response.send_modal(WorkshopModal())
-
-    bot.tree.add_command(create_workshop)
-
-    logger.info("Registered Fran command handlers.")
+    @exercise_agent.action(action_name="get_exercise", 
+        description="Get a specific exercise", 
+        arguments_schema={
+            "description": "Exercise unique identifier (from get_exercises)",
+            "type": "identifier",
+        },
+        outputs_schema={
+            "title": "Exercise",
+            "description": "A description of the exercise, and instructions on how to guide it.",
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "description": "The unique identifier for a Exercise",
+                    "type": "identifier"
+                },
+                "status": {
+                    "description": "The status of the Exercise Record",
+                    "type": "enum",
+                    "enums": "default_status"
+                },
+                "name": {
+                    "description": "Short name for the exercise",
+                    "type": "word"
+                },
+                "description": {
+                    "description": "A description of the exercise and when to use it",
+                    "type": "paragraph"
+                },
+                "duration": {
+                    "description": "duration in minutes",
+                    "type": "count"
+                },
+                "observe_instructions": {
+                    "description": "observation exercise instructions",
+                    "type": "markdown"
+                },
+                "reflect_instructions": {
+                    "description": "reflect exercise instructions",
+                    "type": "markdown"
+                },
+                "make_instructions": {
+                    "description": "make exercise instructions",
+                    "type": "markdown"
+                },
+                "last_saved": {
+                    "description": "Last Saved breadcrumb",
+                    "type": "breadcrumb"
+                }
+            }
+        }
+    )
+    async def get_exercise(arguments):
+        """ Slash command to get a specific exercises"""
+        try:
+            token = create_token()
+            breadcrumb = create_breadcrumb(token)
+            exercises = ExerciseServices.get_exercises(token)
+            logger.info(f"Get Exercise Success {breadcrumb}")
+            return exercises
+        except Exception as e:
+            logger.warning(f"Get Exercise Action Error has occurred: {e}")
+            return "A processing error occurred"

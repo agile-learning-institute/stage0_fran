@@ -1,38 +1,39 @@
+import asyncio
+
 class Agent:
-    def __init__(self, name):
-        """Initialize an agent."""
+    def __init__(self, name: str):
+        """Initialize an agent with a name and an empty action registry."""
         self.name = name
         self.actions = {}
 
-    def action(self, name):
-        """Decorator to register an action."""
-        def wrapper(fn):
-            self.actions[name] = fn
-            return fn
-        return wrapper
+    def register_action(self, action_name: str, function, description: str, arguments_schema: dict, output_schema: dict):
+        """Registers an action with required metadata and ensures validity."""
+        if not all([action_name, function, description, arguments_schema, output_schema]):
+            raise ValueError("Missing required attributes for action registration")
 
-    def get_actions(self):
-        """Returns the list of actions."""
+        self.actions[action_name] = {
+            "function": function,
+            "description": description,
+            "arguments_schema": arguments_schema,
+            "output_schema": output_schema
+        }
+
+    def get_actions(self) -> list:
+        """Returns a list of registered action names."""
         return list(self.actions.keys())
-    
-class EchoAgent(Agent):
-    def __init__(self, bot):
-        super().__init__('echo')
-        self.bot = bot
 
-    @Agent.action('list')
-    async def list_channels(self, arguments, channel, message):
-        """Lists the active channels."""
-        return f"Active channels: {', '.join(map(str, self.bot.active_channels))}" if self.bot.active_channels else "No active channels."
+    def get_action_metadata(self, action_name: str):
+        """Returns metadata for a given action."""
+        return self.actions.get(action_name, None)
 
-    @Agent.action('add_channel')
-    async def add_channel(self, arguments, channel, message):
-        """Adds the bot to a channel."""
-        self.bot.active_channels.add(channel.id)
-        return f"Joined channel: {channel.name}"
+    async def invoke_action(self, action_name: str, arguments: dict):
+        """
+        Executes a registered action asynchronously.
+        - Returns the result if successful.
+        - Returns an error message if the action is not found.
+        """
+        if action_name not in self.actions:
+            return f"Error: Action '{action_name}' not found"
 
-    @Agent.action('remove_channel')
-    async def remove_channel(self, arguments, channel, message):
-        """Removes the bot from a channel."""
-        self.bot.active_channels.discard(channel.id)
-        return f"Left channel: {channel.name}"    
+        action = self.actions[action_name]["function"]
+        return await action(arguments)

@@ -1,31 +1,26 @@
-# Echo 
+# Echo - A Multi-Party Conversational AI Framework
 
-Echo is a python chat-bot agent framework, inspired in syntax by Flask, that maps Discord chat messages following the ``/{Agent}/{Action}/{arguments}`` syntax onto your code in the same way Flask maps HTTP events onto your code. This framework is used to expose specific actions in a chat conversation, using a syntax that supports usage by intelligent agents that might be involved in a conversation.
+Echo is a Python-based chatbot framework inspired by Flask. Echo enables **multi-party conversational AI** by acting as a bridge between **human group conversations (outer dialog)** and **structured agent interactions (inner dialog).**
 
-Echo chat-bot's have to be "invited" to participate in a conversation. They always answer and participate in direct messages with users, they can be ``@mentioned join`` to join any channel, and ``@mention leave`` to exit the conversation. 
+## **How Echo Works**
+- Echo operates in **two conversational layers:**
+  - **Outer Dialog:** The LLM interacts naturally with users in a group chat.
+  - **Inner Dialog:** The LLM privately communicates with structured agents to retrieve and execute information.
+- The LLM follows a **Retrieval-Augmented Generation (RAG)** approach:
+  - **Interprets human intent** from the group chat.
+  - **Generates structured agent requests** to gather information or perform actions.
+  - **Formats agent responses** into human-readable answers before sending them back to the group.
 
-Echo exposes a /echo agent with the following actions
-```
-/echo/list/{}
-/echo/add_channel/{channel}
-/echo/remove_channel/{channel}
-```
+## **🚀 Features**
+- **Agent-based command routing** using `/agent/action/arguments` syntax.
+- **LLM-powered conversation interface** that translates natural language into structured commands.
+- **Multi-party chat participation**, allowing the LLM to engage with multiple users while retrieving structured responses from agents.
+- **State management for bot and conversations**, ensuring persistence and context awareness.
+- **Modular design**, making it easy to add new agents and capabilities.
 
-Echo uses a bot channels interface with get_channels, add_channel, remove_channel functions to allow external persistence of the channels the bot is participating in. Stage0_utils provides this as BotServices or via the bot_agent. 
+---
 
-Echo uses a conversation interface with add_message function to allow external persistence of bot-conversations. Stage0_utils provides this as ConversationServices or via the conversation_agent.
-
-# Echo - A Chat Bot Agent Framework
-
-Echo is a Python-based chatbot framework inspired by Flask. Echo implements **multi-party conversational AI** that can interact within a group setting while maintaining structured agent interactions. 
-
-Features
- - Agent-based command routing using /agent/action/arguments syntax.
- - Discord integration with structured conversation filtering.
- - Natural Language intent and execution of actions
- - Modular design allowing easy addition of new agents.
-
-## Project Structure
+## **📂 Project Structure**
 ```
 echo
 ┣ echo.py            # Core Echo agent framework
@@ -33,74 +28,61 @@ echo
 ┣ llm_handler.py     # LLM-driven message interpretation
 ┣ agents/
 ┃ ┣ echo_agent.py    # Default built-in Echo agent
-┃ ┣ bot_agent.py     # Example: Handles bot-related commands
+┃ ┣ bot_agent.py     # Handles bot-related state management
+┃ ┣ conversation_agent.py  # Manages conversation history and context
 ┗ README.md          # Documentation
 ```
 
-# LLM Chat 
-The /agent/action/parameters syntax is very precise, but extremely terse. For that reason, we have an LLM chat interface that is capable of understanding intent, and formatting the agent action appropriately. The LLM implements a Retrieval Augmented Generation approach that formats an agent request to collect additional information, and interprets the response to back to the group.
+---
 
-# Message Flow Diagram
-```mermaid
-graph TD;
-    subgraph Discord
-        A[User sends message] -->|Structured Command| B[/agent/action/args/]
-        A -->|Natural Language| C[LLM interprets request]
-    end
+## **📌 LLM-Driven Conversational Flow**
+The `/agent/action/parameters` syntax is precise but terse. The LLM acts as a **natural language interface** that understands user intent, generates valid agent requests, and reformats structured responses before sharing them with the group.
 
-    subgraph LLM Handler
-        C -->|Check message format| D{TO: AGENT?}
-        D -- Yes --> E[Forward to Echo agent]
-        D -- No --> F{TO: LLM?}
-        E --> G[Agent executes action]
-        G --> H{Action Exists?}
-        H -- Yes --> I[FROM: AGENT TO: LLM MESSAGE: result]
-        H -- No --> J[FROM: AGENT TO: LLM MESSAGE: Available actions]
-        I --> K{TO: GROUP?}
-        J --> K
-        K -- Yes --> L[Send formatted response to group]
-        K -- No --> M[Internal LLM processing]
-        F -- Yes --> N[LLM generates response]
-        N --> K
-    end
+---
 
-    subgraph Echo Framework
-        B -->|Parse Command| O{Agent Exists?}
-        O -- Yes --> P{Action Exists?}
-        P -- Yes --> Q[Execute Agent Action]
-        Q --> R[Return structured response]
-        P -- No --> S[Return available actions]
-        O -- No --> T[Silence-No Response]
-    end
-
-    L --> U[User sees response]
-    S --> U
-    M --> U
-```
---- 
-
-### Example Conversation
+## **📖 Example Conversation**
+### **🌍 Outer Dialog (Group Conversation with Humans)**
 ```
 FROM: @Alice
 TO: GROUP
 MESSAGE: Hey, what's the status of our channels?
 ```
----
+
+### **🤖 Inner Dialog (LLM Communicating with Agents)**
 ```
 FROM: FRAN_LLM
 TO: AGENTS
 MESSAGE: /echo/list/
 ```
----
+
 ```
 FROM: FRAN_AGENT
-TO: FRAN_LLM
-MESSAGE: Active channels: #general, #bot-commands
+TO: AGENTS
+MESSAGE: Active channels: #general, #bot
 ```
----
+
+### **🌍 Outer Dialog (LLM Responds to the Group)**
 ```
 FROM: FRAN_LLM
 TO: GROUP
-MESSAGE: We are currently active in #general and ```
----
+MESSAGE: We are currently active in #general and #bot
 ```
+
+---
+
+## **🛠️ Installation & Usage**
+### **📌 Install Dependencies**
+```
+pip install -r requirements.txt
+```
+
+### **📌 Run the Discord Bot**
+```
+python discord_bot.py
+```
+
+---
+
+## **🔗 Contributing**
+Want to contribute? Open an issue or PR on GitHub! 🚀
+

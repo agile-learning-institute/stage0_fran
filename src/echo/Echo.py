@@ -1,27 +1,17 @@
-import discord
-import logging
-
-logger = logging.getLogger(__name__)
-
-class Echo(discord.Client):
+class Echo:
     def __init__(self):
-        intents = discord.Intents.default()
-        intents.message_content = True
-        super().__init__(intents=intents)
-        self.event_handlers = {}
+        self.agents = {}
 
-    def register_agent(self, create_agent):
-        """ Register a new event handler """
-        return
+    def register_agent(self, agent, agent_prefix):
+        self.agents[agent_prefix] = agent
 
-    async def on_event(self, message, *args, **kwargs):
-        return
+    async def handle_command(self, agent_name, action, arguments, channel, message):
+        """Executes an agent action if valid."""
+        if agent_name not in self.agents:
+            return f"Unknown agent: `{agent_name}`. Available: {', '.join(self.agents.keys())}"
 
-    async def on_ready(self):
-        await self.on_event("on_ready")
+        agent = self.agents[agent_name]
+        if action not in agent.actions:
+            return f"Unknown action `{action}`. Available: {', '.join(agent.get_actions())}"
 
-    async def on_message(self, message):
-        await self.on_event("on_message", message)
-
-    async def on_reaction_add(self, reaction, user):
-        await self.on_event("on_reaction_add", reaction, user)
+        return await agent.actions[action](arguments, channel, message)

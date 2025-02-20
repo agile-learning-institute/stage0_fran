@@ -10,7 +10,6 @@ from src.config.config import Config
 from src.mongo_utils.mongo_io import MongoIO
 config = Config.get_instance()
 mongo = MongoIO.get_instance()
-# Future - load Versions and Enumerators
 
 # Initialize Logging
 import logging
@@ -44,8 +43,9 @@ app.register_blueprint(create_workshop_routes(), url_prefix='/api/workshop')
 
 # Initialize Discord Bot
 from echo.Echo import Echo
+from src.services.bot_services import BotServices
 from src.services.conversation_services import ConversationServices
-bot = Echo(__name__, ConversationServices)
+bot = Echo(__name__, config=config.BOT_CONFIG, conversations=ConversationServices, channels=BotServices)
 
 # Register Discord Agents
 from agents.bot_agent import create_bot_agent

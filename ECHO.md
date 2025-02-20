@@ -21,16 +21,25 @@ Echo is a Python-based chatbot framework inspired by Flask. Echo enables **multi
 ---
 
 ## **📂 Project Structure**
+For this initial implementation, Echo is intermingled with the stage0_Fran Flask/Echo project. 
+At some point in the future Echo and it's related code will be extracted into an independent package.
 ```
-echo
-┣ echo.py            # Core Echo agent framework
-┣ discord_bot.py     # Discord client, listens for messages
-┣ llm_handler.py     # LLM-driven message interpretation
-┣ agents/
-┃ ┣ echo_agent.py    # Default built-in Echo agent
-┃ ┣ bot_agent.py     # Handles bot-related state management
-┃ ┣ conversation_agent.py  # Manages conversation history and context
-┗ README.md          # Documentation
+echo                 # Echo Utility Code
+┣ echo.py                    # Core Echo agent framework
+┣ discord_bot.py             # Discord client, listens for messages
+┣ llm_handler.py             # LLM-driven message interpretation
+agents/               # Echo Agent Blueprints
+┣ echo_agent.py            # Default built-in Echo agent
+┣ bot_agent.py             # Handles bot-related actions
+┣ conversation_agent.py    # Handles conversation actions
+┣ other_agent.py           # Additional Custom Agents...
+routes/               # Flask API Route Blueprints
+┣ echo_routes.py           # Default built-in Echo API Endpoints
+┣ etc.                     # Additional API endpoints...
+services/             # Services to support Agents/Routes with business logic
+┣ bot_service.py           # Bot services
+┣ conversation_service.py  # Conversation services
+┣ other_service.py         # Additional Custom Services...
 ```
 
 ---

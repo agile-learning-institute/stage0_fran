@@ -26,7 +26,7 @@ class Agent:
         """Returns metadata for a given action."""
         return self.actions.get(action_name, None)
 
-    async def invoke_action(self, action_name: str, arguments: dict):
+    def invoke_action(self, action_name: str, arguments: dict):
         """
         Executes a registered action asynchronously.
         - Returns the result if successful.
@@ -36,4 +36,4 @@ class Agent:
             return f"Error: Action '{action_name}' not found"
 
         action = self.actions[action_name]["function"]
-        return await action(arguments)
+        return action(arguments)

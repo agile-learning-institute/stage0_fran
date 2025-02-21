@@ -37,7 +37,7 @@ class Echo:
 
         return agent_name, action_name, arguments
     
-    async def handle_command(self, command: str):
+    def handle_command(self, command: str):
         """
         Handles an incoming command.
         - Routes it to the correct agent and action.
@@ -55,4 +55,4 @@ class Echo:
             available_actions = ", ".join(agent.get_actions())
             return f"Unknown action '{action_name}'. Available actions: {available_actions}"
 
-        return await agent.invoke_action(action_name, arguments)
+        return agent.invoke_action(action_name, arguments)

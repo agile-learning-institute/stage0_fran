@@ -10,7 +10,7 @@ class TestEchoAgent(unittest.TestCase):
 
     def test_register_action_valid(self):
         """Ensure an action registers correctly with required attributes."""
-        async def sample_action(args):
+        def sample_action(args):
             return "Executed"
 
         self.agent.register_action(
@@ -25,7 +25,7 @@ class TestEchoAgent(unittest.TestCase):
 
     def test_register_action_missing_description(self):
         """Ensure registering an action without a description raises an error."""
-        async def sample_action(args):
+        def sample_action(args):
             return "Executed"
 
         with self.assertRaises(ValueError) as context:
@@ -40,7 +40,7 @@ class TestEchoAgent(unittest.TestCase):
 
     def test_register_action_missing_schemas(self):
         """Ensure registering an action without schemas raises an error."""
-        async def sample_action(args):
+        def sample_action(args):
             return "Executed"
 
         with self.assertRaises(ValueError) as context:
@@ -55,7 +55,7 @@ class TestEchoAgent(unittest.TestCase):
 
     def test_get_action_metadata(self):
         """Ensure actions store metadata correctly."""
-        async def sample_action(args):
+        def sample_action(args):
             return "Executed"
 
         self.agent.register_action(
@@ -74,7 +74,7 @@ class TestEchoAgent(unittest.TestCase):
 
     def test_invoke_registered_action(self):
         """Ensure invoking a registered action works."""
-        async def sample_action(args):
+        def sample_action(args):
             return f"Received {args}"
 
         self.agent.register_action(
@@ -85,12 +85,12 @@ class TestEchoAgent(unittest.TestCase):
             {"type": "string"}
         )
 
-        result = asyncio.run(self.agent.invoke_action("test_action", {"key": "value"}))
+        result = self.agent.invoke_action("test_action", {"key": "value"})
         self.assertEqual(result, "Received {'key': 'value'}")
 
     def test_invoke_unregistered_action(self):
         """Ensure invoking an unregistered action returns an error."""
-        result = asyncio.run(self.agent.invoke_action("unknown_action", {}))
+        result = self.agent.invoke_action("unknown_action", {})
         self.assertEqual(result, "Error: Action 'unknown_action' not found")
 
 if __name__ == "__main__":

@@ -1,108 +1,58 @@
-import json
-from echo import Echo
+import re
+from echo.ollama_llm_client import OllamaLLMClient
+from echo.echo import Echo
 
 class LLMHandler:
-    def __init__(self, echo_framework):
+    def __init__(self, echo_framework, llm_client):
+        """
+        Initializes LLMHandler with an Echo agent framework and an LLM client.
+
+        :param echo_framework: Instance of Echo to route agent calls.
+        :param llm_client: Instance of OllamaLLMClient for LLM chat processing.
+        """
         self.echo = echo_framework
+        self.llm = llm_client
+        self.agent_command_pattern = re.compile(r"^/([^/]+)/([^/]+)(?:/(.*))?$")
 
-    async def handle_message(self, message):
+    def handle_message(self, user: str, channel: str, message: str):
         """
-        Processes incoming messages, determines whether to respond as LLM,
-        call an agent, or forward a response.
+        Processes an incoming message, determines if it's an agent call,
+        updates the conversation, and invokes the LLM for a response.
+
+        :param user: The username of the sender.
+        :param channel: The Discord channel where the message originated.
+        :param message: The message content.
+        :return: The LLM-generated response.
         """
-        structured_message = self.parse_message_format(message.content)
-        
-        if not structured_message:
-            return "Invalid message format. Use FROM: TO: MESSAGE:"
+        # Step 1: Add the user message to the conversation
+        messages = self.post_message(user, "external", message)
 
-        from_user = structured_message["FROM"]
-        to_user = structured_message["TO"]
-        msg_content = structured_message["MESSAGE"]
+        # Step 2: Check if this is an agent call using regex
+        if self.agent_command_pattern.match(message):
+            agent_reply = self.echo.handle_command(message)
+            messages = self.post_message("agent", "internal", agent_reply)
 
-        if to_user == "GROUP":
-            return await self.handle_group_message(from_user, msg_content)
+        # Step 3: Call the LLM with updated conversation history
+        chat_reply = self.llm.chat(model=self.llm.model, messages=messages)
 
-        elif to_user == "AGENT":
-            return await self.call_agent(msg_content)
+        # Step 4: Process LLM response recursively if it's an internal message
+        if isinstance(chat_reply, dict) and chat_reply.get("to") == "internal":
+            return self.handle_message("system", channel, chat_reply["content"])
 
-        elif to_user == "LLM":
-            return await self.handle_llm_message(from_user, msg_content)
+        # Step 5: Add LLM response to conversation and return it
+        messages = self.post_message("system", "external", chat_reply)
 
-        return "Unknown recipient."
+        return chat_reply
 
-    async def handle_group_message(self, from_user, msg_content):
+    def post_message(self, from_role: str, to_role: str, content: str):
         """
-        Handles messages sent to the GROUP.
-        - If it's a command, the LLM might translate it to an agent request.
-        - Otherwise, it engages in conversation.
+        Posts a message to the conversation and returns the updated messages list.
+
+        :param from_role: Sender of the message (e.g., user, agent, system).
+        :param to_role: Recipient of the message (e.g., external, internal).
+        :param content: Message content.
+        :return: Updated conversation message list.
         """
-        if msg_content.startswith("/"):
-            # Assume user is trying to call an agent
-            return await self.call_agent(msg_content)
-
-        # Otherwise, LLM processes it as a general chat message
-        return f"{from_user} said: {msg_content}"
-
-    async def call_agent(self, agent_command):
-        """
-        Extracts agent/action/arguments and calls Echo to execute it.
-        """
-        match = self.parse_command(agent_command)
-        if not match:
-            return "Invalid agent command format."
-
-        agent, action, arguments = match
-        response = await self.echo.handle_command(agent, action, arguments, None, None)
-
-        # Return in structured format
-        return f"FROM: AGENT\nTO: LLM\nMESSAGE: {response}"
-
-    async def handle_llm_message(self, from_user, msg_content):
-        """
-        The LLM generates a response to a user or system message.
-        """
-        return f"FROM: LLM\nTO: GROUP\nMESSAGE: {self.llm_generate_response(from_user, msg_content)}"
-
-    def parse_message_format(self, message_text):
-        """
-        Parses a structured message in the FROM: TO: MESSAGE: format.
-        Returns a dictionary or None if invalid.
-        """
-        try:
-            lines = message_text.split("\n")
-            if len(lines) < 3:
-                return None  # Invalid format
-
-            from_user = lines[0].split(": ", 1)[1]
-            to_user = lines[1].split(": ", 1)[1]
-            msg_content = lines[2].split(": ", 1)[1]
-
-            return {"FROM": from_user, "TO": to_user, "MESSAGE": msg_content}
-
-        except (IndexError, ValueError):
-            return None  # Parsing failed
-
-    def parse_command(self, message_content):
-        """
-        Parses an /agent/action/arguments command.
-        Returns (agent, action, arguments) or None if invalid.
-        """
-        import re
-        match = re.match(r"^/(\w+)/(\w+)/(.*)", message_content)
-        if not match:
-            return None
-
-        agent, action, arguments_str = match.groups()
-        try:
-            arguments = json.loads(arguments_str) if arguments_str else None
-        except json.JSONDecodeError:
-            arguments = None  # Invalid JSON, pass None
-
-        return agent, action, arguments
-
-    def llm_generate_response(self, from_user, msg_content):
-        """
-        Placeholder for LLM-generated responses.
-        Replace with actual model call.
-        """
-        return f"I understand, {from_user}. Let me check that for you."
+        formatted_message = [{"from": from_role, "to": to_role, "content": content}]
+        conversation = self.echo.handle_command(f"/conversation/add_message/{formatted_message}")
+        return conversation if isinstance(conversation, list) else []

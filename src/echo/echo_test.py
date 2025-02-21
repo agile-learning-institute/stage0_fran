@@ -1,26 +1,17 @@
 import unittest
-import asyncio
+import json
 from echo.echo import Echo
 from echo.agent import Agent
+from unittest.mock import Mock
 
 class TestEcho(unittest.TestCase):
 
     def setUp(self):
         """Initialize Echo instance before each test."""
         self.echo = Echo()
-        self.agent = Agent("test_agent")
-
-        async def sample_action(args):
-            return f"Executed with {args}"
-
-        self.agent.register_action(
-            "test_action",
-            sample_action,
-            "A test action",
-            {"type": "object", "properties": {}},
-            {"type": "string"}
-        )
-
+        self.agent = Mock(spec=Agent)
+        self.agent.get_actions.return_value = ["test_action"]
+        self.agent.invoke_action.return_value = "Action executed successfully"
         self.echo.register_agent("test_agent", self.agent)
 
     def test_register_agent(self):
@@ -34,7 +25,7 @@ class TestEcho(unittest.TestCase):
 
     def test_parse_command_valid(self):
         """Ensure a valid command is parsed correctly."""
-        command = '/test_agent/test_action/{"key": "value"}'
+        command = "/test_agent/test_action/{\"key\": \"value\"}"
         agent, action, arguments = self.echo.parse_command(command)
 
         self.assertEqual(agent, "test_agent")
@@ -42,7 +33,7 @@ class TestEcho(unittest.TestCase):
         self.assertEqual(arguments, {"key": "value"})
 
     def test_parse_command_invalid_json(self):
-        """Ensure command with invalid JSON returns (None, None, None)."""
+        """Ensure command with invalid JSON raises an exception."""
         command = "/test_agent/test_action/{invalid_json}"
         with self.assertRaises(Exception):
             self.echo.parse_command(command)
@@ -50,21 +41,22 @@ class TestEcho(unittest.TestCase):
     def test_handle_command_valid(self):
         """Ensure a valid command is routed correctly."""
         command = "/test_agent/test_action/{\"key\": \"value\"}"
-        result = asyncio.run(self.echo.handle_command(command))
-
-        self.assertEqual(result, "Executed with {'key': 'value'}")
+        result = self.echo.handle_command(command)
+        
+        self.assertEqual(result, "Action executed successfully")
+        self.agent.invoke_action.assert_called_once_with("test_action", {"key": "value"})
 
     def test_handle_command_unknown_agent(self):
         """Ensure an unknown agent returns silence."""
         command = "/unknown_agent/test_action/{\"key\": \"value\"}"
-        result = asyncio.run(self.echo.handle_command(command))
+        result = self.echo.handle_command(command)
 
         self.assertEqual(result, "")
 
     def test_handle_command_unknown_action(self):
         """Ensure an unknown action returns available actions."""
         command = "/test_agent/unknown_action/{}"
-        result = asyncio.run(self.echo.handle_command(command))
+        result = self.echo.handle_command(command)
 
         self.assertIn("Unknown action 'unknown_action'", result)
         self.assertIn("Available actions: test_action", result)

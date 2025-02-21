@@ -41,7 +41,7 @@ class TestWorkshopServices(unittest.IsolatedAsyncioTestCase):
         mock_config.return_value = mock_config_instance
         mock_mongo_instance = MagicMock()
         mock_mongo.return_value = mock_mongo_instance
-        mock_get_chain.return_value = ["exercise1"]
+        mock_get_chain.return_value = {"exercises": ["exercise1"]}
         mock_add_conversation.return_value = {"_id": "conv1"}
         mock_mongo_instance.create_document.return_value = "ws1"
         mock_mongo_instance.get_document.return_value = {"_id": "ws1", "name": "New Workshop"}

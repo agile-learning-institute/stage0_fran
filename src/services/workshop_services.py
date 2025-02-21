@@ -44,7 +44,6 @@ class WorkshopServices:
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
-        chain = ChainServices.get_chain(chain_id, token)
         
         def _create_exercise(exercise_id):
             """Create a single exercises based on the exercise ID"""
@@ -57,6 +56,7 @@ class WorkshopServices:
             
         # Build the list of exercises
         exercises = []
+        chain = ChainServices.get_chain(chain_id, token)
         for exercise_id in chain["exercises"]: 
             exercises.append(_create_exercise(exercise_id))
 

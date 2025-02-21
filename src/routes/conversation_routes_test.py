@@ -29,7 +29,7 @@ class TestConversationRoutes(unittest.TestCase):
         self.assertEqual(response.json, [{"id": "conversation1", "name": "Test Conversation"}])
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_get_conversations.assert_called_once_with("", mock_token)
+        mock_get_conversations.assert_called_once_with(mock_token)
 
     @patch('src.routes.conversation_routes.create_token')
     @patch('src.routes.conversation_routes.create_breadcrumb')
@@ -134,8 +134,12 @@ class TestConversationRoutes(unittest.TestCase):
         mock_add_message.return_value = mock_messages
 
         # Act
-        response = self.client.post('/api/conversation/conversation1/message', json=mock_new_message)
-
+        response = self.client.post(
+            '/api/conversation/conversation1/message', 
+            data=mock_new_message.encode('utf-8'),  
+            content_type='text/plain'  
+        )
+        
         # Assert
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, mock_messages)

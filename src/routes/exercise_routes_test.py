@@ -31,7 +31,7 @@ class TestExerciseRoutes(unittest.TestCase):
         self.assertEqual(response.json, mock_exercises)
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_get_exercises.assert_called_once_with("", mock_token)
+        mock_get_exercises.assert_called_once_with(mock_token)
 
     @patch('src.routes.exercise_routes.create_token')
     @patch('src.routes.exercise_routes.create_breadcrumb')

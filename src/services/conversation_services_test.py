@@ -72,15 +72,15 @@ class TestConversationServices(unittest.TestCase):
         mock_mongo_instance = MagicMock()
         mock_mongo.return_value = mock_mongo_instance
         mock_config.return_value = MagicMock()
-
-        mock_mongo_instance.update_document.return_value = {"_id": "conv1", "message_added": True}
+        mock_update_return = {"_id": "conv1", "message_added": True}
+        mock_mongo_instance.update_document.return_value = mock_update_return
 
         token = {"user_id": "test_user"}
         breadcrumb = {"timestamp": "now"}
         message = {"text": "New message"}
 
         result = ConversationServices.add_message("conv1", token, breadcrumb, message)
-        self.assertEqual(result, "")  # Placeholder for LLM reply
+        self.assertEqual(result, mock_update_return)
 
 if __name__ == '__main__':
     unittest.main()

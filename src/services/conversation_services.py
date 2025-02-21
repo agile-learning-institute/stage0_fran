@@ -92,18 +92,10 @@ class ConversationServices:
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
         
-        logger.info(f"Message: {message}")
         match = {"name": channel_name}
         set_data = {"last_saved": breadcrumb}
         push_data = {"conversation": message}
-        mongo.update_document(config.CONVERSATION_COLLECTION_NAME, match=match, set_data=set_data, push_data=push_data)
-        logger.info(f"User Message {message} Added")
+        reply = mongo.update_document(config.CONVERSATION_COLLECTION_NAME, match=match, set_data=set_data, push_data=push_data)
         
-        reply = "LLM Reply" # TODO: LLM Generate goes here!
-        set_data = {"last_saved": breadcrumb}
-        push_data = {"conversation": reply}
-        mongo.update_document(config.CONVERSATION_COLLECTION_NAME, match=match, set_data=set_data, push_data=push_data)
-        logger.info(f"LLM Reply {reply} Added")
-
         return reply
 

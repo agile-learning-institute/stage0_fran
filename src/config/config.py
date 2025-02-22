@@ -39,6 +39,7 @@ class Config:
             self.STAGE0_FRAN_TOKEN = ''
             self.FRAN_MODEL_NAME = ''
             self.FRAN_API_PORT = 0
+            self.FRAN_BOT_ID = ''
             self.SEARCH_API_PORT = 0
             self.MONGO_CONNECTION_STRING = ''
             self.ELASTIC_CLIENT_OPTIONS = {}
@@ -61,7 +62,8 @@ class Config:
                 "EXERCISE_COLLECTION_NAME": "exercises",
                 "VERSION_COLLECTION_NAME": "msmCurrentVersions",
                 "ELASTIC_INDEX_NAME": "stage0",
-                "FRAN_MODEL_NAME": "Fran"
+                "FRAN_MODEL_NAME": "Fran",
+                "FRAN_BOT_ID": "BBB000000000000000000001",
             }
             self.config_ints = {
                 "FRAN_API_PORT": "8580",

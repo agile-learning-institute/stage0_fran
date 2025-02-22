@@ -42,7 +42,7 @@ app.register_blueprint(create_workshop_routes(), url_prefix='/api/workshop')
 
 # Initialize Discord Bot
 from echo.echo import Echo
-bot = Echo(__name__, config=config.BOT_CONFIG)
+bot = Echo(__name__, bot_id=config.FRAN_BOT_ID)
 
 # Register Discord Agents
 from agents.config_agent import create_config_agent

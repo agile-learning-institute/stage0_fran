@@ -3,8 +3,9 @@ import re
 from echo.agent import Agent
 
 class Echo:
-    def __init__(self):
+    def __init__(self, bot_id=None):
         """Initialize Echo with a registry of agents."""
+        self.bot_id = bot_id
         self.agents = {}
 
     def register_agent(self, agent_name: str, agent: Agent):

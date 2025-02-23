@@ -1,4 +1,5 @@
-import asyncio
+from typing import Any, Callable
+
 
 class Agent:
     def __init__(self, name: str):
@@ -6,7 +7,12 @@ class Agent:
         self.name = name
         self.actions = {}
 
-    def register_action(self, action_name: str, function, description: str, arguments_schema: dict, output_schema: dict):
+    def register_action(self, 
+            action_name: str, 
+            function: Callable[[Any], Any], 
+            description: str, 
+            arguments_schema: dict, 
+            output_schema: dict):
         """Registers an action with required metadata and ensures validity."""
         if not all([action_name, function, description, arguments_schema, output_schema]):
             raise ValueError("Missing required attributes for action registration")

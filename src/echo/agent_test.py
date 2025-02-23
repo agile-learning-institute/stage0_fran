@@ -1,5 +1,4 @@
 import unittest
-import asyncio
 from echo.agent import Agent
 
 class TestEchoAgent(unittest.TestCase):
@@ -14,11 +13,11 @@ class TestEchoAgent(unittest.TestCase):
             return "Executed"
 
         self.agent.register_action(
-            "test_action",
-            sample_action,
-            "Test description",
-            {"type": "object", "properties": {}},
-            {"type": "string"}
+            action_name = "test_action",
+            function = sample_action,
+            description = "Test description",
+            arguments_schema = {"type": "object", "properties": {}},
+            output_schema = {"type": "string"}
         )
 
         self.assertIn("test_action", self.agent.get_actions())
@@ -30,11 +29,11 @@ class TestEchoAgent(unittest.TestCase):
 
         with self.assertRaises(ValueError) as context:
             self.agent.register_action(
-                "test_action",
-                sample_action,
-                None,  # Missing description
-                {"type": "object", "properties": {}},
-                {"type": "string"}
+                action_name="test_action",
+                function=sample_action,
+                description=None,  # Missing description
+                arguments_schema={"type": "object", "properties": {}},
+                output_schema={"type": "string"}
             )
         self.assertEqual(str(context.exception), "Missing required attributes for action registration")
 
@@ -45,11 +44,11 @@ class TestEchoAgent(unittest.TestCase):
 
         with self.assertRaises(ValueError) as context:
             self.agent.register_action(
-                "test_action",
-                sample_action,
-                "Test description",
-                None,  # Missing arguments_schema
-                None   # Missing output_schema
+                action_name="test_action",
+                function=sample_action,
+                description="Test description",
+                arguments_schema=None,  # Missing arguments_schema
+                output_schema=None   # Missing output_schema
             )
         self.assertEqual(str(context.exception), "Missing required attributes for action registration")
 
@@ -59,11 +58,11 @@ class TestEchoAgent(unittest.TestCase):
             return "Executed"
 
         self.agent.register_action(
-            "test_action",
-            sample_action,
-            "Test description",
-            {"type": "object", "properties": {}},
-            {"type": "string"}
+            action_name="test_action",
+            function=sample_action,
+            description="Test description",
+            arguments_schema={"type": "object", "properties": {}},
+            output_schema={"type": "string"}
         )
 
         action_metadata = self.agent.get_action_metadata("test_action")
@@ -78,11 +77,11 @@ class TestEchoAgent(unittest.TestCase):
             return f"Received {args}"
 
         self.agent.register_action(
-            "test_action",
-            sample_action,
-            "Test description",
-            {"type": "object", "properties": {}},
-            {"type": "string"}
+            action_name="test_action",
+            function=sample_action,
+            description="Test description",
+            arguments_schema={"type": "object", "properties": {}},
+            output_schema={"type": "string"}
         )
 
         result = self.agent.invoke_action("test_action", {"key": "value"})

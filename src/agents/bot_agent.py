@@ -164,4 +164,4 @@ def create_bot_agent(bot):
             }
         })
 
-    logger.info("Registered Fran command handlers.")
+    logger.info("Registered bot agent action handlers.")

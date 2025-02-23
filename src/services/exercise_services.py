@@ -12,7 +12,7 @@ class ExerciseServices:
         return # No RBAC yet
 
     @staticmethod
-    def get_exercises(token):
+    def get_exercises(token=None):
         """Get a list of all exercises"""
         ExerciseServices._check_user_access(token)
         config = Config.get_instance()
@@ -23,7 +23,7 @@ class ExerciseServices:
         return exercises
 
     @staticmethod
-    def get_exercise(exercise_id, token):
+    def get_exercise(exercise_id=None, token=None):
         """Get the specified exercise"""
         ExerciseServices._check_user_access(token)
         config = Config.get_instance()

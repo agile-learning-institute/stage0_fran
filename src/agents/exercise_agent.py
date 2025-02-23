@@ -1,54 +1,67 @@
 import logging
-from echo import Blueprint
 from echo_utils.breadcrumb import create_breadcrumb
 from echo_utils.token import create_token
 from services.exercise_services import ExerciseServices
 
 logger = logging.getLogger(__name__)
 
-def create_exercise_agent():
+def create_exercise_agent(bot):
     """ Registers event handlers and commands for the Fran home channel. """
-    exercise_agent = Blueprint('conversation_agent', __name__)
     
-    @exercise_agent.action(action_name="get_exercises", 
-                description="Return a list of active exercises", 
-                arguments_schema={},
-                outputs_schema={
-                    "description": "List of name and id's of all exercises",
-                    "type": "array",
-                    "items": {
-                        "type":"object",
-                        "properties": {
-                            "_id": {
-                                "description": "",
-                                "type": "unique identifier",
-                            },
-                            "name": {
-                                "description": "",
-                                "type": "string",
-                            },
-                        }
-                    }
-                })
-    async def get_exercises(arguments):
-        """ Slash command to get a list of all active exercises"""
+    def get_exercises(arguments):
+        """Get the list of Exercise Names and IDs"""
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            exercises = ExerciseServices.get_exercises(token)
-            logger.info(f"Get Exercise Success {breadcrumb}")
-            return exercises
+            exercise = ExerciseServices.get_exercises(token=token)
+            logger.info(f"get_exercises Successful {breadcrumb}")
+            return exercise
         except Exception as e:
-            logger.warning(f"Get Exercise Action Error has occurred: {e}")
-            return "A processing error occurred"
+            logger.warning(f"A get_exercises Error has occurred: {e}")
+            return "error"
+    bot.register_action(
+        action_name="get_exercises", 
+        function=get_exercises,
+        description="Return a list of active exercises", 
+        arguments_schema="none",
+        output_schema={
+            "description": "List of name and id's of all exercises",
+            "type": "array",
+            "items": {
+                "type":"object",
+                "properties": {
+                    "_id": {
+                        "description": "",
+                        "type": "unique identifier",
+                    },
+                    "name": {
+                        "description": "",
+                        "type": "string",
+                    },
+                }
+            }
+        })
 
-    @exercise_agent.action(action_name="get_exercise", 
+    def get_exercise(arguments):
+        """Get a specific exercise exercise"""
+        try:
+            token = create_token()
+            breadcrumb = create_breadcrumb(token)
+            exercise = ExerciseServices.get_exercise(exercise_id=arguments, token=token)
+            logger.info(f"get_exercise Successful {breadcrumb}")
+            return exercise
+        except Exception as e:
+            logger.warning(f"A get_exercise Error has occurred: {e}")
+            return "error"
+    bot.register_action(
+        action_name="get_exercise", 
+        function=get_exercise,
         description="Get a specific exercise", 
         arguments_schema={
             "description": "Exercise unique identifier (from get_exercises)",
             "type": "identifier",
         },
-        outputs_schema={
+        output_schema={
             "title": "Exercise",
             "description": "A description of the exercise, and instructions on how to guide it.",
             "type": "object",
@@ -93,14 +106,6 @@ def create_exercise_agent():
             }
         }
     )
-    async def get_exercise(arguments):
-        """ Slash command to get a specific exercises"""
-        try:
-            token = create_token()
-            breadcrumb = create_breadcrumb(token)
-            exercises = ExerciseServices.get_exercises(token)
-            logger.info(f"Get Exercise Success {breadcrumb}")
-            return exercises
-        except Exception as e:
-            logger.warning(f"Get Exercise Action Error has occurred: {e}")
-            return "A processing error occurred"
+                        
+    logger.info("Registered exercise agent action handlers.")
+    

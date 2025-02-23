@@ -17,8 +17,7 @@ def create_exercise_routes():
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            query = request.args.get('query') or ""
-            exercises = ExerciseServices.get_exercises(token)
+            exercises = ExerciseServices.get_exercises(token=token)
             logger.info(f"Get Exercise Success {breadcrumb}")
             return jsonify(exercises), 200
         except Exception as e:
@@ -31,7 +30,7 @@ def create_exercise_routes():
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            exercise = ExerciseServices.get_exercise(id, token)
+            exercise = ExerciseServices.get_exercise(exercise_id=id, token=token)
             logger.info(f"Get exercise Success {breadcrumb}")
             return jsonify(exercise), 200
         except Exception as e:

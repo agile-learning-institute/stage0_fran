@@ -81,7 +81,11 @@ class DiscordBot(discord.Client):
         Updates the list of active channels using the bot_agent actions.
         """
         try:
-            self.active_channels = self.echo.handle_command(f"/bot/{action}/{json.dumps(channel)}")
+            arguments = {
+                "bot_id": self.echo.bot_id,
+                "channel_id": channel
+            }
+            self.active_channels = self.echo.handle_command(f"/bot/{action}/{json.dumps(arguments)}")
             logger.info(f"Updated active channels list: {self.active_channels}")
             return f"✅ Channel: {channel} {'added to' if action == 'add_channel' else 'removed from'} active channels list."
         except Exception as e:

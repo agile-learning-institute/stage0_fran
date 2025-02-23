@@ -10,6 +10,7 @@ class TestDiscordBot(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         """Set up the bot with mock dependencies before each test."""
         self.echo = MagicMock(spec=Echo)
+        self.echo.bot_id = "Test_Bot_ID"
         self.llm_handler = MagicMock(spec=LLMHandler)
         self.intents = discord.Intents.default()
         self.bot = DiscordBot(self.echo, self.llm_handler, intents=self.intents)

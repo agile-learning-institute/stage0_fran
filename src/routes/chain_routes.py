@@ -17,8 +17,7 @@ def create_chain_routes():
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            query = request.args.get('query') or ""
-            chains = ChainServices.get_chains(token)
+            chains = ChainServices.get_chains(token=token)
             logger.info(f"Get Chain Success {breadcrumb}")
             return jsonify(chains), 200
         except Exception as e:
@@ -27,11 +26,11 @@ def create_chain_routes():
         
     # GET /api/chain/{id} - Return a specific chain
     @chain_routes.route('/<string:id>', methods=['GET'])
-    def get_Chain(id):
+    def get_chain(id):
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            chain = ChainServices.get_chain(id, token)
+            chain = ChainServices.get_chain(chain_id=id, token=token)
             logger.info(f"Get Chain Success {breadcrumb}")
             return jsonify(chain), 200
         except Exception as e:

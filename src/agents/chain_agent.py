@@ -1,50 +1,94 @@
-import discord
 import logging
-from discord import app_commands
-from src.services.chain_services import ChainServices
-from src.services.workshop_services import WorkshopServices
+from echo_utils.breadcrumb import create_breadcrumb
+from echo_utils.token import create_token
+from services.chain_services import ChainServices
 
 logger = logging.getLogger(__name__)
 
 def create_chain_agent(bot):
     """ Registers event handlers and commands for the Fran home channel. """
+    
+    def get_chains(arguments):
+        """Get the list of Chain Names and IDs"""
+        try:
+            token = create_token()
+            breadcrumb = create_breadcrumb(token)
+            chain = ChainServices.get_chains(token=token)
+            logger.info(f"get_chains Successful {breadcrumb}")
+            return chain
+        except Exception as e:
+            logger.warning(f"A get_chains Error has occurred: {e}")
+            return "error"
+    bot.register_action(
+        action_name = "get_chains", 
+        function = get_chains,
+        description = "Get a list of chains", 
+        arguments_schema = {"None"},
+        output_schema = {
+            "title": "Chains",
+            "description": "Stage0 Exercise Chains",
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "description": "The unique identifier for a Chain",
+                    "type": "identifier"
+                },
+                "name": {
+                    "description": "Chain Short Name",
+                    "type": "word"
+                }
+            }
+        })
 
-    @bot.tree.command(name="create_workshop", description="Create a new design-thinking workshop.")
-    async def create_workshop(interaction: discord.Interaction):
-        """ Slash command to create a new workshop. Opens a modal for input. """
-        # Fetch available workshop chains from the service
-        chains = ChainServices.get_chains()
-        chain_options = [discord.SelectOption(label=chain.name, value=chain._id) for chain in chains]
+    def get_chain(arguments):
+        """Get a specific exercise chain"""
+        try:
+            token = create_token()
+            breadcrumb = create_breadcrumb(token)
+            chain = ChainServices.get_chain(chain_id=arguments, token=token)
+            logger.info(f"get_chain Successful {breadcrumb}")
+            return chain
+        except Exception as e:
+            logger.warning(f"A get_chain Error has occurred: {e}")
+            return "error"
+    bot.register_action(
+        action_name= "get_chain", 
+        function = get_chain,
+        description = "Get a exercise chain", 
+        arguments_schema = {
+            "description": "Chain Unique Identifier",
+            "type": "identifier"
+        },
+        output_schema = {
+            "title": "Chain",
+            "description": "A Chain of Exercises - a Template for a Workshop",
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "description": "The unique identifier for a Chain",
+                    "type": "identifier"
+                },
+                "status": {
+                    "description": "The status of the chain",
+                    "type": "enum",
+                    "enums": "default_status"
+                },
+                "name": {
+                    "description": "Chain short name, like Kickoff or Retrospective",
+                    "type": "word"
+                },
+                "exercises": {
+                    "description": "List of Exercise IDs",
+                    "type": "array",
+                    "items": {
+                        "type": "identifier"
+                    }
+                },
+                "last_saved": {
+                    "description": "Last Saved breadcrumb",
+                    "type": "breadcrumb"
+                }
+            }
+        })
 
-        # Create a modal form for user input
-        class WorkshopModal(discord.ui.Modal, title="Create Workshop"):
-            chain = discord.ui.Select(
-                placeholder="Select a workshop chain...",
-                options=chain_options
-            )
-            users = discord.ui.TextInput(
-                label="Invite users (comma-separated @mentions)",
-                placeholder="@user1, @user2",
-                required=True
-            )
-
-            async def on_submit(self, interaction: discord.Interaction):
-                # Extract user inputs
-                token = {} # Need a bot token
-                breadcrumb = {} # Need a bot breadcrumb
-                chain_id = self.chain.values[0]
-                user_mentions = self.users.value.split(",")
-                guild = interaction.guild
-                category = discord.utils.get(guild.categories, name="workshops")  
-
-                # Create a workshop document and Channel
-                workshop = WorkshopServices.create_workshop(chain_id, user_mentions, token, breadcrumb)
-                channel = WorkshopServices.create_channel(workshop, guild, category)
-                await interaction.response.send_message(f"Workshop **{workshop._id}** created in {channel.mention}!", ephemeral=True)
-
-        # Show the modal when the command is executed
-        await interaction.response.send_modal(WorkshopModal())
-
-    bot.tree.add_command(create_workshop)
-
-    logger.info("Registered Fran command handlers.")
+    logger.info("Registered chain agent action handlers.")

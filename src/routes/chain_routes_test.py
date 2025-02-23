@@ -31,7 +31,7 @@ class TestChainRoutes(unittest.TestCase):
         self.assertEqual(response.json, mock_chains)
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_get_chains.assert_called_once_with(mock_token)
+        mock_get_chains.assert_called_once_with(token=mock_token)
 
     @patch('src.routes.chain_routes.create_token')
     @patch('src.routes.chain_routes.create_breadcrumb')
@@ -68,7 +68,7 @@ class TestChainRoutes(unittest.TestCase):
         self.assertEqual(response.json, mock_chain)
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_get_chain.assert_called_once_with("chain1", mock_token)
+        mock_get_chain.assert_called_once_with(chain_id="chain1", token=mock_token)
 
     @patch('src.routes.chain_routes.create_token')
     @patch('src.routes.chain_routes.create_breadcrumb')

@@ -12,7 +12,7 @@ class ChainServices:
         return # No access control implemented yet
 
     @staticmethod
-    def get_chains(token):
+    def get_chains(token=None):
         """Get a list of chain names and ids"""
         ChainServices._check_user_access(token)
         config = Config.get_instance()
@@ -23,7 +23,7 @@ class ChainServices:
         return chains
 
     @staticmethod
-    def get_chain(chain_id, token):
+    def get_chain(chain_id=None, token=None):
         """Get the specified chain"""
         ChainServices._check_user_access(token)
         config = Config.get_instance()

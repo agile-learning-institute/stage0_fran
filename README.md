@@ -4,36 +4,25 @@ This repository contains the API and Discord Chatbot that supports the user inte
 
 See [The OpenAPI](./docs/index.html) doc for information on the API and Data Structures Used. 
 
-This system uses the [Echo] package to expose agent actions in a discord chat conversation.
+This system uses the [Echo](./ECHO.md) package to expose agent actions in a discord chat conversation.
 
 # Separation of Concerns
 
-### Code designed to be extracted to a Echo package.
-This is a Flask-like Package for Discord Bots
+Folder structure for source code
 ```
 /src
-| /echo/Echo.py - Echo flask-like chat agent framework
+| /agents         ECHO Agent Implementations
+| /config         Implements, global configuration management
+| /echo           Implements the Echo chat agent framework
+| /echo_utils     Stage0 Echo helpers
+| /flask_utils    Stage0 Flask helpers
+| /mongo_utils    Simple Mongo IO Wrapper
+| /routes         Flask route implementations
+| /services       Business Service implementations 
+                   (support routes and agents)
 ```
 
-### Code designed to be extracted to a stage0_utils package.
-This shared code will be used in all of the stage0 Bot's and API's
-```
-/src
-| /config - Implements, global configuration management
-| /flask_utils - Flask helpers
-| /llm_utils - LLM Wrapper
-| /mongo_utils - Simple Mongo IO Wrapper
-| /echo_utils - conversation_[agent, route, service]
-```
-
-### Code specific to the Fran API
-```
-/src
-| /server.py - Initialize the server, connect to backing services
-| /agents - Echo Agent handlers
-| /routes - Flask endpoint handlers
-| /services - Business logic, supports agents and routes
-```
+Note: /echo and bot & conversation agents/routes/services will be extracted to an Echo package. The config, config agents/routes, and *_utils folders will be extracted to stage0_api_utilities package. This will leave only agents, routes, services in this repo.
 
 # Supported pipenv commands
 - ``pipenv run local`` run the server locally in dev mode

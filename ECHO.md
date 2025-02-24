@@ -1,6 +1,6 @@
 # Echo - A Multi-Party Conversational AI Framework
 
-Echo is a Python-based chatbot framework inspired by Flask. Echo enables **multi-party conversational AI** by acting as a bridge between **human group conversations (outer dialog)** and **structured agent interactions (inner dialog).**
+Echo is a Python-based chatbot agent framework inspired by Flask. Since Agent/Action syntax can be terse, Echo uses a **multi-party conversational AI** to act as a bridge between **human group conversations (outer dialog)** and **structured agent interactions (inner dialog).**
 
 ## **How Echo Works**
 - Echo operates in **two conversational layers:**
@@ -15,37 +15,37 @@ Echo is a Python-based chatbot framework inspired by Flask. Echo enables **multi
 - **Agent-based command routing** using `/agent/action/arguments` syntax.
 - **LLM-powered conversation interface** that translates natural language into structured commands.
 - **Multi-party chat participation**, allowing the LLM to engage with multiple users while retrieving structured responses from agents.
-- **State management for bot and conversations**, ensuring persistence and context awareness.
+- **Mongo State management** for bot and conversations, ensuring persistence and context awareness.
 - **Modular design**, making it easy to add new agents and capabilities.
 
 ---
 
 ## **📂 Project Structure**
 For this initial implementation, Echo is intermingled with the stage0_Fran Flask/Echo project. 
-At some point in the future Echo and it's related code will be extracted into an independent package.
+At some point in the future Echo and it's related code will be extracted into an independent package. This is the proposed structure for that package repo.
+```text
+/src
+│── 📁 echo                 # Core Echo Utility Code
+│   ├── 📝 echo.py              # Main Echo agent
+│   ├── 📝 agent.py             # Base Echo agent functionality
+│   ├── 🤖 discord_bot.py       # Discord client handling on_message events
+│   ├── 🧠 llm_handler.py       # LLM-driven message generation logic
+│   ├── 🔌 ollama_llm_client.py # Ollama driver for LLM processing
+│
+│── 📁 agents               # Echo Agent Blueprints (Built-in Agents)
+│   ├── 🤖 bot_agent.py          # Bot-related actions
+│   ├── 💬 conversation_agent.py # Conversation-based actions
+│   ├── 🔁 echo_agent.py         # Default Echo agent
+│
+│── 📁 routes               # Flask API Route Blueprints
+│   ├── 🤖 bot_routes.py         # API for bot-related actions
+│   ├── 💬 conversation_routes.py # API for conversation-related actions
+│   ├── 🔁 echo_routes.py        # API for Echo core functionality
+│
+│── 📁 services             # Service Layer (Business Logic)
+│   ├── 🤖 bot_service.py        # Handles bot-related operations
+│   ├── 💬 conversation_service.py # Handles conversation-related operations
 ```
-echo                 # Echo Utility Code
-┣ echo.py                    # Core Echo agent framework
-┣ discord_bot.py             # Discord client, listens for messages
-┣ llm_handler.py             # LLM-driven message interpretation
-agents/               # Echo Agent Blueprints
-┣ echo_agent.py            # Default built-in Echo agent
-┣ bot_agent.py             # Handles bot-related actions
-┣ conversation_agent.py    # Handles conversation actions
-┣ other_agent.py           # Additional Custom Agents...
-routes/               # Flask API Route Blueprints
-┣ echo_routes.py           # Default built-in Echo API Endpoints
-┣ etc.                     # Additional API endpoints...
-services/             # Services to support Agents/Routes with business logic
-┣ bot_service.py           # Bot services
-┣ conversation_service.py  # Conversation services
-┣ other_service.py         # Additional Custom Services...
-```
-
----
-
-## **📌 LLM-Driven Conversational Flow**
-The `/agent/action/parameters` syntax is precise but terse. The LLM acts as a **natural language interface** that understands user intent, generates valid agent requests, and reformats structured responses before sharing them with the group.
 
 ---
 
@@ -75,19 +75,6 @@ MESSAGE: Active channels: #general, #bot
 FROM: FRAN_LLM
 TO: GROUP
 MESSAGE: We are currently active in #general and #bot
-```
-
----
-
-## **🛠️ Installation & Usage**
-### **📌 Install Dependencies**
-```
-pip install -r requirements.txt
-```
-
-### **📌 Run the Discord Bot**
-```
-python discord_bot.py
 ```
 
 ---

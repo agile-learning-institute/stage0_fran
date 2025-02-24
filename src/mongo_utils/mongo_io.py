@@ -14,27 +14,23 @@ class MongoIO:
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = super(MongoIO, cls).__new__(cls, *args, **kwargs)
-            cls._instance.connected = False
-            cls._instance.client = None
-            cls._instance.db = None
-            cls._instance.configure()
-        return cls._instance
+            
+            
+            # TODO: Add timeout configs to Client and use here in client constructor
+            config = Config.get_instance()
+            client = MongoClient(
+                config.MONGO_CONNECTION_STRING, 
+                serverSelectionTimeoutMS=2000, 
+                socketTimeoutMS=5000
+            )
 
-    def configure(self):
-        """Initialize Config values for Versions and Enumerators"""
-        self.config = Config.get_instance()
-
-        """Connect to MongoDB."""
-        try:
-            self.client = MongoClient(self.config.MONGO_CONNECTION_STRING, serverSelectionTimeoutMS=2000, socketTimeoutMS=5000)
-            # TODO: Config timeout
-            self.client.admin.command('ping')  # Force connection
-            self.db = self.client.get_database(self.config.MONGO_DB_NAME)
-            self.connected = True
+            cls._instance.config = config
+            cls._instance.client = client
+            cls._instance.client.admin.command('ping')  # Force connection
+            cls._instance.db = client.get_database(config.MONGO_DB_NAME)
+            cls._instance.connected = True
             logger.info(f"Connected to MongoDB")
-        except Exception as e:
-            logger.fatal(f"Failed to connect to MongoDB: {e} - exiting")
-            sys.exit(1) # fail fast 
+        return cls._instance
 
     def disconnect(self):
         """Disconnect from MongoDB."""

@@ -18,11 +18,11 @@ def create_workshop_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             query = request.args.get('query') or ""
-            workshops = WorkshopServices.get_workshops(query, token)
-            logger.info(f"Get workshops Success {query} {breadcrumb}")   
+            workshops = WorkshopServices.get_workshops(query=query, token=token)
+            logger.info(f"get_workshops Success {query} {breadcrumb}")   
             return jsonify(workshops), 200
         except Exception as e:
-            logger.warning(f"Get workshops Error has occurred: {e}")
+            logger.warning(f"get_workshops Error has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
     # GET /api/workshop/id - Return a specific workshop
@@ -31,7 +31,7 @@ def create_workshop_routes():
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            workshop = WorkshopServices.get_workshop(id, token)
+            workshop = WorkshopServices.get_workshop(workshop_id=id, token=token)
             logger.info(f"Get workshop Success {breadcrumb}")
             return jsonify(workshop), 200
         except Exception as e:
@@ -45,7 +45,7 @@ def create_workshop_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             workshop_data = request.get_json()
-            workshop = WorkshopServices.add_workshop(chain, workshop_data, token, breadcrumb)
+            workshop = WorkshopServices.add_workshop(chain_id=chain, data=workshop_data, token=token, breadcrumb=breadcrumb)
             logger.info(f"add_workshop Success {breadcrumb}")
             return jsonify(workshop), 200
         except Exception as e:
@@ -59,7 +59,7 @@ def create_workshop_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             patch_data = request.get_json()
-            workshop = WorkshopServices.update_workshop(id, patch_data, token, breadcrumb)
+            workshop = WorkshopServices.update_workshop(workshop_id=id, data=patch_data, token=token, breadcrumb=breadcrumb)
             logger.info(f"Update workshop Successful {breadcrumb}")
             return jsonify(workshop), 200
         except Exception as e:
@@ -72,7 +72,7 @@ def create_workshop_routes():
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            workshop = WorkshopServices.start_workshop(id, token, breadcrumb)
+            workshop = WorkshopServices.start_workshop(workshop_id=id, token=token, breadcrumb=breadcrumb)
             logger.info(f"Start workshop Successful {breadcrumb}")
             return jsonify(workshop), 200
         except Exception as e:
@@ -85,7 +85,7 @@ def create_workshop_routes():
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            workshop = WorkshopServices.advance_workshop(id, token, breadcrumb)
+            workshop = WorkshopServices.advance_workshop(workshop_id=id, token=token, breadcrumb=breadcrumb)
             logger.info(f"Advance workshop Successful {breadcrumb}")
             return jsonify(workshop), 200
         except Exception as e:
@@ -99,7 +99,7 @@ def create_workshop_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             observation = request.get_json()
-            workshop = WorkshopServices.add_observation(id, token, breadcrumb, observation)
+            workshop = WorkshopServices.add_observation(workshop_id=id, observation=observation, token=token, breadcrumb=breadcrumb)
             logger.info(f"Add observation to workshop Successful {breadcrumb}")
             return jsonify(workshop), 200
         except Exception as e:

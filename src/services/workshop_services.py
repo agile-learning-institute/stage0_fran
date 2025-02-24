@@ -1,11 +1,9 @@
 from datetime import datetime, timezone
-
 from bson import ObjectId
 from config.config import Config
 from mongo_utils.mongo_io import MongoIO
 from services.chain_services import ChainServices
 from src.services.conversation_services import ConversationServices
-# import discord
 
 import logging
 logger = logging.getLogger(__name__)
@@ -18,7 +16,7 @@ class WorkshopServices:
         return # No RBAC implemented yet
 
     @staticmethod
-    def get_workshops(query, token):
+    def get_workshops(query=None, token=None):
         """Get a list of workshops that have name that matches the provided query"""
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()
@@ -29,7 +27,7 @@ class WorkshopServices:
         return workshops
 
     @staticmethod
-    def get_workshop(workshop_id, token):
+    def get_workshop(workshop_id=None, token=None):
         """Get the specified workshop"""
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()
@@ -39,7 +37,7 @@ class WorkshopServices:
 
 
     @staticmethod
-    def add_workshop(chain_id, data, token, breadcrumb):
+    def add_workshop(chain_id=None, data=None, token=None, breadcrumb=None):
         """Create a new workshop based on the provided chain of exercise and workshop data"""
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()
@@ -71,7 +69,7 @@ class WorkshopServices:
         return workshop
     
     @staticmethod
-    def update_workshop(workshop_id, data, token, breadcrumb):
+    def update_workshop(workshop_id=None, data=None, token=None, breadcrumb=None):
         """Update the specified workshop"""        
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()
@@ -83,7 +81,7 @@ class WorkshopServices:
         return workshop
 
     @staticmethod
-    def start_workshop(workshop_id, token, breadcrumb):
+    def start_workshop(workshop_id=None, token=None, breadcrumb=None):
         """Update the specified workshop Status to Active, record start time"""
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()
@@ -93,15 +91,15 @@ class WorkshopServices:
                 "from": datetime.now(timezone.utc)
             }
         }
-        return WorkshopServices.update_workshop(workshop_id, data, token, breadcrumb)
+        return WorkshopServices.update_workshop(workshop_id=workshop_id, data=data, token=token, breadcrumb=breadcrumb)
 
     @staticmethod
-    def advance_workshop(id, token, breadcrumb):
+    def advance_workshop(workshop_id=None, token=None, breadcrumb=None):
         """Advance a workshop to the next current exercise"""
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
-        workshop = mongo.get_document(config.WORKSHOP_COLLECTION_NAME, id)
+        workshop = mongo.get_document(config.WORKSHOP_COLLECTION_NAME, workshop_id)
         index = workshop["current_exercise"]
         next_index = index + 1
         set_data = {"last_saved": breadcrumb}
@@ -118,10 +116,10 @@ class WorkshopServices:
             set_data["current_exercise"] = next_index
             set_data[f"exercises.{next_index}.status"] = config.PENDING_STATUS
         
-        return mongo.update_document(config.WORKSHOP_COLLECTION_NAME, id, set_data=set_data)
+        return mongo.update_document(config.WORKSHOP_COLLECTION_NAME, workshop_id, set_data=set_data)
     
     @staticmethod
-    def add_observation(workshop_id, token, breadcrumb, observation):
+    def add_observation(workshop_id=None, observation=None, token=None, breadcrumb=None):
         """Add an observation to the observations list"""
         WorkshopServices._check_user_access(token)
         config = Config.get_instance()

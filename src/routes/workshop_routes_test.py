@@ -24,14 +24,14 @@ class TestWorkshopRoutes(unittest.TestCase):
         mock_get_workshops.return_value = mock_workshops
 
         # Act
-        response = self.client.get('/api/workshop')
+        response = self.client.get('/api/workshop?query=name')
 
         # Assert
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, mock_workshops)
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_get_workshops.assert_called_once_with("", mock_token)
+        mock_get_workshops.assert_called_once_with(query="name", token=mock_token)
 
     @patch('src.routes.workshop_routes.create_token')
     @patch('src.routes.workshop_routes.create_breadcrumb')
@@ -68,7 +68,7 @@ class TestWorkshopRoutes(unittest.TestCase):
         self.assertEqual(response.json, mock_workshop)
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_get_workshop.assert_called_once_with("workshop1", mock_token)
+        mock_get_workshop.assert_called_once_with(workshop_id="workshop1", token=mock_token)
 
     @patch('src.routes.workshop_routes.create_token')
     @patch('src.routes.workshop_routes.create_breadcrumb')
@@ -106,7 +106,7 @@ class TestWorkshopRoutes(unittest.TestCase):
         self.assertEqual(response.json, mock_workshop)
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_add_workshop.assert_called_once_with("chain_id", new_workshop, mock_token, mock_breadcrumb)
+        mock_add_workshop.assert_called_once_with(chain_id="chain_id", data=new_workshop, token=mock_token, breadcrumb=mock_breadcrumb)
 
     @patch('src.routes.workshop_routes.create_token')
     @patch('src.routes.workshop_routes.create_breadcrumb')
@@ -145,7 +145,7 @@ class TestWorkshopRoutes(unittest.TestCase):
         self.assertEqual(response.json, mock_workshop)
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_update_workshop.assert_called_once_with("workshop1", patch_data, mock_token, mock_breadcrumb)
+        mock_update_workshop.assert_called_once_with(workshop_id="workshop1", data=patch_data, token=mock_token, breadcrumb=mock_breadcrumb)
 
     @patch('src.routes.workshop_routes.create_token')
     @patch('src.routes.workshop_routes.create_breadcrumb')
@@ -182,7 +182,7 @@ class TestWorkshopRoutes(unittest.TestCase):
         self.assertEqual(response.json, mock_workshop)
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_start_workshop.assert_called_once_with("workshop1", mock_token, mock_breadcrumb)
+        mock_start_workshop.assert_called_once_with(workshop_id="workshop1", token=mock_token, breadcrumb=mock_breadcrumb)
 
     @patch('src.routes.workshop_routes.create_token')
     @patch('src.routes.workshop_routes.create_breadcrumb')
@@ -219,7 +219,7 @@ class TestWorkshopRoutes(unittest.TestCase):
         self.assertEqual(response.json, mock_workshop)
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_advance_workshop.assert_called_once_with("workshop1", mock_token, mock_breadcrumb)
+        mock_advance_workshop.assert_called_once_with(workshop_id="workshop1", token=mock_token, breadcrumb=mock_breadcrumb)
 
     @patch('src.routes.workshop_routes.create_token')
     @patch('src.routes.workshop_routes.create_breadcrumb')
@@ -257,7 +257,7 @@ class TestWorkshopRoutes(unittest.TestCase):
         self.assertEqual(response.json, mock_workshop)
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_add_observation.assert_called_once_with("workshop1", mock_token, mock_breadcrumb, mock_observation)
+        mock_add_observation.assert_called_once_with(workshop_id="workshop1", observation=mock_observation, token=mock_token, breadcrumb=mock_breadcrumb)
 
     @patch('src.routes.workshop_routes.create_token')
     @patch('src.routes.workshop_routes.create_breadcrumb')

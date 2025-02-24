@@ -1,6 +1,6 @@
 import json
 import unittest
-from datetime import datetime
+from datetime import datetime, timezone
 from bson.objectid import ObjectId
 from flask import Flask
 from flask_utils.ejson_encoder import MongoJSONEncoder  # Update with your correct module path
@@ -17,14 +17,14 @@ class TestMongoJSONEncoder(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_encode_datetime(self):
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         result = self.app.json.dumps({'timestamp': now})
         expected = f'{{"timestamp": "{str(now)}"}}'
         self.assertEqual(result, expected)
 
     def test_encode_mixed_objects(self):
         obj_id = ObjectId()
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         data = {
             '_id': obj_id,
             'timestamp': now,

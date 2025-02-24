@@ -1,7 +1,7 @@
 import sys
 from bson import ObjectId 
 from pymongo import MongoClient
-from src.config.config import Config
+from config.config import Config
 
 import logging
 logger = logging.getLogger(__name__)
@@ -23,10 +23,10 @@ class MongoIO:
                 serverSelectionTimeoutMS=2000, 
                 socketTimeoutMS=5000
             )
+            client.admin.command('ping')  # Force connection
 
             cls._instance.config = config
             cls._instance.client = client
-            cls._instance.client.admin.command('ping')  # Force connection
             cls._instance.db = client.get_database(config.MONGO_DB_NAME)
             cls._instance.connected = True
             logger.info(f"Connected to MongoDB")
@@ -63,7 +63,6 @@ class MongoIO:
         match = match or {}
         project = project or None
         sort_by = sort_by or None
-        logger.warning(f"Finding: {match}")
         try:
             collection = self.db.get_collection(collection_name)
             cursor = collection.find(match, project)

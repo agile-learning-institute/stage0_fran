@@ -38,7 +38,6 @@ class BotServices:
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
         data["last_saved"] = breadcrumb
-        logger.info(f"Last Saved: {data["last_saved"]}")
         bot = mongo.update_document(config.BOT_COLLECTION_NAME, bot_id, set_data=data)
         return bot
 

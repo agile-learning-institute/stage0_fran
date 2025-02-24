@@ -75,7 +75,6 @@ class WorkshopServices:
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
         data["last_saved"] = breadcrumb
-        logger.warning(f"Ready to update with {data}")
         
         workshop = mongo.update_document(config.WORKSHOP_COLLECTION_NAME, workshop_id, set_data=data)
         return workshop

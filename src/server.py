@@ -44,21 +44,21 @@ app.register_blueprint(create_workshop_routes(), url_prefix='/api/workshop')
 from echo.echo import Echo
 bot = Echo(__name__, bot_id=config.FRAN_BOT_ID)
 
-# Register Discord Agents
+# Register Discord Agents (Defaults to move to Echo package)
+from agents.bot_agent import create_bot_agent
 from agents.config_agent import create_config_agent
+from agents.conversation_agent import create_conversation_agent
+bot.register_agent(create_bot_agent(bot), agent_prefix="bot")
+bot.register_agent(create_config_agent(bot), agent_prefix="config")
+bot.register_agent(create_conversation_agent(bot), agent_prefix="conversation")
+
+# Register Discord Agents specific to Fran
 from agents.chain_agent import create_chain_agent
 from agents.exercise_agent import create_exercise_agent
 from agents.workshop_agent import create_workshop_agent
-
-from agents.bot_agent import create_bot_agent
-from agents.conversation_agent import create_conversation_agent
-bot.register_agent(create_bot_agent(), agent_prefix="bot")
-bot.register_agent(create_conversation_agent(), agent_prefix="conversation")
-
-bot.register_agent(create_config_agent(), agent_prefix="config")
-bot.register_agent(create_chain_agent(), agent_prefix="chain")
-bot.register_agent(create_exercise_agent(), agent_prefix="exercise")
-bot.register_agent(create_workshop_agent(), agent_prefix="workshop")
+bot.register_agent(create_chain_agent(bot), agent_prefix="chain")
+bot.register_agent(create_exercise_agent(bot), agent_prefix="exercise")
+bot.register_agent(create_workshop_agent(bot), agent_prefix="workshop")
 
 # Define a signal handler for SIGTERM and SIGINT
 def handle_exit(signum, frame):

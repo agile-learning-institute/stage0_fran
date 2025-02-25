@@ -1,5 +1,4 @@
 import ollama
-import json
 
 class OllamaLLMClient:
     def __init__(self, base_url="http://localhost:11434", model="mistral"):

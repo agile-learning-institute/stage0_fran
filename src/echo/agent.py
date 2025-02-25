@@ -1,6 +1,5 @@
 from typing import Any, Callable
 
-
 class Agent:
     def __init__(self, name: str):
         """Initialize an agent with a name and an empty action registry."""

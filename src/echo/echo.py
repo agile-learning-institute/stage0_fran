@@ -1,19 +1,34 @@
 import json
 import re
 from echo.agent import Agent
+from echo.discord_bot import DiscordBot
+from echo.llm_handler import LLMHandler
+from echo.ollama_llm_client import OllamaLLMClient
+
 
 class Echo:
     
     def __init__(self, name=None, bot_id=None):
-        """Initialize Echo with a registry of agents."""
+        """Initialize Echo with a default agents."""
         self.name = name
-        self.bot_id = bot_id
         self.agents = {}
+        self.llm_handler = LLMHandler(self.agents, OllamaLLMClient())
+        self.bot = DiscordBot(self.agents, bot_id, self.llm_handler)
 
-    def register_agent(self, agent_name: str, agent: Agent):
+        # Register default agents
+        from agents.bot_agent import create_bot_agent
+        from agents.conversation_agent import create_conversation_agent
+        from agents.echo_agent import create_echo_agent
+        self.register_agent(create_echo_agent(agent_name="agent", agents=self.agents))
+        self.register_agent(create_bot_agent(agent_name="bot"))
+        self.register_agent(create_conversation_agent(agent_name="conversation"))
+
+    def run(self, token):
+        self.bot.run(token)
+        
+    def register_agent(self, agent, agent_name=None):
         """Registers an agent with Echo."""
-        if not isinstance(agent, Agent):
-            raise ValueError("Only instances of Agent can be registered.")
+        if not isinstance(agent, Agent): raise Exception("can not register agent without actions")
         self.agents[agent_name] = agent
 
     def get_agents(self):

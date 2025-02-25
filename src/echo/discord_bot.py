@@ -1,14 +1,12 @@
 import discord
 import json
 import logging
-from echo.echo import Echo
-from echo.llm_handler import LLMHandler
 
 # logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 class DiscordBot(discord.Client):
-    def __init__(self, bot_framework, llm_handler, **kwargs):
+    def __init__(self, agents, bot_id, llm_handler, **kwargs):
         """
         Initializes the Discord bot with Echo framework and LLM handler.
         """
@@ -18,7 +16,8 @@ class DiscordBot(discord.Client):
         intents.dm_messages = True  
 
         super().__init__(intents=intents, **kwargs)
-        self.echo = bot_framework
+        self.agents = agents
+        self.bot_id = bot_id
         self.llm = llm_handler
         self.active_channels = []  
 
@@ -26,7 +25,7 @@ class DiscordBot(discord.Client):
         """Triggered when the bot successfully connects."""
         logger.info(f"Logged in as {self.user}")
         try:
-            self.active_channels = self.echo.handle_command(f"/bot/get_channels/{json.dumps(self.echo.bot_id)}")
+            self.active_channels = self.bot_agent.invoke_action("get_channels", {json.dumps(self.bot_id)})
             logger.info(f"Initialized active channels: {self.active_channels}")
         except Exception as e:
             logger.warning(f"Failed to initialize active channels: {e}")
@@ -82,10 +81,11 @@ class DiscordBot(discord.Client):
         """
         try:
             arguments = {
-                "bot_id": self.echo.bot_id,
+                "bot_id": self.bot_id,
                 "channel_id": channel
             }
-            self.active_channels = self.echo.handle_command(f"/bot/{action}/{json.dumps(arguments)}")
+            bot_agent = self.agents["bot"] 
+            self.active_channels = bot_agent.invoke_action(action, json.dumps(arguments))
             logger.info(f"Updated active channels list: {self.active_channels}")
             return f"✅ Channel: {channel} {'added to' if action == 'add_channel' else 'removed from'} active channels list."
         except Exception as e:

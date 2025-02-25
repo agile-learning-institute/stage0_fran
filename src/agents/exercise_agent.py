@@ -1,12 +1,14 @@
 import logging
 from echo_utils.breadcrumb import create_breadcrumb
 from echo_utils.token import create_token
+from echo.agent import Agent
 from services.exercise_services import ExerciseServices
 
 logger = logging.getLogger(__name__)
 
-def create_exercise_agent(bot):
+def create_exercise_agent(agent_name):
     """ Registers event handlers and commands for the Fran home channel. """
+    agent = Agent(agent_name)
     
     def get_exercises(arguments):
         """Get the list of Exercise Names and IDs"""
@@ -19,7 +21,7 @@ def create_exercise_agent(bot):
         except Exception as e:
             logger.warning(f"A get_exercises Error has occurred: {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name="get_exercises", 
         function=get_exercises,
         description="Return a list of active exercises", 
@@ -53,7 +55,7 @@ def create_exercise_agent(bot):
         except Exception as e:
             logger.warning(f"A get_exercise Error has occurred: {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name="get_exercise", 
         function=get_exercise,
         description="Get a specific exercise", 
@@ -108,4 +110,5 @@ def create_exercise_agent(bot):
     )
                         
     logger.info("Registered exercise agent action handlers.")
+    return agent
     

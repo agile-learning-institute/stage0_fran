@@ -2,12 +2,14 @@ import logging
 from echo_utils.breadcrumb import create_breadcrumb
 from echo_utils.token import create_token
 from config.config import Config
+from echo.agent import Agent
 
 logger = logging.getLogger(__name__)
 
-def create_config_agent(bot):
+def create_config_agent(agent_name):
     """ Registers event handlers and commands for the Config Agent. """
-
+    agent = Agent(agent_name)
+    
     def get_config(arguments):
         """ Slash command to get config data"""
         try:
@@ -19,7 +21,7 @@ def create_config_agent(bot):
         except Exception as e:
             logger.warning(f"get_config Error has occurred: {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name="get_config", 
         function=get_config,
         description="Get the Bot Configuration information", 
@@ -49,3 +51,4 @@ def create_config_agent(bot):
     )
 
     logger.info("Registered config agent action handlers.")
+    return agent

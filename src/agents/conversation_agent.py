@@ -1,12 +1,14 @@
 import logging
 from echo_utils.breadcrumb import create_breadcrumb
 from echo_utils.token import create_token
+from echo.agent import Agent
 from services.conversation_services import ConversationServices
 
 logger = logging.getLogger(__name__)
 
-def create_conversation_agent(bot):
-    """ Registers agent actions for Echo bot."""
+def create_conversation_agent(agent_name):
+    """ Registers agent actions for Echo agent."""
+    agent = Agent(agent_name)
     
     # Define reused schema's
     conversation_schema = {
@@ -55,7 +57,7 @@ def create_conversation_agent(bot):
         except Exception as e:
             logger.warning(f"Get conversations Error has occurred: {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name="get_conversations",
         function=get_conversations,
         description="Return a list of active, latests, conversations", 
@@ -88,7 +90,7 @@ def create_conversation_agent(bot):
         except Exception as e:
             logger.warning(f"Get conversation Error has occurred: {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name="get_conversation", 
         function=get_conversation,
         description="Get a conversation by ID", 
@@ -112,7 +114,7 @@ def create_conversation_agent(bot):
         except Exception as e:
             logger.warning(f"Update conversation Error has occurred {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name="update_conversation", 
         function=update_conversation,
         description="Update the specified conversation", 
@@ -133,7 +135,7 @@ def create_conversation_agent(bot):
         except Exception as e:
             logger.warning(f"Add Message Error has occurred {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name="add_message", 
         function=add_message,
         description="Add a message to the specified conversation", 
@@ -160,4 +162,5 @@ def create_conversation_agent(bot):
             }
         })
         
-    logger.info("Registered bot agent action handlers.")
+    logger.info("Registered agent agent action handlers.")
+    return agent

@@ -1,12 +1,14 @@
 import logging
 from echo_utils.breadcrumb import create_breadcrumb
 from echo_utils.token import create_token
+from echo.agent import Agent
 from services.bot_services import BotServices
 
 logger = logging.getLogger(__name__)
 
-def create_bot_agent(bot):
+def create_bot_agent(agent_name):
     """ Registers event handlers and commands for the Fran home channel. """
+    agent = Agent(agent_name)
     
     def get_bot(arguments):
         """Get the bot record based on the bot_id passed as arguments"""
@@ -17,15 +19,15 @@ def create_bot_agent(bot):
         except Exception as e:
             logger.warning(f"A get_bot Error has occurred: {e}")
             return "error"
-    bot.register_action(
-        action_name = "get_bot", 
-        function = get_bot,
-        description = "Get all bot information for the specified bot", 
-        arguments_schema = {
+    agent.register_action(
+        action_name="get_bot", 
+        function=get_bot,
+        description="Get all bot information for the specified bot", 
+        arguments_schema={
             "description": "Bot Unique Identifier",
             "type": "identifier"
         },
-        output_schema = {
+        output_schema={
             "title": "Bots",
             "description": "Stage0 Bots",
             "type": "object",
@@ -70,7 +72,7 @@ def create_bot_agent(bot):
         except Exception as e:
             logger.warning(f"A get_channels Error has occurred: {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name= "get_channels", 
         function = get_channels,
         description = "Get a list of active channels", 
@@ -99,7 +101,7 @@ def create_bot_agent(bot):
         except Exception as e:
             logger.warning(f"A add_channel Error has occurred: {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name= "add_channel", 
         function = add_channel,
         description = "Add a channel to the set of active channels", 
@@ -138,7 +140,7 @@ def create_bot_agent(bot):
         except Exception as e:
             logger.warning(f"A remove_channel Error has occurred: {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name= "remove_channel", 
         function = remove_channel,
         description = "Remove a channel from the active channels list", 
@@ -165,3 +167,4 @@ def create_bot_agent(bot):
         })
 
     logger.info("Registered bot agent action handlers.")
+    return agent

@@ -2,8 +2,8 @@ import sys
 import signal
 
 # Initialize Singletons
-from src.config.config import Config
-from src.mongo_utils.mongo_io import MongoIO
+from config.config import Config
+from mongo_utils.mongo_io import MongoIO
 config = Config.get_instance()
 mongo = MongoIO.get_instance()
 
@@ -42,30 +42,26 @@ app.register_blueprint(create_workshop_routes(), url_prefix='/api/workshop')
 
 # Initialize Discord Bot
 from echo.echo import Echo
-bot = Echo(__name__, bot_id=config.FRAN_BOT_ID)
+echo = Echo(__name__, bot_id=config.FRAN_BOT_ID)
 
-# Register Discord Agents (Defaults to move to Echo package)
-from agents.bot_agent import create_bot_agent
+# Register Config Agent
 from agents.config_agent import create_config_agent
-from agents.conversation_agent import create_conversation_agent
-bot.register_agent(create_bot_agent(bot), agent_prefix="bot")
-bot.register_agent(create_config_agent(bot), agent_prefix="config")
-bot.register_agent(create_conversation_agent(bot), agent_prefix="conversation")
+echo.register_agent(create_config_agent(agent_name="config"))
 
 # Register Discord Agents specific to Fran
 from agents.chain_agent import create_chain_agent
 from agents.exercise_agent import create_exercise_agent
 from agents.workshop_agent import create_workshop_agent
-bot.register_agent(create_chain_agent(bot), agent_prefix="chain")
-bot.register_agent(create_exercise_agent(bot), agent_prefix="exercise")
-bot.register_agent(create_workshop_agent(bot), agent_prefix="workshop")
+echo.register_agent(create_chain_agent(agent_name="chain"))
+echo.register_agent(create_exercise_agent(agent_name="exercise"))
+echo.register_agent(create_workshop_agent(agent_name="workshop"))
 
 # Define a signal handler for SIGTERM and SIGINT
 def handle_exit(signum, frame):
     logger.info(f"Received signal {signum}. Initiating shutdown...")
     mongo.disconnect()
     logger.info('MongoDB connection closed.')
-    bot.close()
+    echo.close()
     logger.info('Discord Bot connection closed.')
     sys.exit(0)
 
@@ -75,5 +71,5 @@ signal.signal(signal.SIGINT, handle_exit)
 
 # Start the bot and Expose the app object for Gunicorn
 if __name__ == "__main__":
-    bot.run(config.DISCORD_FRAN_TOKEN)
+    echo.run(config.DISCORD_FRAN_TOKEN)
     app.run(host='0.0.0.0', port=config.FRAN_API_PORT)

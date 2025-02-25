@@ -1,12 +1,14 @@
 import logging
 from echo_utils.breadcrumb import create_breadcrumb
 from echo_utils.token import create_token
+from echo.agent import Agent
 from services.workshop_services import WorkshopServices
 
 logger = logging.getLogger(__name__)
 
-def create_workshop_agent(bot):
-    """ Registers agent actions for Echo bot."""
+def create_workshop_agent(agent_name):
+    """ Registers agent actions for Echo agent."""
+    agent = Agent(agent_name)
     
     # Define reused schema's
     workshop_schema = {
@@ -92,7 +94,7 @@ def create_workshop_agent(bot):
         except Exception as e:
             logger.warning(f"Get workshops Error has occurred: {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name="get_workshops",
         function=get_workshops,
         description="Return a list of active, latests, workshops", 
@@ -127,7 +129,7 @@ def create_workshop_agent(bot):
         except Exception as e:
             logger.warning(f"Get workshop Error has occurred: {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name="get_workshop", 
         function=get_workshop,
         description="Get a workshop by ID", 
@@ -152,7 +154,7 @@ def create_workshop_agent(bot):
         except Exception as e:
             logger.warning(f"add_workshop Error has occurred {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name="add_workshop", 
         function=add_workshop,
         description="Create the specified workshop", 
@@ -183,7 +185,7 @@ def create_workshop_agent(bot):
         except Exception as e:
             logger.warning(f"update_workshop Error has occurred {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name="update_workshop", 
         function=update_workshop,
         description="Update the specified workshop", 
@@ -204,7 +206,7 @@ def create_workshop_agent(bot):
         except Exception as e:
             logger.warning(f"start_workshop Error has occurred {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name="start_workshop", 
         function=start_workshop,
         description="Set the workshop to active status.", 
@@ -230,7 +232,7 @@ def create_workshop_agent(bot):
         except Exception as e:
             logger.warning(f"advance_workshop Error has occurred {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name="advance_workshop", 
         function=advance_workshop,
         description="Advance the current exercise and update status as needed", 
@@ -257,7 +259,7 @@ def create_workshop_agent(bot):
         except Exception as e:
             logger.warning(f"add_observation Error has occurred {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name="add_observation", 
         function=add_observation,
         description="Add a message to the specified workshop", 
@@ -280,5 +282,5 @@ def create_workshop_agent(bot):
             "type": workshop_schema
         })
         
-    logger.info("Registered bot agent action handlers.")
-    
+    logger.info("Registered agent agent action handlers.")
+    return agent

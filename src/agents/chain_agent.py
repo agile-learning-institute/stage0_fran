@@ -2,11 +2,13 @@ import logging
 from echo_utils.breadcrumb import create_breadcrumb
 from echo_utils.token import create_token
 from services.chain_services import ChainServices
+from echo.agent import Agent
 
 logger = logging.getLogger(__name__)
 
-def create_chain_agent(bot):
+def create_chain_agent(agent_name):
     """ Registers event handlers and commands for the Fran home channel. """
+    agent = Agent(agent_name)
     
     def get_chains(arguments):
         """Get the list of Chain Names and IDs"""
@@ -19,7 +21,7 @@ def create_chain_agent(bot):
         except Exception as e:
             logger.warning(f"A get_chains Error has occurred: {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name = "get_chains", 
         function = get_chains,
         description = "Get a list of chains", 
@@ -51,7 +53,7 @@ def create_chain_agent(bot):
         except Exception as e:
             logger.warning(f"A get_chain Error has occurred: {e}")
             return "error"
-    bot.register_action(
+    agent.register_action(
         action_name= "get_chain", 
         function = get_chain,
         description = "Get a exercise chain", 
@@ -92,3 +94,4 @@ def create_chain_agent(bot):
         })
 
     logger.info("Registered chain agent action handlers.")
+    return agent

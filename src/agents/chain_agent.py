@@ -93,5 +93,5 @@ def create_chain_agent(agent_name):
             }
         })
 
-    logger.info("Registered chain agent action handlers.")
+    logger.info(f"Registered chain agent action handlers.")
     return agent

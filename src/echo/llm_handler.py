@@ -1,7 +1,7 @@
 import re
 
 class LLMHandler:
-    def __init__(self, agents=None, llm_client=None):
+    def __init__(self, channel_agent=None, llm_client=None):
         """
         Initializes LLMHandler with an Echo agent framework and an LLM client.
 
@@ -9,7 +9,7 @@ class LLMHandler:
         :param llm_client: Instance of LLMClient for LLM chat processing. (ollama_llm_client)
         """
         self.llm = llm_client
-        self.agents = agents
+        self.channel_agent = channel_agent
         self.agent_command_pattern = re.compile(r"^/([^/]+)/([^/]+)(?:/(.*))?$")
 
     def handle_message(self, user: str, channel: str, message: str):
@@ -51,7 +51,6 @@ class LLMHandler:
         :param content: Message content.
         :return: Updated conversation message list.
         """
-        conversation_agent = self.agents["conversation"]
         formatted_message = [{"from": from_role, "to": to_role, "content": content}]
-        conversation = conversation_agent.invoke_action("add_message", formatted_message)
+        conversation = self.conversation_agent.invoke_action("add_message", formatted_message)
         return conversation if isinstance(conversation, list) else []

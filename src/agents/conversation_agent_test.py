@@ -9,11 +9,11 @@ class TestConversationAgent(unittest.TestCase):
         """Set up a mock bot agent."""
         self.mock_bot = Agent("test_bot_agent")
         self.mock_conversation = {}
-        create_conversation_agent(self.mock_bot)
-        self.get_conversations = self.mock_bot.actions["get_conversations"]["function"]
-        self.get_conversation = self.mock_bot.actions["get_conversation"]["function"]
-        self.update_conversation = self.mock_bot.actions["update_conversation"]["function"]
-        self.add_message = self.mock_bot.actions["add_message"]["function"]
+        self.conversation_agent = create_conversation_agent(self.mock_bot)
+        self.get_conversations = self.conversation_agent.actions["get_conversations"]["function"]
+        self.get_conversation = self.conversation_agent.actions["get_conversation"]["function"]
+        self.update_conversation = self.conversation_agent.actions["update_conversation"]["function"]
+        self.add_message = self.conversation_agent.actions["add_message"]["function"]
 
     @patch("agents.conversation_agent.create_token")  
     @patch("agents.conversation_agent.create_breadcrumb")  

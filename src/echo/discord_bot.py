@@ -1,12 +1,13 @@
 import discord
 import json
-import logging
 
 # logging.basicConfig(level=logging.DEBUG)
+import logging
+logging.basicConfig(level="DEBUG")
 logger = logging.getLogger(__name__)
 
 class DiscordBot(discord.Client):
-    def __init__(self, agents, bot_id, llm_handler, **kwargs):
+    def __init__(self, bot_agent, bot_id, llm_handler, **kwargs):
         """
         Initializes the Discord bot with Echo framework and LLM handler.
         """
@@ -16,7 +17,7 @@ class DiscordBot(discord.Client):
         intents.dm_messages = True  
 
         super().__init__(intents=intents, **kwargs)
-        self.agents = agents
+        self.bot_agent = bot_agent
         self.bot_id = bot_id
         self.llm = llm_handler
         self.active_channels = []  
@@ -84,8 +85,7 @@ class DiscordBot(discord.Client):
                 "bot_id": self.bot_id,
                 "channel_id": channel
             }
-            bot_agent = self.agents["bot"] 
-            self.active_channels = bot_agent.invoke_action(action, json.dumps(arguments))
+            self.active_channels = self.bot_agent.invoke_action(action, json.dumps(arguments))
             logger.info(f"Updated active channels list: {self.active_channels}")
             return f"✅ Channel: {channel} {'added to' if action == 'add_channel' else 'removed from'} active channels list."
         except Exception as e:

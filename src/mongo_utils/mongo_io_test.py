@@ -19,11 +19,7 @@ class TestMongoIO(unittest.TestCase):
         self.mongo_io = MongoIO.get_instance()
 
     def tearDown(self):
-        try:
-            self.mongo_io.delete_document(self.test_collection_name, self.test_id)
-        except:
-            print("Teardown Delete Document Failed")
-            
+        self.mongo_io.delete_document(self.test_collection_name, self.test_id)
         self.mongo_io.disconnect()
     
     def test_singleton_behavior(self):

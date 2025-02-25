@@ -11,24 +11,27 @@ class Echo:
     def __init__(self, name=None, bot_id=None):
         """Initialize Echo with a default agents."""
         self.name = name
-        self.agents = {}
-        self.llm_handler = LLMHandler(self.agents, OllamaLLMClient())
-        self.bot = DiscordBot(self.agents, bot_id, self.llm_handler)
+        self.agents = {}        
 
         # Register default agents
         from agents.bot_agent import create_bot_agent
         from agents.conversation_agent import create_conversation_agent
         from agents.echo_agent import create_echo_agent
-        self.register_agent(create_echo_agent(agent_name="agent", agents=self.agents))
-        self.register_agent(create_bot_agent(agent_name="bot"))
-        self.register_agent(create_conversation_agent(agent_name="conversation"))
+        self.register_agent(create_echo_agent(agent_name="echo", agents=self.agents))
+        self.bot_agent = self.register_agent(create_bot_agent(agent_name="bot"))
+        self.conversation_agent = self.register_agent(create_conversation_agent(agent_name="conversation"))
 
+        # Initialize LLM and Bot 
+        self.llm_handler = LLMHandler(self.conversation_agent, OllamaLLMClient())
+        self.bot = DiscordBot(self.bot_agent, bot_id, self.llm_handler)
+        
     def run(self, token):
         self.bot.run(token)
         
     def register_agent(self, agent, agent_name=None):
         """Registers an agent with Echo."""
-        if not isinstance(agent, Agent): raise Exception("can not register agent without actions")
+        if not isinstance(agent, Agent): 
+            raise Exception(f"can not register agent without actions: {agent}")
         self.agents[agent_name] = agent
 
     def get_agents(self):

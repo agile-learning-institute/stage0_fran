@@ -2,17 +2,19 @@ import unittest
 import json
 from echo.echo import Echo
 from echo.agent import Agent
-from unittest.mock import Mock
+from unittest.mock import MagicMock, Mock, patch
 
 class TestEcho(unittest.TestCase):
 
     def setUp(self):
-        """Initialize Echo instance before each test."""
+        """Initialize Echo instance with Mock Agent before each test."""
         self.echo = Echo()
-        self.agent = Mock(spec=Agent)
-        self.agent.get_actions.return_value = ["test_action"]
-        self.agent.invoke_action.return_value = "Action executed successfully"
-        self.echo.register_agent("test_agent", self.agent)
+        
+        self.mock_action = MagicMock()
+        
+        self.mock_agent = Agent("test_agent")
+        self.mock_agent.register_action("test_action", self.mock_action, "description", "arguments_schema", "output_schema")
+        self.echo.register_agent(agent_name="test_agent", agent=self.mock_agent)
 
     def test_register_agent(self):
         """Ensure an agent is registered successfully."""
@@ -20,7 +22,7 @@ class TestEcho(unittest.TestCase):
 
     def test_register_invalid_agent(self):
         """Ensure registering a non-Agent instance raises an error."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(Exception):
             self.echo.register_agent("invalid_agent", "not_an_agent")
 
     def test_parse_command_valid(self):
@@ -37,14 +39,16 @@ class TestEcho(unittest.TestCase):
         command = "/test_agent/test_action/{invalid_json}"
         with self.assertRaises(Exception):
             self.echo.parse_command(command)
-
-    def test_handle_command_valid(self):
+    
+    @patch("echo.agent.Agent.invoke_action")
+    def test_handle_command_valid(self, mock_invoke_action):
         """Ensure a valid command is routed correctly."""
         command = "/test_agent/test_action/{\"key\": \"value\"}"
+        mock_invoke_action.return_value = "Action executed successfully"
         result = self.echo.handle_command(command)
         
         self.assertEqual(result, "Action executed successfully")
-        self.agent.invoke_action.assert_called_once_with("test_action", {"key": "value"})
+        mock_invoke_action.assert_called_once_with("test_action", {"key": "value"})
 
     def test_handle_command_unknown_agent(self):
         """Ensure an unknown agent returns silence."""

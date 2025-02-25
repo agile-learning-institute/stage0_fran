@@ -7,11 +7,11 @@ class TestExerciseAgent(unittest.TestCase):
     
     def setUp(self):
         """Set up a mock bot agent."""
-        self.mock_bot = Agent("test_bot_agent")
         self.mock_exercise = {}
-        create_exercise_agent(self.mock_bot)
-        self.get_exercises = self.mock_bot.actions["get_exercises"]["function"]
-        self.get_exercise = self.mock_bot.actions["get_exercise"]["function"]
+        self.mock_bot = Agent("test_bot_agent")
+        self.exercise_agent = create_exercise_agent(self.mock_bot)
+        self.get_exercises = self.exercise_agent.actions["get_exercises"]["function"]
+        self.get_exercise = self.exercise_agent.actions["get_exercise"]["function"]
 
     @patch("agents.exercise_agent.create_token")  
     @patch("agents.exercise_agent.create_breadcrumb")  

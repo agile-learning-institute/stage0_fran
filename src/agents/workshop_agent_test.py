@@ -9,14 +9,14 @@ class TestWorkshopAgent(unittest.TestCase):
         """Set up a mock bot agent."""
         self.mock_bot = Agent("test_bot_agent")
         self.mock_workshop = {}
-        create_workshop_agent(self.mock_bot)
-        self.get_workshops = self.mock_bot.actions["get_workshops"]["function"]
-        self.get_workshop = self.mock_bot.actions["get_workshop"]["function"]
-        self.add_workshop = self.mock_bot.actions["add_workshop"]["function"]
-        self.update_workshop = self.mock_bot.actions["update_workshop"]["function"]
-        self.start_workshop = self.mock_bot.actions["start_workshop"]["function"]
-        self.advance_workshop = self.mock_bot.actions["advance_workshop"]["function"]
-        self.add_observation = self.mock_bot.actions["add_observation"]["function"]
+        self.workshop_agent = create_workshop_agent(self.mock_bot)
+        self.get_workshops = self.workshop_agent.actions["get_workshops"]["function"]
+        self.get_workshop = self.workshop_agent.actions["get_workshop"]["function"]
+        self.add_workshop = self.workshop_agent.actions["add_workshop"]["function"]
+        self.update_workshop = self.workshop_agent.actions["update_workshop"]["function"]
+        self.start_workshop = self.workshop_agent.actions["start_workshop"]["function"]
+        self.advance_workshop = self.workshop_agent.actions["advance_workshop"]["function"]
+        self.add_observation = self.workshop_agent.actions["add_observation"]["function"]
 
     @patch("agents.workshop_agent.create_token")  
     @patch("agents.workshop_agent.create_breadcrumb")  

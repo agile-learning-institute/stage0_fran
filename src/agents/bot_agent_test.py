@@ -8,11 +8,11 @@ class TestBotAgent(unittest.TestCase):
     def setUp(self):
         """Set up a mock bot agent."""
         self.mock_bot = Agent("test_bot_agent")
-        create_bot_agent(self.mock_bot)
-        self.get_bot = self.mock_bot.actions["get_bot"]["function"]
-        self.get_channels = self.mock_bot.actions["get_channels"]["function"]
-        self.add_channel = self.mock_bot.actions["add_channel"]["function"]
-        self.remove_channel = self.mock_bot.actions["remove_channel"]["function"]
+        bot_agent = create_bot_agent(self.mock_bot)
+        self.get_bot = bot_agent.actions["get_bot"]["function"]
+        self.get_channels = bot_agent.actions["get_channels"]["function"]
+        self.add_channel = bot_agent.actions["add_channel"]["function"]
+        self.remove_channel = bot_agent.actions["remove_channel"]["function"]
 
     @patch("agents.bot_agent.create_token")  
     @patch("agents.bot_agent.BotServices.get_bot")

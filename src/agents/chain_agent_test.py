@@ -7,11 +7,10 @@ class TestChainAgent(unittest.TestCase):
     
     def setUp(self):
         """Set up a mock bot agent."""
-        self.mock_bot = Agent("test_bot_agent")
-        self.mock_chain = {}
-        create_chain_agent(self.mock_bot)
-        self.get_chains = self.mock_bot.actions["get_chains"]["function"]
-        self.get_chain = self.mock_bot.actions["get_chain"]["function"]
+        self.mock_bot = Agent("mock bot")
+        chain_agent = create_chain_agent(self.mock_bot)
+        self.get_chains = chain_agent.actions["get_chains"]["function"]
+        self.get_chain = chain_agent.actions["get_chain"]["function"]
 
     @patch("agents.chain_agent.create_token")  
     @patch("agents.chain_agent.create_breadcrumb")  

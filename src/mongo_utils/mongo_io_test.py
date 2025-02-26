@@ -14,12 +14,13 @@ class TestMongoIO(unittest.TestCase):
         self.test_id = "eeee00000000000000009999"
         self.test_collection_name = self.config.BOT_COLLECTION_NAME
         self.test_bot = {"status":"active","name":"Test","description":"A Test Bot","channels":[],"last_saved":{"fromIp":"","byUser":"","atTime":datetime(2025, 1, 1, 12, 34, 56),"correlationId":""}}
-
+        self.document_created = False
         MongoIO._instance = None
         self.mongo_io = MongoIO.get_instance()
 
     def tearDown(self):
-        self.mongo_io.delete_document(self.test_collection_name, self.test_id)
+        if self.document_created:
+            self.mongo_io.delete_document(self.test_collection_name, self.test_id)
         self.mongo_io.disconnect()
     
     def test_singleton_behavior(self):
@@ -39,6 +40,7 @@ class TestMongoIO(unittest.TestCase):
     def test_CR_document(self):
         # Create a Test Document
         self.test_id = self.mongo_io.create_document(self.test_collection_name, self.test_bot)
+        self.document_created = True
         id_str = str(self.test_id)
         
         self.assertEqual(id_str, str(self.test_id))
@@ -51,6 +53,7 @@ class TestMongoIO(unittest.TestCase):
     def test_CRU_document(self):
         # Create a Test Document
         self.test_id = self.mongo_io.create_document(self.test_collection_name, self.test_bot)
+        self.document_created = True
         id_str = str(self.test_id)
 
         # Update the document with set data
@@ -62,6 +65,7 @@ class TestMongoIO(unittest.TestCase):
     def test_add_to_set_document(self):
         # Create a Test Document
         self.test_id = self.mongo_io.create_document(self.test_collection_name, self.test_bot)
+        self.document_created = True
         id_str = str(self.test_id)
 
         # Add a channel
@@ -91,6 +95,7 @@ class TestMongoIO(unittest.TestCase):
     def test_push_document(self):
         # Create a Test Document
         self.test_id = self.mongo_io.create_document(self.test_collection_name, self.test_bot)
+        self.document_created = True
         id_str = str(self.test_id)
 
         # Add a channel
@@ -122,6 +127,7 @@ class TestMongoIO(unittest.TestCase):
     def test_pull_from_document(self):
         # Create a Test Document
         self.test_id = self.mongo_io.create_document(self.test_collection_name, self.test_bot)
+        self.document_created = True
         id_str = str(self.test_id)
 
         # Add some channels

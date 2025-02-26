@@ -18,12 +18,20 @@ class Echo:
         from agents.conversation_agent import create_conversation_agent
         from agents.echo_agent import create_echo_agent
         self.register_agent(create_echo_agent(agent_name="echo", agents=self.agents))
-        self.bot_agent = self.register_agent(create_bot_agent(agent_name="bot"))
-        self.conversation_agent = self.register_agent(create_conversation_agent(agent_name="conversation"))
+        self.register_agent(create_bot_agent(agent_name="bot"))
+        self.register_agent(create_conversation_agent(agent_name="conversation"))
 
-        # Initialize LLM and Bot 
-        self.llm_handler = LLMHandler(self.conversation_agent, OllamaLLMClient())
-        self.bot = DiscordBot(self.bot_agent, bot_id, self.llm_handler)
+        # Initialize LLM Conversation Handler
+        self.llm_handler = LLMHandler(
+            handle_command_function=self.handle_command, 
+            llm_client=OllamaLLMClient()
+        )
+        # Initialize Discord Chatbot
+        self.bot = DiscordBot(
+            handle_command_function=self.handle_command, 
+            handle_message_function=self.llm_handler.handle_command, 
+            bot_id=bot_id
+        )
         
     def run(self, token):
         self.bot.run(token)

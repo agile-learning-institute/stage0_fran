@@ -7,8 +7,8 @@ logger = logging.getLogger(__name__)
 class LLMHandler:
     """_summary_
         LLM handler implements the inner/outer chat discussions used by
-        the Chat Engine. It persists the conversation using the /conversation
-        Agent
+        the Chat Engine. It persists the conversation using the 
+        /conversation/add_message Agent Action
     """
     def __init__(self, handle_command_function=None, llm_client=None):
         """
@@ -23,9 +23,9 @@ class LLMHandler:
 
     def handle_message(self, user: str, channel: str, message: str):
         """
-        Processes an incoming message, using it to update the conversation, and 
-        generate a reply. If the reply is on the "internal" dialog process
-        the message by invoking the requested agent/action. 
+        Processes an incoming message, using it to update the conversation, 
+        and generate a reply. If the reply is on the "internal" dialog it will 
+        process the message by invoking the requested agent/action. 
 
         :param user: The username of the sender.
         :param channel: The Discord channel where the message originated.
@@ -42,9 +42,8 @@ class LLMHandler:
             :param content: The message itself
             :return: The full conversation (list of messages)
             """
-            formatted_message = [{"from": from_role, "to": to_role, "content": content}]
-            arguments = json.dumps({"channel_id": channel, "message": formatted_message}, separators=(',', ':'))
-            conversation = self.handle_command(f"/conversation/add_message/{arguments}")
+            formatted_message = json.dumps({"from": from_role, "to": to_role, "content": content}, separators=(',', ':'))
+            conversation = self.handle_command(f"/conversation/add_message/{formatted_message}")
             return conversation if isinstance(conversation, list) else []
 
         # Step 1: Add the user message to the conversation

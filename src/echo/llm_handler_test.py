@@ -13,10 +13,15 @@ class TestLLMHandler(unittest.TestCase):
     @patch("echo.llm_handler.logging.debug")
     def test_handle_message_with_agent_call(self, mock_debug):
         """Ensure agent call messages are correctly processed."""
+        message1 = {"from": "user", "to": "external", "content": "Hello"}
+        agent_response = "Agent Response"
+        message2 = {"from": "agent", "to": "internal", "content": "Agent Response"}
+        llm_response = "LLM Response"
+        
         self.mock_handle_command.side_effect = [
-            [{"from": "user", "to": "external", "content": "Hello"}],  # Mock conversation update
-            "Agent Response",  # Mock agent reply
-            [{"from": "agent", "to": "internal", "content": "Agent Response"}],  # Agent reply added
+            [message1],
+            "Agent Response",
+            [],  # Agent reply added
             "LLM Response"  # Mock LLM response
         ]
         self.mock_llm_client.chat.return_value = "LLM Response"

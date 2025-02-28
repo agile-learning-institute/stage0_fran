@@ -6,9 +6,9 @@ logger = logging.getLogger(__name__)
 
 class LLMHandler:
     """_summary_
-        LLM handler implements the inner/outer chat discussions used by
-        the Chat Engine. It persists the conversation using the 
-        /conversation/add_message Agent Action
+    LLM handler implements the inner/outer chat discussions used by
+    the Chat Engine. It persists the conversation using the 
+    /conversation/add_message Agent Action
     """
     def __init__(self, handle_command_function=None, llm_client=None):
         """

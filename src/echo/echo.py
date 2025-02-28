@@ -7,6 +7,13 @@ from echo.ollama_llm_client import OllamaLLMClient
 
 
 class Echo:
+    """_summary_
+    The Echo class is the container that coordinates
+    action between the discord_bot and llm_handler. 
+    Agents register their actions with Echo, and Echo
+    implements the handle_command function used in
+    those classes to execute agent/actions.
+    """
     
     def __init__(self, name=None, bot_id=None):
         """Initialize Echo with a default agents."""
@@ -29,7 +36,7 @@ class Echo:
         # Initialize Discord Chatbot
         self.bot = DiscordBot(
             handle_command_function=self.handle_command, 
-            handle_message_function=self.llm_handler.handle_command, 
+            handle_message_function=self.llm_handler.handle_message,
             bot_id=bot_id
         )
         

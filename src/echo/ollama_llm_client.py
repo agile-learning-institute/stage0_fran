@@ -1,6 +1,9 @@
 import ollama
 
 class OllamaLLMClient:
+    """_summary_
+    Wrapper for the ollama Library for chat function
+    """
     def __init__(self, base_url="http://localhost:11434", model="mistral"):
         """
         Initializes the LLMClient to communicate with an Ollama server.

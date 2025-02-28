@@ -71,11 +71,12 @@ def handle_exit(signum, frame):
         flask_thread.join()
 
     # Disconnect from MongoDB
+    logger.info("Closing MongoDB connection.")
     mongo.disconnect()
-    logger.info("MongoDB connection closed.")
 
     # Close the Discord bot
-    echo.close()
+    logger.info("Closing Discord connection.")
+    echo.close(timeout=0.1) # TODO Add DISCORD_TIMEOUT config value with this default value
 
     logger.info("Shutdown complete.")
     sys.exit(0)  

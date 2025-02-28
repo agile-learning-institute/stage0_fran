@@ -67,8 +67,8 @@ def create_bot_agent(agent_name):
         """Get a list of active channels for the specified bot"""
         try:
             token = create_token()
-            bot = BotServices.get_channels(arguments, token)
-            return bot
+            channels = BotServices.get_channels(arguments, token)
+            return channels
         except Exception as e:
             logger.warning(f"A get_channels Error has occurred: {e}")
             return "error"
@@ -94,10 +94,10 @@ def create_bot_agent(agent_name):
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            bot = BotServices.add_channel(
+            channels = BotServices.add_channel(
                 arguments["bot_id"], arguments["channel_id"], 
                 token, breadcrumb)
-            return bot
+            return channels
         except Exception as e:
             logger.warning(f"A add_channel Error has occurred: {e}")
             return "error"
@@ -133,10 +133,10 @@ def create_bot_agent(agent_name):
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            bot = BotServices.remove_channel(
+            channels = BotServices.remove_channel(
                 arguments["bot_id"], arguments["channel_id"], 
                 token, breadcrumb)
-            return bot
+            return channels
         except Exception as e:
             logger.warning(f"A remove_channel Error has occurred: {e}")
             return "error"

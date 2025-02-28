@@ -48,30 +48,27 @@ class Echo:
     def run(self, token):
         self.bot.run(token)
    
-    def close(self):
+    def close(self, timeout=2):
         """
         Gracefully shut down the Discord bot, and handle the 
         asynchronous nature of Client.close() without hanging.
         """
         logger.info("Closing Discord Bot connection...")
-        timeout = 2 #seconds
 
         try:
-            loop = asyncio.get_running_loop()  # Check if an event loop is already running
-            logger.info("Running inside an active event loop. Using `run_coroutine_threadsafe`.")
+            # Check if an event loop is already running
+            loop = asyncio.get_running_loop()  
             future = asyncio.run_coroutine_threadsafe(self.bot.close(), loop)
             future.result(timeout=timeout)  # Wait for close() to finish
-        except TimeoutError:
-            logger.info(f"Discord Client.close() timed out after {timeout} seconds")
         except RuntimeError:
-            logger.info("No active event loop found. Creating a new one.")
+            # No active event loop found. Creating a new one.
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             loop.run_until_complete(self.bot.close())  
             loop.close()  # Clean up the event loop
-        
-        logger.info("Discord Bot shut down successfully.")
-                            
+        except TimeoutError:
+            logger.info(f"Discord Client.close() timed out after {timeout} seconds")
+                                    
     def register_agent(self, agent, agent_name=None):
         """Registers an agent with Echo."""
         if not isinstance(agent, Agent): 

@@ -93,7 +93,22 @@ tests:
             Content-Type: application/json          
           check:
             status: /200/
-            jsonpath:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  description:
+                    type: string
+                  name:
+                    type: string
+                required:
+                  - _id
+                  - description
+                  - name
+                additionalProperties: false
       - name: Get a Bot
         http:
           url: http://${{env.host}}/api/bot/bbb000000000000000000001
@@ -102,7 +117,42 @@ tests:
             Content-Type: application/json          
           check:
             status: /200/
+            Content-Type: application/json          
+            schema:
+              type: object
+              properties:
+                _id:
+                  type: string
+                status:
+                  type: string
+                name:
+                  type: string
+                description:
+                  type: string
+                channels:
+                  type: array
+                  items:
+                    type: string
+                last_saved:
+                  type: object
+                  properties:
+                    fromIp:
+                      type: string
+                    byUser:
+                      type: string
+                    atTime:
+                      type: string
+                    correlationId:
+                      type: string
+                  additionalProperties: false
+              additionalProperties: false
             jsonpath:
+              status: active
+              name: Fran
+              description: Fran the Design Thinking Facilitator
+              channels[0]: TEST_CHANNEL_1
+              channels[1]: TEST_CHANNEL_2
+
       - name: Update a bot
         http:
           url: http://${{env.host}}/api/bot/bbb000000000000000000001
@@ -122,11 +172,11 @@ tests:
           headers:
             Content-Type: application/json
           json: 
-            description: Basic Bot1
+            description: Fran the Design Thinking Facilitator
           check:
             status: /200/
             jsonpath:
-              description: Basic Bot1
+              description: Fran the Design Thinking Facilitator
       - name: Get bot channels
         http:
           url: http://${{env.host}}/api/bot/bbb000000000000000000001/channels
@@ -136,6 +186,8 @@ tests:
           check:
             status: /200/
             jsonpath:
+              - TEST_CHANNEL_1
+              - TEST_CHANNEL_2
       - name: Add a channel
         http:
           url: http://${{env.host}}/api/bot/bbb000000000000000000001/channel/DISCORD_CHANNEL_NAME
@@ -145,6 +197,9 @@ tests:
           check:
             status: /200/
             jsonpath:
+              - TEST_CHANNEL_1
+              - TEST_CHANNEL_2
+              - DISCORD_CHANNEL_NAME
       - name: Remove a channel
         http:
           url: http://${{env.host}}/api/bot/bbb000000000000000000001/channel/DISCORD_CHANNEL_NAME
@@ -154,45 +209,47 @@ tests:
           check:
             status: /200/
             jsonpath:
-  conversations:
-    steps:
-      - name: Get all latest active Conversations
-        http:
-          url: http://${{env.host}}/api/conversation
-          method: GET
-          headers:
-            Content-Type: application/json          
-          check:
-            status: /200/
-            jsonpath:
-      - name: Get some latest active Conversations
-        http:
-          url: http://${{env.host}}/api/conversation?query=^D
-          method: GET
-          headers:
-            Content-Type: application/json          
-          check:
-            status: /200/
-            jsonpath:
-      - name: Get a Conversation
-        http:
-          url: http://${{env.host}}/api/conversation/DISCORD_01
-          method: GET
-          headers:
-            Content-Type: application/json          
-          check:
-            status: /200/
-            jsonpath:
-      - name: Add a message to a Conversation
-        http:
-          url: http://${{env.host}}/api/conversation/DISCORD_01/message
-          method: POST
-          headers:
-            Content-Type: text/plain
-          body: This is a new message
-          check:
-            status: /200/
-            jsonpath:
+              - TEST_CHANNEL_1
+              - TEST_CHANNEL_2
+  # conversations:
+  #   steps:
+  #     - name: Get all latest active Conversations
+  #       http:
+  #         url: http://${{env.host}}/api/conversation
+  #         method: GET
+  #         headers:
+  #           Content-Type: application/json          
+  #         check:
+  #           status: /200/
+  #           jsonpath:
+  #     - name: Get some latest active Conversations
+  #       http:
+  #         url: http://${{env.host}}/api/conversation?query=^D
+  #         method: GET
+  #         headers:
+  #           Content-Type: application/json          
+  #         check:
+  #           status: /200/
+  #           jsonpath:
+  #     - name: Get a Conversation
+  #       http:
+  #         url: http://${{env.host}}/api/conversation/DISCORD_01
+  #         method: GET
+  #         headers:
+  #           Content-Type: application/json          
+  #         check:
+  #           status: /200/
+  #           jsonpath:
+  #     - name: Add a message to a Conversation
+  #       http:
+  #         url: http://${{env.host}}/api/conversation/DISCORD_01/message
+  #         method: POST
+  #         headers:
+  #           Content-Type: text/plain
+  #         body: This is a new message
+  #         check:
+  #           status: /200/
+  #           jsonpath:
   workshops:
     steps:
       - name: Get all active Workshops

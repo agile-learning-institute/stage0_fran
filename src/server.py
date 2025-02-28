@@ -75,9 +75,7 @@ def handle_exit(signum, frame):
     logger.info("MongoDB connection closed.")
 
     # Close the Discord bot
-    if echo.bot.is_ready():
-        logger.info("Closing Discord Bot connection...")
-        echo.bot.close()
+    echo.close()
 
     logger.info("Shutdown complete.")
     sys.exit(0)  

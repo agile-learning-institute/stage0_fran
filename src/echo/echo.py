@@ -1,9 +1,14 @@
+import asyncio
 import json
 import re
 from echo.agent import Agent
 from echo.discord_bot import DiscordBot
 from echo.llm_handler import LLMHandler
 from echo.ollama_llm_client import OllamaLLMClient
+
+import logging
+# logging.basicConfig(level="DEBUG")
+logger = logging.getLogger(__name__)
 
 
 class Echo:
@@ -42,10 +47,31 @@ class Echo:
         
     def run(self, token):
         self.bot.run(token)
-        
+   
     def close(self):
-        self.bot.close()
+        """
+        Gracefully shut down the Discord bot, and handle the 
+        asynchronous nature of Client.close() without hanging.
+        """
+        logger.info("Closing Discord Bot connection...")
+        timeout = 2 #seconds
 
+        try:
+            loop = asyncio.get_running_loop()  # Check if an event loop is already running
+            logger.info("Running inside an active event loop. Using `run_coroutine_threadsafe`.")
+            future = asyncio.run_coroutine_threadsafe(self.bot.close(), loop)
+            future.result(timeout=timeout)  # Wait for close() to finish
+        except TimeoutError:
+            logger.info(f"Discord Client.close() timed out after {timeout} seconds")
+        except RuntimeError:
+            logger.info("No active event loop found. Creating a new one.")
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(self.bot.close())  
+            loop.close()  # Clean up the event loop
+        
+        logger.info("Discord Bot shut down successfully.")
+                            
     def register_agent(self, agent, agent_name=None):
         """Registers an agent with Echo."""
         if not isinstance(agent, Agent): 
@@ -70,7 +96,7 @@ class Echo:
 
         # Parse JSON safely
         try:
-            arguments = json.loads(arguments_str) if arguments_str else {}
+            arguments = json.loads(arguments_str) if arguments_str else None
         except json.JSONDecodeError as e:
             raise Exception(f"Invalid JSON in arguments: {arguments_str}") from e
 

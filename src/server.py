@@ -11,7 +11,8 @@ mongo = MongoIO.get_instance()
 
 # Initialize Logging
 import logging
-logging.basicConfig(level=config.LOGGING_LEVEL)
+# logging.basicConfig(level=config.LOGGING_LEVEL)
+logging.basicConfig(level="DEBUG")
 logger = logging.getLogger(__name__)
 
 # Initialize Echo Discord Bot

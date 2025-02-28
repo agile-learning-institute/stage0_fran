@@ -109,16 +109,16 @@ class MongoIO:
             if pull_data:
                 pipeline["$pull"] = pull_data
 
-            updated = document_collection.update_one(match, pipeline)
+            updated = document_collection.find_one_and_update(match, pipeline, return_document=True)
 
-            if updated.matched_count == 0:
+            if not updated:
                 raise Exception(f"Document Not Found {document_id}")
 
         except Exception as e:
             logger.error(f"Failed to update document: {e}")
             raise
 
-        return self.get_document(collection_name, document_id)
+        return updated
 
     def get_document(self, collection_name, document_id):
         """Retrieve a document by ID."""

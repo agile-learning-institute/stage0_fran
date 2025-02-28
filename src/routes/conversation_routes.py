@@ -17,7 +17,7 @@ def create_conversation_routes():
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            conversations = ConversationServices.get_conversations(token)
+            conversations = ConversationServices.get_conversations(token=token)
             logger.info(f"Get conversation Success {breadcrumb}")
             return jsonify(conversations), 200
         except Exception as e:
@@ -30,7 +30,7 @@ def create_conversation_routes():
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            conversation = ConversationServices.get_conversation(channel_id, token)
+            conversation = ConversationServices.get_conversation(channel_id=channel_id, token=token, breadcrumb=breadcrumb)
             logger.info(f"Get conversation Success {breadcrumb}")
             return jsonify(conversation), 200
         except Exception as e:
@@ -44,23 +44,24 @@ def create_conversation_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             data = request.get_json()
-            conversation = ConversationServices.update_conversation(channel_id, token, breadcrumb, data)
+            conversation = ConversationServices.update_conversation(channel_id=channel_id, data=data, token=token, breadcrumb=breadcrumb)
             logger.info(f"Update conversation Successful {breadcrumb}")
             return jsonify(conversation), 200
         except Exception as e:
             logger.warning(f"A processing error occurred {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
-    # POST /api/conversation/{channel_id}/message - Update a conversation
+    # POST /api/conversation/{channel_id}/message - Add a message to a conversation
     @conversation_routes.route('/<string:channel_id>/message', methods=['POST'])
     def add_message(channel_id):
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             message = request.data.decode('utf-8')
-            conversation = ConversationServices.add_message(channel_id, token, breadcrumb, message)
+            logger.info(f"add_message route channel_id={channel_id}, message={message}")
+            messages = ConversationServices.add_message(channel_id=channel_id, message=message, token=token, breadcrumb=breadcrumb)
             logger.info(f"Update conversation Successful {breadcrumb}")
-            return jsonify(conversation), 200
+            return jsonify(messages), 200
         except Exception as e:
             logger.warning(f"A processing error occurred {e}")
             return jsonify({"error": "A processing error occurred"}), 500

@@ -53,7 +53,7 @@ class DiscordBot(discord.Client):
             return  # Ignore self-messages
 
         user_id = message.author.id
-        username = message.author.username
+        username = message.author
         channel = message.channel.id if message.guild else f"DM-{user_id}"
         content = message.content
         response = None

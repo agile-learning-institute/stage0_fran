@@ -176,7 +176,7 @@ tests:
             jsonpath:
       - name: Get a Conversation
         http:
-          url: http://${{env.host}}/api/conversation/c00000000000000000000001
+          url: http://${{env.host}}/api/conversation/DISCORD_01
           method: GET
           headers:
             Content-Type: application/json          

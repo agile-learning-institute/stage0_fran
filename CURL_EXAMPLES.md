@@ -92,7 +92,7 @@ curl http://localhost:8580/api/conversation/c00000000000000000000001
 ```
 #### Add a message to a conversation
 ```sh
-curl -X POST http://localhost:8580/api/conversation/DISCORD_CHANNEL_ID/message \
+curl -X POST http://localhost:8580/api/conversation/DISCORD_01/message \
      -H "Content-Type: text/plain" \
      -d "This is a new message"
 ```

@@ -43,6 +43,9 @@ class Echo:
     def run(self, token):
         self.bot.run(token)
         
+    def close(self):
+        self.bot.close()
+
     def register_agent(self, agent, agent_name=None):
         """Registers an agent with Echo."""
         if not isinstance(agent, Agent): 

@@ -4,7 +4,7 @@ Echo is a Python-based Discord chatbot agent framework inspired by Flask. Since 
 
 ## **How Echo Works**
 - Echo operates in **two conversational layers:**
-  - **External Dialog:** The LLM interacts naturally with users in a group chat.
+  - **Group Dialog:** The LLM interacts naturally with users in a group chat.
   - **Inner Dialog:** The LLM privately communicates with structured agents.
 - The LLM follows a **Retrieval-Augmented Generation (RAG)** approach:
   - **Interprets human intent** from the group chat.
@@ -25,10 +25,10 @@ For this initial implementation, Echo is intermingled with the stage0_Fran Flask
 At some point in the future Echo and it's related code will be extracted into an independent package. This is the proposed structure for that package repo.
 ```text
 /📁 echo                         
-├── 📝 echo.py                     # Main Echo code
-├── 🧑‍💼 agent.py                    # An Echo Agent that implements actions
-├── 🤖 discord_bot.py              # Discord client handling on_message 
-├── 🧠 llm_handler.py              # LLM Interface using chat function
+├── 📝 echo.py                     # Main Echo code handle_command()
+├── 🧑‍💼 agent.py                    # An Echo Agent.action() references
+├── 🤖 discord_bot.py              # Discord on_message() join/leave 
+├── 🧠 llm_handler.py              # LLM Chat manager handle_message()
 ├── 🦙 ollama_llm_client.py        # Ollama driver for LLM Handler
 │
 │── 📁 agents               
@@ -46,14 +46,29 @@ At some point in the future Echo and it's related code will be extracted into an
 │   ├── 💬 conversation_service.py # Conversation (messages) persistence
 ```
 
-## Message Fow
-
-```mermaid
-graph TD;
-    Discord --> DiscordBot --> Discord
-    DiscordBot --> LLMHandler --> DiscordBot
-    LLMHandler --> OllamaClient --> LLMHandler
-
+## Message Fow and Agent Management
+```text
+┌──────────────────┐      
+│   Discord        │      
+└──────────────────┘      
+      │  ▲                   
+      │  │
+      ▼  │                    
+┌──────────────────┐      ┌───────────────┐
+│  DiscordBot      │◀──┬──│     Echo      │
+└──────────────────┘   │  └───────────────┘
+      │  ▲             │         ▲ 1
+      │  │             │         │
+      ▼  │             │         │
+┌──────────────────┐   │         │   *┌───────────────┐
+│  LLMHandler      │◀──╯         ╰───▶│     Agent     │
+└──────────────────┘                  └───────────────┘
+      │  ▲
+      │  │                         
+      ▼  │                    
+┌──────────────────┐      
+│ OllamaLLMClient  │      
+└──────────────────┘      
 ```
 
 ---
@@ -63,23 +78,43 @@ graph TD;
 [
   {
     "from": "user",
-    "to": "external",
-    "content": "Hey, what agents do I have access to?"
+    "to": "group",
+    "content": "Please create a kick-off workshop for me"
   },
   {
     "from": "assistant",
     "to": "internal",
-    "content": "/echo/agents/"
+    "content": "/chain/get_chains/"
   },
   {
     "from": "agent",
     "to": "internal",
-    "content": '["echo", "bot", "conversation"]'
+    "content": '[
+      {"name": "Kick off", "_id": "CHAIN_1"},
+      {"name": "Empathy Mapping", "_id": "CHAIN_2"},
+      {"name": "Retrospective", "_id": "CHAIN_3"}
+    ]'
   },
   {
     "from": "assistant",
-    "to": "external",
-    "content": "I can help with the following agents: echo, bot, and conversation"
+    "to": "internal",
+    "content": "/workshop/add_workshop/CHAN_1"
+  },
+  {
+    "from": "agent",
+    "to": "internal",
+    "content": '[
+      {
+        "_id": "WORKSHOP_1",
+        "name": "Kickoff Workshop", 
+        "exercises": []
+      }
+    ]'
+  },
+  {
+    "from": "assistant",
+    "to": "group",
+    "content": "Your workshop ID is WORKSHOP_1"
   }
 ]
 ```

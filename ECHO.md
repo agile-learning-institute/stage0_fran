@@ -1,6 +1,6 @@
 # Echo - A Multi-Party Conversational AI Framework
 
-Echo is a Python-based chatbot agent framework inspired by Flask. Since Agent/Action syntax can be terse, Echo uses a **multi-party conversational AI** to act as a bridge between human group conversations (outer dialog) and structured agent interactions (inner dialog).
+Echo is a Python-based Discord chatbot agent framework inspired by Flask. Since Agent/Action syntax can be terse, Echo uses a **multi-party conversational AI** to act as a bridge between human group conversations (outer dialog) and structured agent interactions (inner dialog).
 
 ## **How Echo Works**
 - Echo operates in **two conversational layers:**
@@ -44,6 +44,16 @@ At some point in the future Echo and it's related code will be extracted into an
 │── 📁 services             
 │   ├── 🤖 bot_service.py          # Bot (Active Channels) persistence
 │   ├── 💬 conversation_service.py # Conversation (messages) persistence
+```
+
+## Message Fow
+
+```mermaid
+graph TD;
+    Discord --> DiscordBot --> Discord
+    DiscordBot --> LLMHandler --> DiscordBot
+    LLMHandler --> OllamaClient --> LLMHandler
+
 ```
 
 ---

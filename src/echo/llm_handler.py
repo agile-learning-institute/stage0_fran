@@ -14,14 +14,14 @@ class LLMHandler:
         """
         Initializes LLMHandler with an Echo agent framework and an LLM client.
 
-        :param echo_framework: Instance of Echo to route agent calls.
+        :param handle_command_function: Echo handle command function
         :param llm_client: Instance of LLMClient for LLM chat processing. (ollama_llm_client)
         """
         self.llm = llm_client
         self.handle_command = handle_command_function
         self.agent_command_pattern = re.compile(r"^/([^/]+)/([^/]+)(?:/(.*))?$")
 
-    def handle_message(self, user: str, channel: str, message: str):
+    def handle_message(self, user=None, channel=None, message=None, dialog=None):
         """
         Processes an incoming message, using it to update the conversation, 
         and generate a reply. If the reply is on the "internal" dialog it will 
@@ -30,6 +30,7 @@ class LLMHandler:
         :param user: The username of the sender.
         :param channel: The Discord channel where the message originated.
         :param message: The message content.
+        :param dialog: The "internal" or "external" dialog this message will be posted to, defaults to external
         :return: The response to be written to the chat-channel. 
         """
         def post_message(from_role: str, to_role: str, content: str):
@@ -42,31 +43,40 @@ class LLMHandler:
             :param content: The message itself
             :return: The full conversation (list of messages)
             """
-            formatted_message = json.dumps({"from": from_role, "to": to_role, "content": content}, separators=(',', ':'))
-            conversation = self.handle_command(f"/conversation/add_message/{formatted_message}")
+            formatted_message = {"from": from_role, "to": to_role, "content": content}
+            arguments = json.dumps({"channel_id": channel, "message":formatted_message}, separators=(',', ':'))
+            command_message = f"/conversation/add_message/{arguments}"
+            conversation = self.handle_command(command_message)
+            logger.debug(f"Command Message Sent: {command_message}")
             return conversation if isinstance(conversation, list) else []
 
         # Step 1: Add the user message to the conversation
-        logger.debug(f"Posting Message {message}")
-        messages = post_message(user, "external", message)
+        if not dialog: dialog = "external"
+        # logger.debug(f"Posting Message {message}")
+        messages = post_message(user, dialog, message)
 
         # Step 2: Check if this is an agent call using regex
         if self.agent_command_pattern.match(message):
-            logger.debug(f"Calling agent")
             agent_reply = self.handle_command(message)
+            logger.debug(f"Command Message Sent: {message}")
             messages = post_message("agent", "internal", agent_reply)
 
         # Step 3: Call the LLM with updated conversation history
-        logger.debug(f"Calling llm chat")
         chat_reply = self.llm.chat(model=self.llm.model, messages=messages)
+        # logger.debug(f"LLM Chat Reply {chat_reply}")
 
-        # Step 4: Process LLM response recursively if it's an internal message
-        if isinstance(chat_reply, dict) and chat_reply.get("to") == "internal":
-            logger.debug(f"Process LLM response recursively")
-            return self.handle_message("system", channel, chat_reply["content"])
+        # Step 4: Verify chat_reply conforms to template
+        if not (isinstance(chat_reply, dict) and chat_reply["from"] and chat_reply["to"] and chat_reply["content"]):
+            logger.warning(f"LLM Response is not formatted correctly {chat_reply}")
+            return chat_reply
 
-        # Step 5: Add LLM response to conversation and return it
-        messages = post_message("system", "external", chat_reply)
-        logger.debug(f"Posting LLM response message")
+        # Step 5: Process LLM response recursively if it's an internal message
+        if chat_reply["to"] == "internal":
+            logger.debug(f"Process LLM response recursively {chat_reply["content"]}")
+            return self.handle_message(user="system", channel=channel, message=chat_reply["content"], dialog="internal")
 
-        return chat_reply
+        # Step 6: Add LLM response to conversation and return it
+        logger.debug(f"Posting LLM response message to chat: {chat_reply["content"]}")
+        messages = post_message("system", "external", chat_reply["content"])
+        return chat_reply["content"]
+

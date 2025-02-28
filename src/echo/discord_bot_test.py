@@ -1,120 +1,108 @@
-import json
 import unittest
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
+import json
 import discord
 from echo.discord_bot import DiscordBot
-from echo.echo import Echo
-from echo.llm_handler import LLMHandler
-from echo.agent import Agent
 
 class TestDiscordBot(unittest.IsolatedAsyncioTestCase):
     
     async def asyncSetUp(self):
-        """Set up the bot with mock dependencies before each test."""
-        self.llm_handler = MagicMock(spec=LLMHandler)
-        self.mock_agent = MagicMock(spec=Agent)  
-        self.mock_agent.invoke_action = MagicMock()  
+        """Set up a mock bot instance before each test."""
+        self.mock_handle_command = MagicMock()
+        self.mock_handle_message = MagicMock()
+        self.mock_handle_command.return_value = ["12345"]  # Default active channel
         
-        self.bot = DiscordBot(self.mock_agent, "Test_Bot_ID", self.llm_handler)
-        self.bot.active_channels = ["test-channel"]
-        
-        self.message = MagicMock()
-        self.message.author.id = "USER-12345"
-        self.message.author.username = "Alice"
-        self.message.channel.id = "test-channel"
-        self.message.channel.send = AsyncMock()
-        self.message.mentions = [self.bot.user]
-        self.message.channel.send = AsyncMock()
-        self.message.content = ""
-    
-    async def test_on_message_first_dm(self):
-        """Ensure DMs processed when unknown."""
-        self.message.guild = None
-        self.message.content = "Hello bot!"
+        self.bot = DiscordBot(
+            handle_command_function=self.mock_handle_command,
+            handle_message_function=self.mock_handle_message,
+            bot_id="BOT-123"
+        )
 
-        # Mock expected behavior
-        mock_response = ["DM-USER-12345"]
-        self.mock_agent.invoke_action.return_value = mock_response  # Directly mock return value
-        self.llm_handler.handle_message.return_value = "Hello Alice!"
-        
-        await self.bot.on_message(self.message)
+        # Properly patch `self.bot.user`
+        self.bot._user = MagicMock()
+        type(self.bot).user = PropertyMock(return_value=self.bot._user)  # Correctly mock user property
 
-        # Ensure code worked as expected
-        self.mock_agent.invoke_action.assert_called_once_with("add_channel", json.dumps({"bot_id": "Test_Bot_ID", "channel_id": "DM-USER-12345"}))
-        self.assertEqual(self.message.channel.send.call_count, 2)
-        self.message.channel.send.assert_any_call("✅ Channel: DM-USER-12345 added to active channels list.")
-        self.message.channel.send.assert_any_call("Hello Alice!")
+        # Set initial active channels list
+        self.bot.active_channels = ["12345"]
 
-    async def test_on_message_second_dm(self):
-        """Ensure DMs processed when known."""
-        self.message.guild = None
-        self.message.content = "Hello bot!"
-        self.llm_handler.handle_message.return_value = "Hello Alice!"
-        self.bot.active_channels = ["DM-USER-12345"]
-        
-        await self.bot.on_message(self.message)
-        self.llm_handler.handle_message.assert_called_once_with(self.message.author.username, "DM-USER-12345", "Hello bot!")
-        self.assertEqual(self.message.channel.send.call_count, 1)
-        self.message.channel.send.assert_any_call("Hello Alice!")
-    
-    async def test_on_message_channel(self):
-        """Respond to a known channel"""
-        self.message.guild = "SERVER"
-        self.message.content = "Hello bot!"
-        self.llm_handler.handle_message.return_value = "Hello Alice!"
-        self.bot.active_channels = ["test-channel"]
-        
-        await self.bot.on_message(self.message)
-        self.llm_handler.handle_message.assert_called_once_with(self.message.author.username, "test-channel", "Hello bot!")
-        self.assertEqual(self.message.channel.send.call_count, 1)
-        self.message.channel.send.assert_any_call("Hello Alice!")
-    
-    @patch.object(DiscordBot, 'user', new_callable=MagicMock)
-    async def test_on_message_leave(self, mock_user):
-        """Ensure leave messages are processed."""
-        # Set up mocks
-        mock_user.username = "test-user"
-        self.bot.user = mock_user
-        self.message.content = "@test-user leave"
-        self.message.mentions = [self.bot.user]
-        self.mock_agent.invoke_action.return_value = []
-
-        await self.bot.on_message(self.message)
-
-        # Ensure bot_agent.invoke_action was called correctly
-        self.mock_agent.invoke_action.assert_called_once_with("remove_channel", json.dumps({
-            "bot_id": "Test_Bot_ID",
-            "channel_id": "test-channel"
-        }))
-
-        # Ensure the bot sends the correct leave message
-        self.message.channel.send.assert_called_once_with("✅ Channel: test-channel removed from active channels list.")
-        self.assertEqual(self.message.channel.send.call_count, 1)
-        
-    @patch.object(DiscordBot, 'user', new_callable=MagicMock) 
-    async def test_on_message_join(self, mock_user):
-        """Ensure leave messages are processed."""
-        mock_user.username = "test-user"
-        self.bot.active_channels = []
-        self.mock_agent.invoke_action.return_value = []
-        self.message.content = "@test-user join"
-        self.message.mentions = [self.bot.user]
-
-        await self.bot.on_message(self.message)
-        
-        self.assertEqual(self.message.channel.send.call_count, 1)
-        self.message.channel.send.assert_called_once_with("✅ Channel: test-channel added to active channels list.")
-        
     @patch.object(discord.TextChannel, 'send', new_callable=AsyncMock)
-    async def test_on_message_ignored_channel(self, mock_send):
-        """Ensure messages in non-active channels are ignored."""
-        self.message.channel.id = "random-channel"
-        self.message.channel = MagicMock(spec=discord.TextChannel)
-        self.message.channel.id = "test-unknown-channel-id"
+    async def test_on_ready_loads_active_channels(self, mock_send):
+        """Test that the bot loads active channels on startup."""
+        self.mock_handle_command.return_value = ["12345", "67890"]
         
-        await self.bot.on_message(self.message)
-        self.llm_handler.handle_message.assert_not_called()
-        mock_send.assert_not_called()
-    
+        await self.bot.on_ready()
+
+        self.mock_handle_command.assert_called_once_with(f"/bot/get_channels/{json.dumps('BOT-123', separators=(',', ':'))}")
+        self.assertEqual(self.bot.active_channels, ["12345", "67890"])
+
+    async def test_on_message_processes_active_channel_message(self):
+        """Test that the bot processes messages from active channels."""
+        message = MagicMock()
+        message.guild = True
+        message.channel.id = "12345"  # Active channel
+        message.author = MagicMock()
+        message.author.id = "USER-1"
+        message.author.username = "Alice"
+        message.content = "Hello bot!"
+        message.channel.send = AsyncMock()  
+
+        self.mock_handle_message.return_value = "Hello Alice!"
+
+        await self.bot.on_message(message)
+
+        self.mock_handle_message.assert_called_once_with("Alice", "12345", "Hello bot!")
+        message.channel.send.assert_called_once_with("Hello Alice!")
+
+    async def test_on_message_ignores_self_messages(self):
+        """Ensure bot ignores its own messages."""
+        message = MagicMock()
+        message.author = self.bot.user  # Message from the bot itself
+        message.channel.send = AsyncMock()
+
+        await self.bot.on_message(message)
+
+        self.mock_handle_message.assert_not_called()
+        message.channel.send.assert_not_called()
+
+    async def test_on_message_handles_join_command(self):
+        """Test that the bot joins a channel when @mention join is used."""
+        message = MagicMock()
+        message.guild = True
+        message.channel.id = "67890"
+        message.author = MagicMock()
+        message.author.id = "USER-2"
+        message.author.username = "Bob"
+        message.content = "@bot join"
+        message.mentions = [self.bot.user]
+        message.channel.send = AsyncMock()  
+        
+        self.mock_handle_command.return_value = ["12345", "67890"]  # Updated channel list
+
+        await self.bot.on_message(message)
+
+        self.mock_handle_command.assert_called_once_with(f"/bot/add_channel/{json.dumps({'bot_id': 'BOT-123', 'channel_id': '67890'}, separators=(',', ':'))}")
+        message.channel.send.assert_called_once_with("✅ Channel: 67890 added to active channels list.")
+        self.assertIn("67890", self.bot.active_channels)
+
+    async def test_on_message_handles_leave_command(self):
+        """Test that the bot leaves a channel when @mention leave is used."""
+        message = MagicMock()
+        message.guild = True
+        message.channel.id = "12345"
+        message.author = MagicMock()
+        message.author.id = "USER-3"
+        message.author.username = "Charlie"
+        message.content = "@bot leave"
+        message.mentions = [self.bot.user]
+        message.channel.send = AsyncMock()  
+
+        self.mock_handle_command.return_value = ["67890"]  
+
+        await self.bot.on_message(message)
+
+        self.mock_handle_command.assert_called_once_with(f"/bot/remove_channel/{json.dumps({'bot_id': 'BOT-123', 'channel_id': '12345'}, separators=(',', ':'))}")
+        message.channel.send.assert_called_once_with("✅ Channel: 12345 removed from active channels list.")
+        self.assertNotIn("12345", self.bot.active_channels)
+
 if __name__ == "__main__":
     unittest.main()

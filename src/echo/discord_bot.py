@@ -5,10 +5,10 @@ logger = logging.getLogger(__name__)
 
 class DiscordBot(discord.Client):
     """_summary_
-        This class handles interactions with Discord, and implements the on_message
-        event handler. It maintains the list of active channels that the bot is participating in 
-        and implements the channel join/leave logic. It uses the LLM handle_message_function 
-        to process any messages that are not join/leave messages.
+    This class handles interactions with Discord, and implements the on_message
+    event handler. It maintains the list of active channels that the bot is participating in 
+    and implements the channel join/leave logic. It uses the LLM handle_message_function 
+    to process any messages that are not join/leave messages.
     """
     def __init__(self, handle_command_function=None, handle_message_function=None,  bot_id=None, **kwargs):
         """
@@ -31,8 +31,8 @@ class DiscordBot(discord.Client):
 
     async def on_ready(self):
         """
-            Triggered when the bot successfully connects, trigger the loading of 
-            active channels from the /bot/get_channels action
+        Triggered when the bot successfully connects, trigger the loading of 
+        active channels from the /bot/get_channels action
         """
         logger.info(f"Logged in as {self.user}")
         try:
@@ -44,9 +44,9 @@ class DiscordBot(discord.Client):
 
     async def on_message(self, message):
         """
-            Processes incoming messages from Discord. 
-            Handles all join/leave logic
-            Passes messages to the LLM handle_message_function
+        Processes incoming messages from Discord. 
+        Handles all join/leave logic
+        Passes messages to the LLM handle_message_function
         """
         logger.debug(f"Got a message!")
         if message.author == self.user:

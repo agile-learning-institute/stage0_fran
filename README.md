@@ -4,7 +4,7 @@ This repository contains the API and Discord Chatbot that supports the user inte
 
 See [The OpenAPI](./docs/index.html) doc for information on the API and Data Structures Used. 
 
-This system uses the [Echo](./ECHO.md) package to expose agent actions in a discord chat conversation.
+This system uses the [Flask]() API framework, and the [Echo](./ECHO.md) discord chat agent framework.
 
 # Separation of Concerns
 

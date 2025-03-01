@@ -29,7 +29,7 @@ class TestConversationRoutes(unittest.TestCase):
         self.assertEqual(response.json, [{"id": "conversation1", "name": "Test Conversation"}])
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_get_conversations.assert_called_once_with(mock_token)
+        mock_get_conversations.assert_called_once_with(token=mock_token)
 
     @patch('src.routes.conversation_routes.create_token')
     @patch('src.routes.conversation_routes.create_breadcrumb')
@@ -65,7 +65,7 @@ class TestConversationRoutes(unittest.TestCase):
         self.assertEqual(response.json, mock_conversation)
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_get_conversation.assert_called_once_with("conversation1", mock_token)
+        mock_get_conversation.assert_called_once_with(channel_id='conversation1', token=mock_token, breadcrumb={'breadcrumb': 'mock_breadcrumb'})
 
     @patch('src.routes.conversation_routes.create_token')
     @patch('src.routes.conversation_routes.create_breadcrumb')
@@ -103,7 +103,10 @@ class TestConversationRoutes(unittest.TestCase):
         self.assertEqual(response.json, mock_conversation)
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_update_conversation.assert_called_once_with("conversation1", mock_token, mock_breadcrumb, patch_data)
+        mock_update_conversation.assert_called_once_with(
+            channel_id='conversation1', 
+            data=patch_data, 
+            token=mock_token, breadcrumb=mock_breadcrumb)
 
     @patch('src.routes.conversation_routes.create_token')
     @patch('src.routes.conversation_routes.create_breadcrumb')
@@ -145,7 +148,12 @@ class TestConversationRoutes(unittest.TestCase):
         self.assertEqual(response.json, mock_messages)
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        mock_add_message.assert_called_once_with("conversation1", mock_token, mock_breadcrumb, mock_new_message)
+        mock_add_message.assert_called_once_with(
+            channel_id='conversation1', 
+            message=mock_new_message, 
+            token=mock_token, 
+            breadcrumb=mock_breadcrumb
+        )
 
     @patch('src.routes.conversation_routes.create_token')
     @patch('src.routes.conversation_routes.create_breadcrumb')

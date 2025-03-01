@@ -84,7 +84,7 @@ def create_conversation_agent(agent_name):
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            conversation = ConversationServices.get_conversation(channel_id=arguments, token=token)
+            conversation = ConversationServices.get_conversation(channel_id=arguments, token=token, breadcrumb=breadcrumb)
             logger.info(f"Get conversation Success {breadcrumb}")
             return conversation
         except Exception as e:

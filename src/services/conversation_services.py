@@ -60,7 +60,6 @@ class ConversationServices:
     @staticmethod
     def get_conversation(channel_id=None, token=None, breadcrumb=None):
         """Get the specified conversation"""
-        logger.info(f"get_conversation(channel_id={channel_id})")
         ConversationServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
@@ -73,7 +72,6 @@ class ConversationServices:
     @staticmethod
     def add_conversation(data=None, token=None, breadcrumb=None):
         """Create a new conversation"""
-        logger.info(f"add_conversation(data={data})")
         ConversationServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
@@ -87,7 +85,6 @@ class ConversationServices:
     @staticmethod
     def update_conversation(channel_id=None, data=None, token=None, breadcrumb=None):
         """Update the latest version of the specified conversation"""
-        logger.info(f"update_conversation(channel_id={channel_id}, data={data})")
         ConversationServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
@@ -103,14 +100,12 @@ class ConversationServices:
     @staticmethod
     def add_message(channel_id=None, message=None, token=None, breadcrumb=None):
         """Add a message to the conversation and generate a reply"""
-        logger.info(f"add_message(channel_id={channel_id}, message={message})")
         ConversationServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
         
         # Fetch the existing conversation, create it if needed
         conversation = ConversationServices.get_conversation(channel_id=channel_id, token=token, breadcrumb=breadcrumb)
-        logger.info(f"Conversation len is {len(conversation["conversation"])}")
         if len(conversation["conversation"]) > 1000: #TODO: Add config.MAX_MESSAGES
             pass # TODO - Add document_full or conversation_old roll-off logic here
         
@@ -121,8 +116,6 @@ class ConversationServices:
         ]}
         set_data = {"last_saved": breadcrumb}
         push_data = {"conversation": message}
-        logger.info(f"match: {match}, set_data {set_data}, push_data {push_data}")
         reply = mongo.update_document(config.CONVERSATION_COLLECTION_NAME, match=match, set_data=set_data, push_data=push_data)
-        logger.info(f"reply: {reply}")
         return reply["conversation"]
 

@@ -1,4 +1,6 @@
 from typing import Any, Callable
+import logging
+logger = logging.getLogger(__name__)
 
 class Agent:
     def __init__(self, name: str):
@@ -38,6 +40,7 @@ class Agent:
         - Returns an error message if the action is not found.
         """
         if action_name not in self.actions:
+            logger.debug(f"Action {action_name} not found")
             return f"Error: Action '{action_name}' not found"
 
         action = self.actions[action_name]["function"]

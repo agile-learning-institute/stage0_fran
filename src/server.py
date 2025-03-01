@@ -11,13 +11,13 @@ mongo = MongoIO.get_instance()
 
 # Initialize Logging
 import logging
-# logging.basicConfig(level=config.LOGGING_LEVEL)
-logging.basicConfig(level="DEBUG")
+logging.basicConfig(level=config.LOGGING_LEVEL)
 logger = logging.getLogger(__name__)
+logger.info(f"============= Starting Server Initialization, Logging at {config.LOGGING_LEVEL}===============")
 
 # Initialize Echo Discord Bot
 from echo.echo import Echo
-echo = Echo(__name__, bot_id=config.FRAN_BOT_ID)
+echo = Echo(__name__, bot_id=config.FRAN_BOT_ID, model=config.FRAN_MODEL_NAME)
 
 # Register Config Agent
 from agents.config_agent import create_config_agent

@@ -7,9 +7,7 @@ from echo.llm_handler import LLMHandler
 from echo.ollama_llm_client import OllamaLLMClient
 
 import logging
-# logging.basicConfig(level="DEBUG")
 logger = logging.getLogger(__name__)
-
 
 class Echo:
     """_summary_
@@ -20,9 +18,10 @@ class Echo:
     those classes to execute agent/actions.
     """
     
-    def __init__(self, name=None, bot_id=None):
+    def __init__(self, name=None, bot_id=None, model=None):
         """Initialize Echo with a default agents."""
         self.name = name
+        self.model = model
         self.agents = {}        
 
         # Register default agents
@@ -36,7 +35,7 @@ class Echo:
         # Initialize LLM Conversation Handler
         self.llm_handler = LLMHandler(
             handle_command_function=self.handle_command, 
-            llm_client=OllamaLLMClient()
+            llm_client=OllamaLLMClient(model=self.model)
         )
         # Initialize Discord Chatbot
         self.bot = DiscordBot(
@@ -69,11 +68,11 @@ class Echo:
         except TimeoutError:
             logger.info(f"Discord Client.close() timed out after {timeout} seconds")
                                     
-    def register_agent(self, agent, agent_name=None):
+    def register_agent(self, agent):
         """Registers an agent with Echo."""
         if not isinstance(agent, Agent): 
             raise Exception(f"can not register agent without actions: {agent}")
-        self.agents[agent_name] = agent
+        self.agents[agent.name] = agent
 
     def get_agents(self):
         """Returns a list of registered agent names."""
@@ -109,6 +108,7 @@ class Echo:
         agent_name, action_name, arguments = self.parse_command(command)
 
         if agent_name not in self.agents:
+            logger.debug(f"Agent {agent_name} not found")
             return ""  # Silence for unknown agents
 
         agent = self.agents[agent_name]

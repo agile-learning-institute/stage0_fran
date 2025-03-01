@@ -5,6 +5,7 @@ name = "pypi"
 
 [scripts]
 local = "sh -c 'PYTHONPATH=$(pwd)/src python3 -m server'"
+debug = "sh -c 'PYTHONPATH=$(pwd)/src LOGGING_LEVEL=DEBUG python3 -m server'"
 start = "sh -c 's0 down && s0 up mongodb && pipenv run local'"
 test = "python -m unittest discover -s ./src -p '*_test.py'"
 stepci = "stepci run ./test/stepci.yaml"

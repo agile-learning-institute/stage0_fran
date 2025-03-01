@@ -4,7 +4,7 @@ class OllamaLLMClient:
     """_summary_
     Wrapper for the ollama Library for chat function
     """
-    def __init__(self, base_url="http://localhost:11434", model="mistral"):
+    def __init__(self, base_url="http://localhost:11434", model="llama3.2:latest"):
         """
         Initializes the LLMClient to communicate with an Ollama server.
         
@@ -24,7 +24,7 @@ class OllamaLLMClient:
         """
 
         response = ollama.chat(model=model, messages=messages)
-        response.raise_for_status()
+        # response.raise_for_status()
         return response
 
     def set_model(self, model_name: str):

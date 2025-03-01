@@ -14,7 +14,7 @@ def create_bot_agent(agent_name):
         """Get the bot record based on the bot_id passed as arguments"""
         try:
             token = create_token()
-            bot = BotServices.get_bot(arguments, token)
+            bot = BotServices.get_bot(bot_id=arguments, token=token)
             return bot
         except Exception as e:
             logger.warning(f"A get_bot Error has occurred: {e}")
@@ -67,7 +67,7 @@ def create_bot_agent(agent_name):
         """Get a list of active channels for the specified bot"""
         try:
             token = create_token()
-            channels = BotServices.get_channels(arguments, token)
+            channels = BotServices.get_channels(bot_id=arguments, token=token)
             return channels
         except Exception as e:
             logger.warning(f"A get_channels Error has occurred: {e}")
@@ -92,11 +92,16 @@ def create_bot_agent(agent_name):
         """Add the specified channel_id 
         to the set of active channels for bot_id"""
         try:
+            logger.debug(f"Agent Add Channel({arguments})")
             token = create_token()
+            logger.debug(f"Token: {token}")
             breadcrumb = create_breadcrumb(token)
+            logger.debug(f"Breadcrumb: {breadcrumb}")
             channels = BotServices.add_channel(
-                arguments["bot_id"], arguments["channel_id"], 
-                token, breadcrumb)
+                channel_id=arguments["channel_id"], 
+                bot_id=arguments["bot_id"], 
+                token=token, breadcrumb=breadcrumb)
+            logger.debug(f"Channels: {channels}")
             return channels
         except Exception as e:
             logger.warning(f"A add_channel Error has occurred: {e}")
@@ -134,8 +139,9 @@ def create_bot_agent(agent_name):
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             channels = BotServices.remove_channel(
-                arguments["bot_id"], arguments["channel_id"], 
-                token, breadcrumb)
+                bot_id=arguments["bot_id"], 
+                channel_id=arguments["channel_id"], 
+                token=token, breadcrumb=breadcrumb)
             return channels
         except Exception as e:
             logger.warning(f"A remove_channel Error has occurred: {e}")

@@ -75,7 +75,7 @@ class TestConversationAgent(unittest.TestCase):
         # Assertions
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with("fake_token")
-        mock_get_conversation.assert_called_once_with(channel_id=arguments, token="fake_token")
+        mock_get_conversation.assert_called_once_with(channel_id=arguments, token="fake_token", breadcrumb='fake_breadcrumb')
         self.assertEqual(result, "a_conversation")
     
     @patch("agents.conversation_agent.create_token")  
@@ -96,7 +96,7 @@ class TestConversationAgent(unittest.TestCase):
         # Assertions
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with("fake_token")
-        mock_get_conversation.assert_called_once_with(channel_id=arguments, token="fake_token")
+        mock_get_conversation.assert_called_once_with(channel_id=arguments, token="fake_token", breadcrumb='fake_breadcrumb')
         self.assertEqual(result, "error")
                 
     @patch("agents.conversation_agent.create_token")  

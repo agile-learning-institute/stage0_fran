@@ -14,7 +14,7 @@ class TestEcho(unittest.TestCase):
         
         self.mock_agent = Agent("test_agent")
         self.mock_agent.register_action("test_action", self.mock_action, "description", "arguments_schema", "output_schema")
-        self.echo.register_agent(agent_name="test_agent", agent=self.mock_agent)
+        self.echo.register_agent(agent=self.mock_agent)
 
     def test_register_agent(self):
         """Ensure an agent is registered successfully."""

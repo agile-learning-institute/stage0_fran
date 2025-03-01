@@ -68,7 +68,7 @@ class Echo:
         except TimeoutError:
             logger.info(f"Discord Client.close() timed out after {timeout} seconds")
                                     
-    def register_agent(self, agent):
+    def register_agent(self, agent=None):
         """Registers an agent with Echo."""
         if not isinstance(agent, Agent): 
             raise Exception(f"can not register agent without actions: {agent}")

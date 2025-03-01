@@ -37,7 +37,7 @@ class TestBotAgent(unittest.TestCase):
         
         # Assertions
         mock_create_token.assert_called_once()
-        mock_get_bot.assert_called_once_with(arguments, "fake_token")
+        mock_get_bot.assert_called_once_with(bot_id=arguments, token='fake_token')
         self.assertEqual(result, mock_bot_object)
     
     @patch("agents.bot_agent.create_token")  
@@ -55,7 +55,7 @@ class TestBotAgent(unittest.TestCase):
         
         # Assertions
         mock_create_token.assert_called_once()
-        mock_get_bot.assert_called_once_with(arguments, "fake_token")
+        mock_get_bot.assert_called_once_with(bot_id=arguments, token='fake_token')
         self.assertEqual(result, "error")
         
     @patch("agents.bot_agent.create_token")  
@@ -74,7 +74,7 @@ class TestBotAgent(unittest.TestCase):
         
         # Assertions
         mock_create_token.assert_called_once()
-        mock_get_channels.assert_called_once_with(arguments, "fake_token")
+        mock_get_channels.assert_called_once_with(bot_id=arguments, token='fake_token')
         self.assertEqual(result, mock_channels)
     
     @patch("agents.bot_agent.create_token")  
@@ -92,7 +92,7 @@ class TestBotAgent(unittest.TestCase):
         
         # Assertions
         mock_create_token.assert_called_once()
-        mock_get_channels.assert_called_once_with(arguments, "fake_token")
+        mock_get_channels.assert_called_once_with(bot_id=arguments, token='fake_token')
         self.assertEqual(result, "error")
         
     @patch("agents.bot_agent.create_token")  
@@ -117,7 +117,7 @@ class TestBotAgent(unittest.TestCase):
         # Assertions
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with("fake_token")
-        mock_add_channel.assert_called_once_with("test_bot_id", "test_channel", "fake_token", "fake_breadcrumb")
+        mock_add_channel.assert_called_once_with(channel_id='test_channel', bot_id='test_bot_id', token='fake_token', breadcrumb='fake_breadcrumb')
         self.assertEqual(result, mock_channels)
     
     @patch("agents.bot_agent.create_token")  
@@ -141,7 +141,10 @@ class TestBotAgent(unittest.TestCase):
         # Assertions
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with("fake_token")
-        mock_add_channel.assert_called_once_with(arguments["bot_id"], arguments["channel_id"], "fake_token", "fake_breadcrumb")
+        mock_add_channel.assert_called_once_with(
+            channel_id='test_channel', 
+            bot_id='test_bot_id', 
+            token='fake_token', breadcrumb='fake_breadcrumb')
         self.assertEqual(result, "error")
         
     @patch("agents.bot_agent.create_token")  
@@ -166,7 +169,10 @@ class TestBotAgent(unittest.TestCase):
         # Assertions
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with("fake_token")
-        mock_remove_channel.assert_called_once_with("test_bot_id", "test_channel", "fake_token", "fake_breadcrumb")
+        mock_remove_channel.assert_called_once_with(
+            bot_id='test_bot_id', 
+            channel_id='test_channel', 
+            token='fake_token', breadcrumb='fake_breadcrumb')
         self.assertEqual(result, mock_channels)
     
     @patch("agents.bot_agent.create_token")  
@@ -190,7 +196,10 @@ class TestBotAgent(unittest.TestCase):
         # Assertions
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with("fake_token")
-        mock_remove_channel.assert_called_once_with(arguments["bot_id"], arguments["channel_id"], "fake_token", "fake_breadcrumb")
+        mock_remove_channel.assert_called_once_with(
+            bot_id='test_bot_id', 
+            channel_id='test_channel', 
+            token='fake_token', breadcrumb='fake_breadcrumb')
         self.assertEqual(result, "error")
         
 if __name__ == "__main__":

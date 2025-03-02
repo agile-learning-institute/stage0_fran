@@ -75,7 +75,7 @@ class ConversationServices:
             data["status"] = config.ACTIVE_STATUS
             data["version"] = config.LATEST_VERSION
             data["last_saved"] = breadcrumb
-            data["conversation"] = []
+            data["messages"] = []
             new_id = mongo.create_document(collection_name=config.CONVERSATION_COLLECTION_NAME, document=data)
             conversation = mongo.get_document(collection_name=config.CONVERSATION_COLLECTION_NAME, document_id=new_id)
             return conversation

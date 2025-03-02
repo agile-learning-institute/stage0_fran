@@ -57,7 +57,7 @@ def create_conversation_routes():
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            message = request.data.decode('utf-8')
+            message = request.get_json()
             logger.info(f"add_message route channel_id={channel_id}, message={message}")
             messages = ConversationServices.add_message(channel_id=channel_id, message=message, token=token, breadcrumb=breadcrumb)
             logger.info(f"Update conversation Successful {breadcrumb}")

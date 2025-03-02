@@ -106,7 +106,7 @@ class ConversationServices:
         
         # Fetch the existing conversation, create it if needed
         conversation = ConversationServices.get_conversation(channel_id=channel_id, token=token, breadcrumb=breadcrumb)
-        if len(conversation["conversation"]) > 1000: #TODO: Add config.MAX_MESSAGES
+        if len(conversation["messages"]) > 1000: #TODO: Add config.MAX_MESSAGES
             pass # TODO - Add document_full or conversation_old roll-off logic here
         
         match = {"$and": [
@@ -115,7 +115,9 @@ class ConversationServices:
             {"status": config.ACTIVE_STATUS}
         ]}
         set_data = {"last_saved": breadcrumb}
-        push_data = {"conversation": message}
+        push_data = {"messages": message}
+        logger.info(f"add_message ready to update document - match: {match} set_data: {set_data}, push_data: {push_data}")
         reply = mongo.update_document(config.CONVERSATION_COLLECTION_NAME, match=match, set_data=set_data, push_data=push_data)
-        return reply["conversation"]
+        logger.info(f"add_message got reply: {reply}")
+        return reply["messages"]
 

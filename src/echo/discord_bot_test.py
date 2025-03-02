@@ -39,10 +39,10 @@ class TestDiscordBot(unittest.IsolatedAsyncioTestCase):
         """Test that the bot processes messages from active channels."""
         message = MagicMock()
         message.guild = True
-        message.channel.id = "12345"  # Active channel
+        message.channel.id = "12345"  
         message.author = MagicMock()
         message.author.id = "USER-1"
-        message.author.username = "Alice"
+        message.author.name = "Alice"
         message.content = "Hello bot!"
         message.channel.send = AsyncMock()  
 
@@ -50,7 +50,7 @@ class TestDiscordBot(unittest.IsolatedAsyncioTestCase):
 
         await self.bot.on_message(message)
 
-        self.mock_handle_message.assert_called_once_with("Alice", "12345", "Hello bot!")
+        self.mock_handle_message.assert_called_once_with(user="Alice", channel="12345", message="Hello bot!")
         message.channel.send.assert_called_once_with("Hello Alice!")
 
     async def test_on_message_ignores_self_messages(self):

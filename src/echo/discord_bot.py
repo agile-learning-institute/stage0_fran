@@ -52,6 +52,7 @@ class DiscordBot(discord.Client):
         if message.author == self.user:
             return  # Ignore self-messages
 
+        # Initialize Message Values
         user_id = message.author.id
         username = message.author.name
         channel = message.channel.id if message.guild else f"DM-{user_id}"

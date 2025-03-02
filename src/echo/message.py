@@ -11,16 +11,18 @@ class Message:
     VALID_DIALOGS = [GROUP_DIALOG, TOOLS_DIALOG]
     
     def __init__(self, message=None, role=None, dialog=None, content=None):
+        logger.debug(f"role: {role}, dialog: {dialog}, message: {message}, content: {content}")
         """Initialize a message."""
         if isinstance(message, str):
             # Construct default message from message
+            logger.debug(f"Constructing from string {message}")
             self.role = Message.USER_ROLE
             self.dialog = Message.GROUP_DIALOG                
             self.content = message
             
         elif isinstance(message, dict):  
             # Construct from a message dict without a dialog property
-            logger.info(f"Constructing from message {message}")
+            logger.debug(f"Constructing from message {message}")
             self.role = message.get("role", Message.USER_ROLE)
             content_value = message.get("content", "")  
 
@@ -32,7 +34,7 @@ class Message:
                 self.content = content_value  
         else:
             # Construct from individual parameters
-            logger.info(f"Constructing from parameters {role}, {dialog}, {content}")
+            logger.debug(f"Constructing from parameters {role}, {dialog}, {content}")
             if role in Message.VALID_ROLES:
                 self.role = role
             else: 

@@ -34,15 +34,13 @@ class TestWorkshopServices(unittest.IsolatedAsyncioTestCase):
 
     @patch('src.services.workshop_services.MongoIO.get_instance')
     @patch('src.services.workshop_services.ChainServices.get_chain')
-    @patch('src.services.workshop_services.ConversationServices.add_conversation')
     @patch('src.services.workshop_services.Config.get_instance')
-    def test_add_workshop(self, mock_config, mock_add_conversation, mock_get_chain, mock_mongo):
+    def test_add_workshop(self, mock_config, mock_get_chain, mock_mongo):
         mock_config_instance = MagicMock()
         mock_config.return_value = mock_config_instance
         mock_mongo_instance = MagicMock()
         mock_mongo.return_value = mock_mongo_instance
         mock_get_chain.return_value = {"exercises": ["exercise1"]}
-        mock_add_conversation.return_value = {"_id": "conv1"}
         mock_mongo_instance.create_document.return_value = "ws1"
         mock_mongo_instance.get_document.return_value = {"_id": "ws1", "name": "New Workshop"}
 

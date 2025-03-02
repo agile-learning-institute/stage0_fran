@@ -3,7 +3,6 @@ from bson import ObjectId
 from config.config import Config
 from mongo_utils.mongo_io import MongoIO
 from services.chain_services import ChainServices
-from src.services.conversation_services import ConversationServices
 
 import logging
 logger = logging.getLogger(__name__)

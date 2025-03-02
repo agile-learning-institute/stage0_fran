@@ -132,15 +132,14 @@ class TestConversationRoutes(unittest.TestCase):
         mock_create_token.return_value = mock_token
         mock_breadcrumb = {"breadcrumb": "mock_breadcrumb"}
         mock_create_breadcrumb.return_value = mock_breadcrumb
-        mock_new_message = "message3"
-        mock_messages = ["message1","message2","message3"]
+        mock_new_message = {"role": "user", "content": "message3"}
+        mock_messages = [{"role": "user", "content": "message1"}, {"role": "user", "content": "message2"},{"role": "user", "content": "message3"}]
         mock_add_message.return_value = mock_messages
 
         # Act
         response = self.client.post(
             '/api/conversation/conversation1/message', 
-            data=mock_new_message.encode('utf-8'),  
-            content_type='text/plain'  
+            json = mock_new_message
         )
         
         # Assert

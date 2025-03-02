@@ -72,15 +72,15 @@ class TestConversationServices(unittest.TestCase):
         mock_mongo_instance = MagicMock()
         mock_mongo.return_value = mock_mongo_instance
         mock_config.return_value = MagicMock()
-        mock_update_return = {"_id": "conv1", "conversation": "List Of Values"}
+        mock_update_return = {"_id": "conv1", "messages": "List Of Values"}
         mock_mongo_instance.update_document.return_value = mock_update_return
 
         token = {"user_id": "test_user"}
         breadcrumb = {"timestamp": "now"}
-        message = {"text": "New message"}
+        message = {"role":"user", "content": "New message"}
 
         result = ConversationServices.add_message(channel_id="conv1", message=message, token=token, breadcrumb=breadcrumb)
-        self.assertEqual(result, mock_update_return["conversation"])
+        self.assertEqual(result, mock_update_return["messages"])
 
 if __name__ == '__main__':
     unittest.main()

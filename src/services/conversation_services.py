@@ -31,7 +31,7 @@ class ConversationServices:
             {"version": config.LATEST_VERSION},
             {"status": config.ACTIVE_STATUS}
         ]}
-        project = {"_id":1, "name":1}
+        project = {"_id":1, "channel_id":1}
         conversations = mongo.get_documents(config.CONVERSATION_COLLECTION_NAME, match, project)
         return conversations
 
@@ -52,8 +52,8 @@ class ConversationServices:
         ConversationServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
-        match = {"name": {"$regex": query}} if query else None
-        project = {"_id":1, "name":1}
+        match = {"channel_id": {"$regex": query}} if query else None
+        project = {"_id":1, "channel_id":1}
         conversations = mongo.get_documents(config.CONVERSATION_COLLECTION_NAME, match, project)
         return conversations
 
@@ -63,25 +63,25 @@ class ConversationServices:
         ConversationServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
-        match = {"name": channel_id}
+        match = {"$and": [
+            {"channel_id": channel_id},
+            {"version": config.LATEST_VERSION},
+            {"status": config.ACTIVE_STATUS}
+        ]}
         conversations = mongo.get_documents(collection_name=config.CONVERSATION_COLLECTION_NAME, match=match)
         if len(conversations) == 0:
-            return ConversationServices.add_conversation(data=match, token=token, breadcrumb=breadcrumb)
-        return conversations[0]
-    
-    @staticmethod
-    def add_conversation(data=None, token=None, breadcrumb=None):
-        """Create a new conversation"""
-        ConversationServices._check_user_access(token)
-        config = Config.get_instance()
-        mongo = MongoIO.get_instance()
-        data["status"] = config.ACTIVE_STATUS
-        data["version"] = config.LATEST_VERSION
-        data["last_saved"] = breadcrumb
-        data["conversation"] = []
-        mongo.create_document(collection_name=config.CONVERSATION_COLLECTION_NAME, document=data)
-        return ConversationServices.get_conversation(channel_id=data["name"], token=token, breadcrumb=breadcrumb)
-    
+            data = {}
+            data["channel_id"] = channel_id
+            data["status"] = config.ACTIVE_STATUS
+            data["version"] = config.LATEST_VERSION
+            data["last_saved"] = breadcrumb
+            data["conversation"] = []
+            new_id = mongo.create_document(collection_name=config.CONVERSATION_COLLECTION_NAME, document=data)
+            conversation = mongo.get_document(collection_name=config.CONVERSATION_COLLECTION_NAME, document_id=new_id)
+            return conversation
+        else:
+            return conversations[0]
+        
     @staticmethod
     def update_conversation(channel_id=None, data=None, token=None, breadcrumb=None):
         """Update the latest version of the specified conversation"""
@@ -89,7 +89,7 @@ class ConversationServices:
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
         match = {"$and": [
-            {"name": channel_id},
+            {"channel_id": channel_id},
             {"version": config.LATEST_VERSION},
             {"status": config.ACTIVE_STATUS}
         ]}
@@ -110,7 +110,7 @@ class ConversationServices:
             pass # TODO - Add document_full or conversation_old roll-off logic here
         
         match = {"$and": [
-            {"name": channel_id},
+            {"channel_id": channel_id},
             {"version": config.LATEST_VERSION},
             {"status": config.ACTIVE_STATUS}
         ]}

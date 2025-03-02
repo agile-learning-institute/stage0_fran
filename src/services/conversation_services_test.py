@@ -14,13 +14,13 @@ class TestConversationServices(unittest.TestCase):
         mock_config_instance.ACTIVE_STATUS = "active"
         mock_config.return_value = mock_config_instance
 
-        mock_mongo_instance.get_documents.return_value = [{"_id": "conv1", "name": "Test Conversation"}]
+        mock_mongo_instance.get_documents.return_value = [{"_id": "conv1", "channel_id": "CHANNEL_ID"}]
 
         token = {"user_id": "test_user"}
         result = ConversationServices.get_conversations(token)
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]["name"], "Test Conversation")
+        self.assertEqual(result[0]["channel_id"], "CHANNEL_ID")
 
     @patch('src.services.conversation_services.MongoIO.get_instance')
     @patch('src.services.conversation_services.Config.get_instance')
@@ -29,13 +29,13 @@ class TestConversationServices(unittest.TestCase):
         mock_mongo.return_value = mock_mongo_instance
         mock_config.return_value = MagicMock()
 
-        mock_mongo_instance.get_documents.return_value = [{"_id": "conv1", "name": "Test Channel"}]
+        mock_mongo_instance.get_documents.return_value = [{"_id": "conv1", "channel_id": "CHANNEL_1"}]
 
         token = {"user_id": "test_user"}
         result = ConversationServices.get_all_conversations_by_name("Test", token)
 
         self.assertEqual(len(result), 1)
-        self.assertIn("Test Channel", [conv["name"] for conv in result])
+        self.assertIn("CHANNEL_1", [conv["channel_id"] for conv in result])
 
     @patch('src.services.conversation_services.MongoIO.get_instance')
     @patch('src.services.conversation_services.Config.get_instance')
@@ -44,7 +44,7 @@ class TestConversationServices(unittest.TestCase):
         mock_mongo.return_value = mock_mongo_instance
         mock_config.return_value = MagicMock()
 
-        mock_mongo_instance.get_document.return_value = {"_id": "conv1", "name": "Test Conversation"}
+        mock_mongo_instance.get_document.return_value = {"_id": "conv1", "channel_id": "CHANNEL_1"}
 
         token = {"user_id": "test_user"}
         result = ConversationServices.get_conversation("conv1", token)

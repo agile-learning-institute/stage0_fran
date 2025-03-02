@@ -50,7 +50,7 @@ class TestDiscordBot(unittest.IsolatedAsyncioTestCase):
 
         await self.bot.on_message(message)
 
-        self.mock_handle_message.assert_called_once_with(user="Alice", channel="12345", message="Hello bot!")
+        self.mock_handle_message.assert_called_once_with(channel='12345', role='user', dialog='group', text='Hello bot!')
         message.channel.send.assert_called_once_with("Hello Alice!")
 
     async def test_on_message_ignores_self_messages(self):

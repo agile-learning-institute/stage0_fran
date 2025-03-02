@@ -1,6 +1,8 @@
 import discord
 import json
 import logging
+from echo.message import Message
+
 logger = logging.getLogger(__name__)
 
 class DiscordBot(discord.Client):
@@ -75,7 +77,7 @@ class DiscordBot(discord.Client):
             # Process Message if from an active channel            
             elif channel in self.active_channels:
                 logger.info(f"Getting LLM Response in {channel}")
-                response = self.handle_message(user=username, channel=channel, message=content)
+                response = self.handle_message(channel=channel, role=Message.USER_ROLE, dialog=Message.GROUP_DIALOG, text=content)
                 
             # Join Channels when requested
             elif self.user in message.mentions and "join" in content.lower():

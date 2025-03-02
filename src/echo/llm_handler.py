@@ -67,8 +67,9 @@ class LLMHandler:
 
         # Step 3: Call the LLM with updated conversation history
         llm_reply = self.llm.chat(model=self.llm.model, messages=messages)
-        logger.debug(f"LLM reply Role is {llm_reply.message.role} content is {llm_reply.message.content}.")
-        chat_reply = Message({"role": llm_reply.message.role, "content": llm_reply.message.content})
+        llm_role = llm_reply["message"]["role"]
+        llm_content = llm_reply["message"]["content"]
+        chat_reply = Message({"role": llm_role, "content": llm_content})
 
         # Step 4: Process LLM response recursively if it's an tool message
         if chat_reply.dialog == Message.TOOLS_DIALOG:

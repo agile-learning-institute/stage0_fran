@@ -2,6 +2,7 @@ import json
 import unittest
 from unittest.mock import MagicMock, patch
 from echo.llm_handler import LLMHandler
+from echo.message import Message
 
 class TestLLMHandler(unittest.TestCase):
     def setUp(self):
@@ -13,9 +14,9 @@ class TestLLMHandler(unittest.TestCase):
 
     def test_handle_simple_message(self):
         """Ensure simple agent call falls through."""
-        message1 = {"channel_id": "CHANNEL_1", "message":{"from": "Alice", "to": "external", "content": "Simple Message"}}
-        llm_response = {"from": "system", "to": "external", "content": "LLM Response"}
-        message2 = {"channel_id": "CHANNEL_1", "message":{"from": "system", "to": "external", "content": "LLM Response"}}
+        message1 = {"channel_id": "CHANNEL_1", "message":{"role": Message.USER_ROLE, "content": f"{Message.GROUP_DIALOG}:Simple Message"}}
+        llm_response = {"role": Message.ASSISTANT_ROLE, "content": "LLM Response"}
+        message2 = {"channel_id": "CHANNEL_1", "message":{"role": Message.ASSISTANT_ROLE, "content": f"{Message.GROUP_DIALOG}:LLM Response"}}
         
         self.mock_handle_command.side_effect = [
             [message1],
@@ -24,7 +25,7 @@ class TestLLMHandler(unittest.TestCase):
         ]
         self.mock_llm_client.chat.return_value = llm_response
 
-        result = self.llm_handler.handle_message("Alice", "CHANNEL_1", "Simple Message")
+        result = self.llm_handler.handle_message(channel="CHANNEL_1", text="Simple Message")
 
         self.assertEqual(result, "LLM Response")
         self.mock_handle_command.assert_any_call(f"/conversation/add_message/{json.dumps(message1, separators=(',', ':'))}")
@@ -33,8 +34,8 @@ class TestLLMHandler(unittest.TestCase):
 
     def test_llm_reply_format_error(self):
         """Ensure simple agent call falls through."""
-        message1 = {"channel_id": "CHANNEL_1", "message":{"from": "Alice", "to": "external", "content": "Simple Message"}}
-        llm_response = "Not A Dict"
+        message1 = {"channel_id": "CHANNEL_1", "message":{"role": Message.USER_ROLE, "content": f"{Message.GROUP_DIALOG}:Simple Message"}}
+        llm_response = "Just a String"
         
         self.mock_handle_command.side_effect = [
             [message1],
@@ -42,19 +43,19 @@ class TestLLMHandler(unittest.TestCase):
         ]
         self.mock_llm_client.chat.return_value = llm_response
 
-        result = self.llm_handler.handle_message("Alice", "CHANNEL_1", "Simple Message")
+        result = self.llm_handler.handle_message(channel="CHANNEL_1", text="Simple Message")
 
-        self.assertEqual(result, "Not A Dict")
+        self.assertEqual(result, "Just a String")
         self.mock_handle_command.assert_any_call(f"/conversation/add_message/{json.dumps(message1, separators=(',', ':'))}")
         self.mock_llm_client.chat.assert_called_once()
 
     def test_handle_message_with_agent_call(self):
         """Ensure user making agent call messages are correctly processed."""
-        message1 = {"channel_id": "CHANNEL_1", "message":{"from": "Alice", "to": "external", "content": "/test_agent/test_action"}}
+        message1 = {"channel_id": "CHANNEL_1", "message":{"role": Message.USER_ROLE, "content": f"{Message.GROUP_DIALOG}:/test_agent/test_action"}}
         agent_response = "Agent Response"
-        message2 = {"channel_id": "CHANNEL_1", "message":{"from": "agent", "to": "internal", "content": "Agent Response"}}
-        llm_response = {"from": "agent", "to": "external", "content": "LLM says Agent Response"}
-        message3 = {"channel_id": "CHANNEL_1", "message":{"from": "system", "to": "external", "content": "LLM says Agent Response"}}
+        message2 = {"channel_id": "CHANNEL_1", "message":{"role": Message.ASSISTANT_ROLE, "content": f"{Message.TOOLS_DIALOG}:Agent Response"}}
+        llm_response = {"role": Message.ASSISTANT_ROLE, "content": f"{Message.GROUP_DIALOG}:LLM says Agent Response"}
+        message3 = {"channel_id": "CHANNEL_1", "message":{"role": Message.ASSISTANT_ROLE, "content": f"{Message.GROUP_DIALOG}:LLM says Agent Response"}}
         
         self.mock_handle_command.side_effect = [
             [message1],
@@ -65,7 +66,7 @@ class TestLLMHandler(unittest.TestCase):
         ]
         self.mock_llm_client.chat.return_value = llm_response
 
-        result = self.llm_handler.handle_message("Alice", "CHANNEL_1", "/test_agent/test_action")
+        result = self.llm_handler.handle_message(channel="CHANNEL_1", text="/test_agent/test_action")
 
         self.assertEqual(result, "LLM says Agent Response")
         self.mock_handle_command.assert_any_call("/test_agent/test_action")
@@ -76,18 +77,17 @@ class TestLLMHandler(unittest.TestCase):
 
     def test_handle_simple_message_with_recursion(self):
         """Ensure recursive agent call messages are correctly processed."""
-        message1 = {"channel_id": "CHANNEL_1", "message":{"from": "Alice", "to": "external", "content": "Simple Message"}}
-        llm_response = {"from": "system", "to": "internal", "content": "/test_agent/test_action"}
-        message2 = {"channel_id": "CHANNEL_1", "message":{"from": "system", "to": "internal", "content": "/test_agent/test_action"}}
+        message1 = {"channel_id": "CHANNEL_1", "message":{"role": Message.USER_ROLE, "content": f"{Message.GROUP_DIALOG}:Simple Message"}}
+        llm_response = {"role": Message.ASSISTANT_ROLE, "content": f"{Message.TOOLS_DIALOG}:/test_agent/test_action"}
+        message2 = {"channel_id": "CHANNEL_1", "message":{"role": Message.ASSISTANT_ROLE, "content": f"{Message.TOOLS_DIALOG}:/test_agent/test_action"}}
         agent_reply = "agent reply 1"
-        message3 = {"channel_id": "CHANNEL_1", "message":{"from": "agent", "to": "internal", "content": "agent reply 1"}}
-        llm_response2 = {"from": "system", "to": "internal", "content": "/test_agent/test_action2"}
-        message4 = {"channel_id": "CHANNEL_1", "message":{"from": "system", "to": "internal", "content": "/test_agent/test_action2"}}
+        message3 = {"channel_id": "CHANNEL_1", "message":{"role": Message.ASSISTANT_ROLE, "content": f"{Message.TOOLS_DIALOG}:agent reply 1"}}
+        llm_response2 = {"role": Message.ASSISTANT_ROLE, "content": f"{Message.TOOLS_DIALOG}:/test_agent/test_action2"}
+        message4 = {"channel_id": "CHANNEL_1", "message":{"role": Message.ASSISTANT_ROLE, "content": f"{Message.TOOLS_DIALOG}:/test_agent/test_action2"}}
         agent_reply2 = "agent reply 2"
-        message5 = {"channel_id": "CHANNEL_1", "message":{"from": "agent", "to": "internal", "content": "agent reply 2"}}
-        llm_response3 = {"from": "system", "to": "external", "content": "LLM Final Answer"}
-        message6 = {"channel_id": "CHANNEL_1", "message":{"from": "system", "to": "external", "content": "LLM Final Answer"}}
-        
+        message5 = {"channel_id": "CHANNEL_1", "message":{"role": Message.ASSISTANT_ROLE, "content": f"{Message.TOOLS_DIALOG}:agent reply 2"}}
+        llm_response3 = {"role": Message.ASSISTANT_ROLE, "content": f"{Message.GROUP_DIALOG}:LLM Final Answer"}
+        message6 = {"channel_id": "CHANNEL_1", "message":{"role": Message.ASSISTANT_ROLE, "content": f"{Message.GROUP_DIALOG}:LLM Final Answer"}}
 
         self.mock_handle_command.side_effect = [
             [message1],
@@ -103,7 +103,7 @@ class TestLLMHandler(unittest.TestCase):
             llm_response, llm_response2, llm_response3
         ]
 
-        result = self.llm_handler.handle_message("Alice", "CHANNEL_1", "Simple Message")
+        result = self.llm_handler.handle_message(channel="CHANNEL_1", text="Simple Message")
 
         self.assertEqual(result, "LLM Final Answer")
         self.mock_handle_command.assert_any_call(f"/conversation/add_message/{json.dumps(message1, separators=(',', ':'))}")

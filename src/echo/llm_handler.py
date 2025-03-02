@@ -1,5 +1,6 @@
 import json
 import re
+from echo.message import Message
 import logging
 logging.basicConfig(level="DEBUG")
 logger = logging.getLogger(__name__)
@@ -21,7 +22,7 @@ class LLMHandler:
         self.handle_command = handle_command_function
         self.agent_command_pattern = re.compile(r"^/([^/]+)/([^/]+)(?:/(.*))?$")
 
-    def handle_message(self, user=None, channel=None, message=None, dialog=None):
+    def handle_message(self, channel=None, role=Message.USER_ROLE, dialog=None, text=None ):
         """
         Processes an incoming message, using it to update the conversation, 
         and generate a reply. If the reply is on the "internal" dialog it will 
@@ -33,7 +34,7 @@ class LLMHandler:
         :param dialog: The "internal" or "external" dialog this message will be posted to, defaults to external
         :return: The response to be written to the chat-channel. 
         """
-        def post_message(from_role: str, to_role: str, content: str):
+        def post_message(role: str, dialog: str, content: str):
             """
             Small helper function to add a message to the conversation
             Uses the /conversation/add_message agent action
@@ -43,47 +44,39 @@ class LLMHandler:
             :param content: The message itself
             :return: The full conversation (list of messages)
             """
-            formatted_message = {"from": from_role, "to": to_role, "content": content}
-            arguments = json.dumps({"channel_id": channel, "message":formatted_message}, separators=(',', ':'))
-            command_message = f"/conversation/add_message/{arguments}"
-            logger.info(f"Sending Command Message: {command_message}")
-            conversation = self.handle_command(command_message)
+            message = Message(role=role, dialog=dialog, content=content)
+            arguments = json.dumps({"channel_id": channel, "message":message.as_llm_message()}, separators=(',', ':'))
+            command = f"/conversation/add_message/{arguments}"
+            logger.info(f"Sending Command Message: {command}")
+            conversation = self.handle_command(command)
             return conversation if isinstance(conversation, list) else []
 
         # Set default dialog
-        if not dialog: dialog = "external"
+        if not dialog: dialog = Message.GROUP_DIALOG
+        if not role: role = Message.USER_ROLE
         
         # Step 1: Add the user message to the conversation
-        logger.info(f"Posting Message {message}")
-        messages = post_message(user, dialog, message)
+        logger.info(f"Posting Message {text}")
+        messages = post_message(role=role, dialog=dialog, content=text)
 
         # Step 2: Check if this is an agent call using regex
-        if self.agent_command_pattern.match(message):
-            agent_reply = self.handle_command(message)
-            logger.info(f"Command Message Sent: {message} reply: {agent_reply}")
-            messages = post_message("agent", "internal", agent_reply)
+        if self.agent_command_pattern.match(text):
+            agent_reply = self.handle_command(text)
+            logger.info(f"Command Message Sent: {text} reply: {agent_reply}")
+            messages = post_message(role=Message.ASSISTANT_ROLE, dialog=Message.TOOLS_DIALOG, content=agent_reply)
 
         # Step 3: Call the LLM with updated conversation history
         logger.info(f"Getting Chat Reply")
-        chat_reply = self.llm.chat(model=self.llm.model, messages=messages)
+        chat_reply = Message(message=self.llm.chat(model=self.llm.model, messages=messages))
         logger.info(f"LLM Chat Reply {chat_reply}")
 
-        # Step 4: Verify chat_reply conforms to template
-        if not (isinstance(chat_reply, dict) and chat_reply["from"] and chat_reply["to"] and chat_reply["content"]):
-            logger.warning(f"LLM Response is not formatted correctly {chat_reply}")
-            chat_reply = {
-                "from": "assistant",
-                "to": "external",
-                "content": chat_reply
-            }
-
-        # Step 5: Process LLM response recursively if it's an internal message
-        if chat_reply["to"] == "internal":
-            logger.info(f"Process LLM response recursively {chat_reply["content"]}")
-            return self.handle_message(user="system", channel=channel, message=chat_reply["content"], dialog="internal")
+        # Step 4: Process LLM response recursively if it's an tool message
+        if chat_reply.dialog == Message.TOOLS_DIALOG:
+            logger.info(f"Process LLM response recursively {chat_reply.content}")
+            return self.handle_message(channel=channel, role=chat_reply.role, text=chat_reply.content, dialog=chat_reply.dialog)
 
         # Step 6: Add LLM response to conversation and return it
-        logger.info(f"Posting LLM response message to chat: {chat_reply["content"]}")
-        messages = post_message("system", "external", chat_reply["content"])
-        return chat_reply["content"]
+        logger.info(f"Posting LLM response message to chat: {chat_reply.content}")
+        post_message(role=chat_reply.role, dialog=chat_reply.dialog, content=chat_reply.content)
+        return chat_reply.content
 

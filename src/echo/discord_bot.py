@@ -50,7 +50,7 @@ class DiscordBot(discord.Client):
         Handles all join/leave logic
         Passes messages to the LLM handle_message_function
         """
-        logger.info(f"Got a message!")
+        logger.debug(f"Got a message!")
         if message.author == self.user:
             return  # Ignore self-messages
 
@@ -60,34 +60,36 @@ class DiscordBot(discord.Client):
         channel = message.channel.id if message.guild else f"DM-{user_id}"
         content = message.content
         response = None
-        logger.info(f"Processing message for: {username}-{user_id}: channel: {channel} content: {content}")
+        logger.debug(f"Processing message for: {username}-{user_id}: channel: {channel} content: {content}")
 
         try:
             # Always Join DM channels if they are not already active
             if message.guild is None and channel not in self.active_channels:
-                logger.info(f"Joining DM Channel {channel}")
+                logger.debug(f"Joining DM Channel {channel}")
                 response = self.update_active_channels(action="add_channel", channel=channel)
                 await message.channel.send(response)                
                 
             # Leave Channels when requested
             if self.user in message.mentions and "leave" in content.lower():
-                logger.info(f"Leaving Channel {channel}")
+                logger.debug(f"Leaving Channel {channel}")
                 response = self.update_active_channels(action="remove_channel", channel=channel)
                 
             # Process Message if from an active channel            
             elif channel in self.active_channels:
-                logger.info(f"Getting LLM Response in {channel}")
+                logger.debug(f"Getting LLM Response in {channel}")
                 response = self.handle_message(channel=channel, role=Message.USER_ROLE, dialog=Message.GROUP_DIALOG, text=content)
                 
             # Join Channels when requested
             elif self.user in message.mentions and "join" in content.lower():
-                logger.info(f"Joining Channel {channel}")
+                logger.debug(f"Joining Channel {channel}")
                 response = self.update_active_channels(action="add_channel", channel=channel)
 
             # Send the reply message
-            logger.info(f"Sending response {response}.")
+            logger.debug(f"Sending response {response}.")
             if response: 
                 await message.channel.send(response)
+
+            logger.debug(f"on_message processing complete {content}.")
             return
 
         except Exception as e:

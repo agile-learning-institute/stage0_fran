@@ -47,7 +47,7 @@ class LLMHandler:
             message = Message(role=role, dialog=dialog, content=content)
             arguments = json.dumps({"channel_id": channel, "message":message.as_llm_message()}, separators=(',', ':'))
             command = f"/conversation/add_message/{arguments}"
-            logger.info(f"Sending Command Message: {command}")
+            logger.debug(f"Sending the command: {command}")
             conversation = self.handle_command(command)
             return conversation if isinstance(conversation, list) else []
 
@@ -56,23 +56,22 @@ class LLMHandler:
         if not role: role = Message.USER_ROLE
         
         # Step 1: Add the user message to the conversation
-        logger.info(f"Posting Message {text}")
+        logger.debug(f"Posting Message {text}")
         messages = post_message(role=role, dialog=dialog, content=text)
 
         # Step 2: Check if this is an agent call using regex
         if self.agent_command_pattern.match(text):
             agent_reply = self.handle_command(text)
-            logger.info(f"Command Message Sent: {text} reply: {agent_reply}")
+            logger.debug(f"Command Message Sent: {text} reply: {agent_reply}")
             messages = post_message(role=Message.ASSISTANT_ROLE, dialog=Message.TOOLS_DIALOG, content=agent_reply)
 
         # Step 3: Call the LLM with updated conversation history
-        logger.info(f"Getting Chat Reply")
+        logger.debug(f"Getting Chat Reply")
         chat_reply = Message(message=self.llm.chat(model=self.llm.model, messages=messages))
-        logger.info(f"LLM Chat Reply {chat_reply}")
 
         # Step 4: Process LLM response recursively if it's an tool message
         if chat_reply.dialog == Message.TOOLS_DIALOG:
-            logger.info(f"Process LLM response recursively {chat_reply.content}")
+            logger.debug(f"Process LLM response recursively {chat_reply.content}")
             return self.handle_message(channel=channel, role=chat_reply.role, text=chat_reply.content, dialog=chat_reply.dialog)
 
         # Step 6: Add LLM response to conversation and return it

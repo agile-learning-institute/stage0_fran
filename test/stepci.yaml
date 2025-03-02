@@ -194,10 +194,10 @@ tests:
             Content-Type: application/json
           check:
             status: /200/
-            jsonpath:
-              - TEST_CHANNEL_1
-              - TEST_CHANNEL_2
-              - DISCORD_CHANNEL_NAME
+            schema:
+              type: array
+              items:
+                type: string
       - name: Remove a channel
         http:
           url: http://${{env.host}}/api/bot/bbb000000000000000000001/channel/DISCORD_CHANNEL_NAME
@@ -226,11 +226,11 @@ tests:
                 properties:
                   _id:
                     type: string
-                  name:
+                  channel_id:
                     type: string
                 required:
                   - _id
-                  - name
+                  - channel_id
                 additionalProperties: false
       - name: Get some latest active Conversations
         http:
@@ -250,24 +250,33 @@ tests:
           check:
             status: /200/
             jsonpath:
+              channel_id: DISCORD_01
               status: active
-              name: DISCORD_01
               version: latest
-              conversation[0]: Hi
-              conversation[1]: Hello
+              messages[0].role: user
+              messages[0].content: group:Hi
+              messages[1].role: assistant
+              messages[1].content: group:Hello, how can I help you
       - name: Add a message to a Conversation
         http:
           url: http://${{env.host}}/api/conversation/DISCORD_01/message
           method: POST
           headers:
-            Content-Type: text/plain
-          body: This is a new message
+            Content-Type: application/json          
+          json:
+            role: user
+            content: group:Why is the sky blue?
           check:
             status: /200/
             schema:
               type: array
               items:
-                type: string
+                type: object
+                properties:
+                  role:
+                    type: string
+                  content:
+                    type: string
             jsonpath:
   workshops:
     steps:

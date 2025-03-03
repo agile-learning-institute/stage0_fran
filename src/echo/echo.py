@@ -18,11 +18,12 @@ class Echo:
     those classes to execute agent/actions.
     """
     
-    def __init__(self, name=None, bot_id=None, model=None):
+    def __init__(self, name=None, bot_id=None, model=None, client=None):
         """Initialize Echo with a default agents."""
         self.name = name
         self.model = model
         self.agents = {}        
+        self.llm_client = client or OllamaLLMClient(model=model)
 
         # Register default agents
         from agents.bot_agent import create_bot_agent
@@ -35,7 +36,7 @@ class Echo:
         # Initialize LLM Conversation Handler
         self.llm_handler = LLMHandler(
             handle_command_function=self.handle_command, 
-            llm_client=OllamaLLMClient(model=self.model)
+            llm_client=self.llm_client
         )
         # Initialize Discord Chatbot
         self.bot = DiscordBot(

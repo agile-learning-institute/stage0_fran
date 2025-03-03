@@ -162,5 +162,28 @@ def create_conversation_agent(agent_name):
             }
         })
         
+    def reset_conversation(arguments):
+        try:
+            token = create_token()
+            breadcrumb = create_breadcrumb(token)
+            conversation = ConversationServices.reset_conversation(
+                channel_id=arguments,
+                token=token, breadcrumb=breadcrumb)
+            logger.info(f"Reset conversation Successful {breadcrumb}")
+            return conversation
+        except Exception as e:
+            logger.warning(f"Reset Conversation Error has occurred {e}")
+            return "error"
+    agent.register_action(
+        action_name="reset_conversation", 
+        function=reset_conversation,
+        description="Reset (archive) the specified active Conversation", 
+        arguments_schema={
+            "description":"A channel_id",
+            "type": "string" 
+        },
+       output_schema=conversation_schema
+    )
+        
     logger.info("Registered agent agent action handlers.")
     return agent

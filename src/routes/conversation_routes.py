@@ -66,5 +66,20 @@ def create_conversation_routes():
             logger.warning(f"A processing error occurred {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
+    # POST /api/conversation/{channel_id}/reset - Reset the currently active conversation 
+    @conversation_routes.route('/<string:channel_id>/message', methods=['POST'])
+    def reset_conversation(channel_id):
+        try:
+            token = create_token()
+            breadcrumb = create_breadcrumb(token)
+            message = request.get_json()
+            logger.info(f"add_message route channel_id={channel_id}, message={message}")
+            messages = ConversationServices.reset_conversation(channel_id=channel_id, token=token, breadcrumb=breadcrumb)
+            logger.info(f"Reset conversation successful {breadcrumb}")
+            return jsonify(messages), 200
+        except Exception as e:
+            logger.warning(f"reset_conversation processing error occurred {e}")
+            return jsonify({"error": "A processing error occurred"}), 500
+        
     # Ensure the Blueprint is returned correctly
     return conversation_routes

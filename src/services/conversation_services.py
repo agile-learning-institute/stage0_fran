@@ -107,7 +107,7 @@ class ConversationServices:
         # Fetch the existing conversation, create it if needed
         conversation = ConversationServices.get_conversation(channel_id=channel_id, token=token, breadcrumb=breadcrumb)
         if len(conversation["messages"]) > 1000: #TODO: Add config.MAX_MESSAGES
-            pass # TODO - Add document_full or conversation_old roll-off logic here
+            conversation = ConversationServices.reset_conversation(channel_id=channel_id, token=token, breadcrumb=breadcrumb)
         
         match = {"$and": [
             {"channel_id": channel_id},
@@ -116,8 +116,31 @@ class ConversationServices:
         ]}
         set_data = {"last_saved": breadcrumb}
         push_data = {"messages": message}
-        logger.info(f"add_message ready to update document - match: {match} set_data: {set_data}, push_data: {push_data}")
         reply = mongo.update_document(config.CONVERSATION_COLLECTION_NAME, match=match, set_data=set_data, push_data=push_data)
-        logger.info(f"add_message got reply: {reply}")
-        return reply["messages"]
+        messages = reply["messages"]
+        logger.debug(f"add_message update_document last message in reply: {messages[len(messages)-1]}")
+        return messages
+
+    @staticmethod
+    def reset_conversation(channel_id=None, token=None, breadcrumb=None):
+        """Move the active conversation to full and set the version string"""
+        ConversationServices._check_user_access(token)
+        config = Config.get_instance()
+        mongo = MongoIO.get_instance()
+        
+        match = {"$and": [
+            {"channel_id": channel_id},
+            {"version": config.LATEST_VERSION},
+            {"status": config.ACTIVE_STATUS}
+        ]}
+        set_data = {
+            "version": datetime.now(),
+            "status": config.COMPLETED_STATUS,
+            "last_saved": breadcrumb
+        }
+        reply = mongo.update_document(config.CONVERSATION_COLLECTION_NAME, match=match, set_data=set_data)
+        messages = reply["messages"]
+        last_message = messages[len(messages)-1]
+        logger.debug(f"reset_conversation update_document, last message in reply: {last_message}")
+        return reply
 

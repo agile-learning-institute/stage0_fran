@@ -111,9 +111,6 @@ class MongoIO:
 
             updated = document_collection.find_one_and_update(match, pipeline, return_document=True)
 
-            if not updated:
-                raise Exception(f"Document Not Found {document_id}")
-
         except Exception as e:
             logger.error(f"Failed to update document: {e}")
             raise

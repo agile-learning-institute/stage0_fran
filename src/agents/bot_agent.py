@@ -101,7 +101,7 @@ def create_bot_agent(agent_name):
                 channel_id=arguments["channel_id"], 
                 bot_id=arguments["bot_id"], 
                 token=token, breadcrumb=breadcrumb)
-            logger.debug(f"Channels: {channels}")
+            logger.info(f"Channels: {channels}")
             return channels
         except Exception as e:
             logger.warning(f"A add_channel Error has occurred: {e}")

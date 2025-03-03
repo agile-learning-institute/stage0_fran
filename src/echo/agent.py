@@ -45,3 +45,20 @@ class Agent:
 
         action = self.actions[action_name]["function"]
         return action(arguments)
+    
+    def as_dict(self):
+        """Returns a dictionary representation of the agent and its actions."""
+        actions = []
+        for action_name, action_data in self.actions.items():
+            action_dict = {
+                "name": action_name,
+                "description": action_data["description"],
+                "arguments_schema": action_data["arguments_schema"],
+                "output_schema": action_data["output_schema"]
+            }
+            actions.append(action_dict)
+
+        return {
+            "name": self.name,
+            "actions": actions
+        }

@@ -52,7 +52,7 @@ from routes.conversation_routes import create_conversation_routes
 app.register_blueprint(create_conversation_routes(), url_prefix='/api/conversation')
 
 from routes.echo_routes import create_echo_routes
-app.register_blueprint(create_echo_routes(agents=echo.agents), url_prefix='/api/echo')
+app.register_blueprint(create_echo_routes(echo=echo), url_prefix='/api/echo')
 
 from routes.config_routes import create_config_routes
 app.register_blueprint(create_config_routes(), url_prefix='/api/config')

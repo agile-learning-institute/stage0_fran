@@ -185,5 +185,5 @@ def create_conversation_agent(agent_name):
        output_schema=conversation_schema
     )
         
-    logger.info("Registered agent agent action handlers.")
+    logger.info("Registered conversation agent action handlers.")
     return agent

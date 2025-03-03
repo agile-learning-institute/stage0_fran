@@ -29,7 +29,7 @@ class Echo:
         from agents.bot_agent import create_bot_agent
         from agents.conversation_agent import create_conversation_agent
         from agents.echo_agent import create_echo_agent
-        self.register_agent(create_echo_agent(agent_name="echo", agents=self.agents))
+        self.register_agent(create_echo_agent(agent_name="echo", echo=self))
         self.register_agent(create_bot_agent(agent_name="bot"))
         self.register_agent(create_conversation_agent(agent_name="conversation"))
 
@@ -78,6 +78,14 @@ class Echo:
     def get_agents(self):
         """Returns a list of registered agent names."""
         return list(self.agents.keys())
+
+    def get_agent(self, agent_name=None):
+        """Returns a a registered agent."""
+        if agent_name not in self.agents:
+            logger.info(f"Agent {agent_name} not found")
+            return ""  # Silence for unknown agents
+        agent = self.agents[agent_name] 
+        return agent.as_dict()
 
     def parse_command(self, command: str):
         """

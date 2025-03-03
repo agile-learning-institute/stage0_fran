@@ -37,5 +37,5 @@ def create_chain_routes():
             logger.warning(f"get_chain Error has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
-    # Ensure the Blueprint is returned correctly
+    logger.info("Chain Flask Routes Registered")
     return chain_routes

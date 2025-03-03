@@ -91,5 +91,5 @@ def create_bot_routes():
             logger.warning(f"remove_channel processing error occurred {e}")
             return jsonify({"error": "A processing error occurred"}), 500
 
-    # Ensure the Blueprint is returned correctly
+    logger.info("Bot Flask Routes Registered")
     return bot_routes

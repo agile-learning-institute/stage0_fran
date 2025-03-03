@@ -106,5 +106,5 @@ def create_workshop_routes():
             logger.warning(f"add_observation A processing error occurred {e}")
             return jsonify({"error": "A processing error occurred"}), 500
                 
-    # Ensure the Blueprint is returned correctly
+    logger.info("Workshop Flask Routes Registered")
     return workshop_routes

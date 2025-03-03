@@ -38,5 +38,5 @@ def create_echo_routes(echo=None):
             logger.warning(f"get_agent {type(e)} exception has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
-    # Ensure the Blueprint is returned correctly
+    logger.info("Echo Flask Routes Registered")
     return echo_routes

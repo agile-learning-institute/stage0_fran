@@ -37,5 +37,5 @@ def create_exercise_routes():
             logger.warning(f"get_Exercise Error has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
 
-    # Ensure the Blueprint is returned correctly
+    logger.info("Exercise Flask Routes Registered")
     return exercise_routes

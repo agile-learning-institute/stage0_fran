@@ -24,5 +24,5 @@ def create_config_routes():
             logger.warning(f"get_config Error has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
-    # Ensure the Blueprint is returned correctly
+    logger.info("Config Flask Routes Registered")
     return config_routes

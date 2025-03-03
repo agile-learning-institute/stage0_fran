@@ -78,5 +78,5 @@ def create_conversation_routes():
             logger.warning(f"reset_conversation processing error occurred {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
-    # Ensure the Blueprint is returned correctly
+    logger.info("Conversation Flask Routes Registered")
     return conversation_routes

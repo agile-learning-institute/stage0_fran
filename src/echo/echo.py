@@ -93,7 +93,7 @@ class Echo:
         Ensures only the first two slashes separate agent and action, 
         while keeping the arguments intact.
         """
-        match = re.match(r"^/([^/]+)/([^/]+)/(.*)$", command)
+        match = re.match(r"^/([^/]+)/([^/]+)(?:/(.*))?$", command)
         if not match:
             raise Exception(f"Invalid command format: {command}")
 
@@ -126,4 +126,6 @@ class Echo:
             available_actions = ", ".join(agent.get_actions())
             return f"Unknown action '{action_name}'. Available actions: {available_actions}"
 
-        return agent.invoke_action(action_name, arguments)
+        output  = agent.invoke_action(action_name, arguments)
+        logger.info(f"Agent/Action: Output - {agent_name}/{action_name}: {output}") 
+        return output

@@ -22,6 +22,7 @@ class DiscordBot(discord.Client):
         """
         intents = kwargs.pop("intents", discord.Intents.default())
         intents.messages = True
+        intents.message_content = True
         intents.guilds = True
         intents.dm_messages = True  
 
@@ -58,38 +59,42 @@ class DiscordBot(discord.Client):
         user_id = message.author.id
         username = message.author.name
         channel = message.channel.id if message.guild else f"DM-{user_id}"
+        channel = str(channel) if channel is not None else ""
         content = message.content
-        response = None
-        logger.debug(f"Processing message for: {username}-{user_id}: channel: {channel} content: {content}")
+        if not content: logger.warning(f"Content is None")
+        logger.info(f"Processing message for: {username}-{user_id}: channel: {channel} content: {content}")
+        logger.info(f"channel {channel} active channels {self.active_channels}")
+        logger.info(f"channel in active channels {channel in self.active_channels}")
 
+        response = ""
         try:
             # Always Join DM channels if they are not already active
             if message.guild is None and channel not in self.active_channels:
-                logger.debug(f"Joining DM Channel {channel}")
+                logger.info(f"Joining DM Channel {channel}")
                 response = self.update_active_channels(action="add_channel", channel=channel)
                 await message.channel.send(response)                
                 
             # Leave Channels when requested
             if self.user in message.mentions and "leave" in content.lower():
-                logger.debug(f"Leaving Channel {channel}")
+                logger.info(f"Leaving Channel {channel}")
                 response = self.update_active_channels(action="remove_channel", channel=channel)
                 
             # Process Message if from an active channel            
             elif channel in self.active_channels:
-                logger.debug(f"Getting LLM Response in {channel}")
+                logger.info(f"Getting LLM Response in {channel}")
                 response = self.handle_message(channel=channel, role=Message.USER_ROLE, dialog=Message.GROUP_DIALOG, text=content)
                 
             # Join Channels when requested
             elif self.user in message.mentions and "join" in content.lower():
-                logger.debug(f"Joining Channel {channel}")
+                logger.info(f"Joining Channel {channel}")
                 response = self.update_active_channels(action="add_channel", channel=channel)
 
             # Send the reply message
-            logger.debug(f"Sending response {response.strip()}.")
+            logger.info(f"Sending response {response}.")
             if len(response.strip()) > 0:
                 await message.channel.send(response.strip())
 
-            logger.debug(f"on_message processing complete {content}.")
+            logger.info(f"on_message processing complete {content}.")
             return
 
         except Exception as e:
@@ -103,7 +108,11 @@ class DiscordBot(discord.Client):
         try:
             arguments = json.dumps({"bot_id": self.bot_id,"channel_id": channel}, separators=(',', ':'))
             channels =  self.handle_command(f"/bot/{action}/{arguments}")
-            self.active_channels = channels
-            return f"✅ Channel: {channel} {'added to' if action == 'add_channel' else 'removed from'} active channels list."
+            if isinstance(channels, list):
+                self.active_channels = channels
+                return f"✅ Channel: {channel} {'added to' if action == 'add_channel' else 'removed from'} active channels list."
+            else:
+                logger.warning(f"bot/{action}/{arguments} did not return a list")
+                return f"❎ Something went wrong, Try again later"
         except Exception as e:
             raise Exception(f"Failed to update active channels: {e}")

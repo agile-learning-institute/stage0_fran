@@ -18,13 +18,13 @@ class Message:
             logger.debug(f"Constructing from string {message}")
             self.role = Message.USER_ROLE
             self.dialog = Message.GROUP_DIALOG                
-            self.content = message
+            self.content = message.strip()
             
         elif isinstance(message, dict):  
             # Construct from a message dict without a dialog property
             logger.debug(f"Constructing from message {message}")
             self.role = message.get("role", Message.USER_ROLE)
-            content_value = message.get("content", "")  
+            content_value = message.get("content", "").strip()
 
             # Ensure content is long enough before slicing
             if len(content_value) >= 6 and ":" in content_value[:6]:
@@ -45,7 +45,10 @@ class Message:
             else:
                 self.dialog = Message.GROUP_DIALOG
                 
-            self.content = content or ""
+            if isinstance(content, str):
+                self.content = content.strip()
+            else:
+                self.content = ""
 
     def as_llm_message(self):
         """Get a message with dialog added to the front of content."""

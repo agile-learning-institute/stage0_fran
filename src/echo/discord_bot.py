@@ -85,9 +85,9 @@ class DiscordBot(discord.Client):
                 response = self.update_active_channels(action="add_channel", channel=channel)
 
             # Send the reply message
-            logger.debug(f"Sending response {response}.")
-            if response: 
-                await message.channel.send(response)
+            logger.debug(f"Sending response {response.strip()}.")
+            if len(response.strip()) > 0:
+                await message.channel.send(response.strip())
 
             logger.debug(f"on_message processing complete {content}.")
             return

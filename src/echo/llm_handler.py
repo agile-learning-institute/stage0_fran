@@ -70,6 +70,7 @@ class LLMHandler:
         llm_role = llm_reply["message"]["role"]
         llm_content = llm_reply["message"]["content"]
         chat_reply = Message({"role": llm_role, "content": llm_content})
+        logger.debug(f"LLM Reply: {llm_reply}, Role: {llm_role}, Content: {llm_content}")
 
         # Step 4: Process LLM response recursively if it's an tool message
         if chat_reply.dialog == Message.TOOLS_DIALOG:

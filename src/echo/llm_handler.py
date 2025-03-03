@@ -62,8 +62,10 @@ class LLMHandler:
         # Step 2: Check if this is an agent call using regex
         if self.agent_command_pattern.match(text):
             agent_reply = self.handle_command(text)
-            logger.debug(f"Command Message Sent: {text} reply: {agent_reply}")
-            messages = post_message(role=Message.ASSISTANT_ROLE, dialog=Message.TOOLS_DIALOG, content=agent_reply)
+            agent_reply_string = json.dumps(agent_reply, separators=(',', ':'))
+            messages = post_message(role=Message.USER_ROLE, dialog=dialog, content=agent_reply_string)
+            # If this was a direct user to agent call, return the reply to the group.
+            if dialog == Message.GROUP_DIALOG: return agent_reply_string
 
         # Step 3: Call the LLM with updated conversation history
         llm_reply = self.llm.chat(model=self.llm.model, messages=messages)
@@ -78,7 +80,7 @@ class LLMHandler:
             return self.handle_message(channel=channel, role=chat_reply.role, text=chat_reply.content, dialog=chat_reply.dialog)
 
         # Step 6: Add LLM response to conversation and return it
-        logger.info(f"Posting LLM response message to chat: {chat_reply.content}")
+        logger.debug(f"Posting LLM response message to chat: {chat_reply.content}")
         post_message(role=chat_reply.role, dialog=chat_reply.dialog, content=chat_reply.content)
         return chat_reply.content
 

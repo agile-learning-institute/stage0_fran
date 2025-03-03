@@ -18,10 +18,10 @@ def create_config_routes():
             # Return the JSON representation of the config object
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            logger.info(f"Get Config Success {breadcrumb}")
+            logger.debug(f"get_config Success {breadcrumb}")
             return jsonify(config.to_dict(token)), 200
         except Exception as e:
-            logger.warning(f"Get Config Error has occurred: {e}")
+            logger.warning(f"get_config Error has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
     # Ensure the Blueprint is returned correctly

@@ -18,10 +18,10 @@ def create_chain_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             chains = ChainServices.get_chains(token=token)
-            logger.info(f"Get Chain Success {breadcrumb}")
+            logger.debug(f"get_chains Success {breadcrumb}")
             return jsonify(chains), 200
         except Exception as e:
-            logger.warning(f"Get Chain Error has occurred: {e}")
+            logger.warning(f"get_chains Error has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
     # GET /api/chain/{id} - Return a specific chain
@@ -31,10 +31,10 @@ def create_chain_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             chain = ChainServices.get_chain(chain_id=id, token=token)
-            logger.info(f"Get Chain Success {breadcrumb}")
+            logger.debug(f"get_chain Success {breadcrumb}")
             return jsonify(chain), 200
         except Exception as e:
-            logger.warning(f"Get Chain Error has occurred: {e}")
+            logger.warning(f"get_chain Error has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
     # Ensure the Blueprint is returned correctly

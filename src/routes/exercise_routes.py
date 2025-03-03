@@ -18,10 +18,10 @@ def create_exercise_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             exercises = ExerciseServices.get_exercises(token=token)
-            logger.info(f"Get Exercise Success {breadcrumb}")
+            logger.debug(f"get_exercises Success {breadcrumb}")
             return jsonify(exercises), 200
         except Exception as e:
-            logger.warning(f"Get Exercise Error has occurred: {e}")
+            logger.warning(f"get_exercises Error has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
     # GET /api/exercise/id - Return a specific exercise
@@ -31,10 +31,10 @@ def create_exercise_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             exercise = ExerciseServices.get_exercise(exercise_id=id, token=token)
-            logger.info(f"Get exercise Success {breadcrumb}")
+            logger.debug(f"get_Exercise Success {breadcrumb}")
             return jsonify(exercise), 200
         except Exception as e:
-            logger.warning(f"Get Exercise Error has occurred: {e}")
+            logger.warning(f"get_Exercise Error has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
 
     # Ensure the Blueprint is returned correctly

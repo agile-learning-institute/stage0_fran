@@ -139,12 +139,5 @@ class ConversationServices:
             "last_saved": breadcrumb
         }
         reply = mongo.update_document(config.CONVERSATION_COLLECTION_NAME, match=match, set_data=set_data)
-        if reply:
-            messages = reply["messages"]
-            last_message = messages[len(messages)-1]
-            logger.debug(f"reset_conversation update_document, last message in reply: {last_message}")
-            return reply
-        else:
-            logger.debug(f"reset_conversation no document to update")
-            return {}
+        return reply
 

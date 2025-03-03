@@ -17,10 +17,10 @@ def create_echo_routes(agents=None):
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            logger.info(f"Get Agents Success {breadcrumb}")
+            logger.debug(f"get_agents Success {breadcrumb}")
             return jsonify(agents), 200
         except Exception as e:
-            logger.warning(f"Get Agents Error has occurred: {e}")
+            logger.warning(f"get_agents Error has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
     # Ensure the Blueprint is returned correctly

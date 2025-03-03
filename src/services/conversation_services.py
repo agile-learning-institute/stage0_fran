@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from bson import ObjectId
 from config.config import Config
 import logging
@@ -134,7 +134,7 @@ class ConversationServices:
             {"status": config.ACTIVE_STATUS}
         ]}
         set_data = {
-            "version": datetime.now(),
+            "version": datetime.now().strftime("%Y-%m-%d%H:%M:%S"),
             "status": config.COMPLETED_STATUS,
             "last_saved": breadcrumb
         }

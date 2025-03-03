@@ -96,6 +96,12 @@ curl -X POST http://localhost:8580/api/conversation/DISCORD_01/message \
      -H "Content-Type: application/json" \
      -d '{"role": "user", "content": "This is a new message"}'
 ```
+#### Reset a conversation
+This will update the version, and set the status to complete, leaving no active conversation for this channel. A new active:latest conversation will be created when it is needed. 
+```sh
+curl -X POST http://localhost:8580/api/conversation/DISCORD_01/reset \
+     -H "Content-Type: application/json" 
+```
 
 ## /api/exercise endpoints
 

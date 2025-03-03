@@ -18,10 +18,10 @@ def create_conversation_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             conversations = ConversationServices.get_conversations(token=token)
-            logger.info(f"Get conversation Success {breadcrumb}")
+            logger.debug(f"get_conversations Success {breadcrumb}")
             return jsonify(conversations), 200
         except Exception as e:
-            logger.warning(f"Get conversation Error has occurred: {e}")
+            logger.warning(f"get_conversations Error has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
     # GET /api/conversation/channel_id - Return a specific conversation
@@ -31,10 +31,10 @@ def create_conversation_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             conversation = ConversationServices.get_conversation(channel_id=channel_id, token=token, breadcrumb=breadcrumb)
-            logger.info(f"Get conversation Success {breadcrumb}")
+            logger.debug(f"get_conversation Success {breadcrumb}")
             return jsonify(conversation), 200
         except Exception as e:
-            logger.warning(f"Get conversation Error has occurred: {e}")
+            logger.warning(f"get_conversation Error has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
 
     # PATCH /api/conversation/{channel_id} - Update a conversation
@@ -45,10 +45,10 @@ def create_conversation_routes():
             breadcrumb = create_breadcrumb(token)
             data = request.get_json()
             conversation = ConversationServices.update_conversation(channel_id=channel_id, data=data, token=token, breadcrumb=breadcrumb)
-            logger.info(f"Update conversation Successful {breadcrumb}")
+            logger.debug(f"update_conversation Successful {breadcrumb}")
             return jsonify(conversation), 200
         except Exception as e:
-            logger.warning(f"A processing error occurred {e}")
+            logger.warning(f"update_conversation processing error occurred {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
     # POST /api/conversation/{channel_id}/message - Add a message to a conversation
@@ -58,24 +58,21 @@ def create_conversation_routes():
             token = create_token()
             breadcrumb = create_breadcrumb(token)
             message = request.get_json()
-            logger.info(f"add_message route channel_id={channel_id}, message={message}")
             messages = ConversationServices.add_message(channel_id=channel_id, message=message, token=token, breadcrumb=breadcrumb)
-            logger.info(f"Update conversation Successful {breadcrumb}")
+            logger.debug(f"add_message Successful {breadcrumb}")
             return jsonify(messages), 200
         except Exception as e:
-            logger.warning(f"A processing error occurred {e}")
+            logger.warning(f"add_message processing error occurred {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
     # POST /api/conversation/{channel_id}/reset - Reset the currently active conversation 
-    @conversation_routes.route('/<string:channel_id>/message', methods=['POST'])
+    @conversation_routes.route('/<string:channel_id>/reset', methods=['POST'])
     def reset_conversation(channel_id):
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            message = request.get_json()
-            logger.info(f"add_message route channel_id={channel_id}, message={message}")
             messages = ConversationServices.reset_conversation(channel_id=channel_id, token=token, breadcrumb=breadcrumb)
-            logger.info(f"Reset conversation successful {breadcrumb}")
+            logger.debug(f"reset_conversation successful {breadcrumb}")
             return jsonify(messages), 200
         except Exception as e:
             logger.warning(f"reset_conversation processing error occurred {e}")

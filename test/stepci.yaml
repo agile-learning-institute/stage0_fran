@@ -52,8 +52,14 @@ tests:
             Content-Type: application/json          
           check:
             status: /200/
-            schema:
-              type: object
+            jsonpath:
+              - "echo"
+              - "bot"
+              - "conversation"
+              - "config"
+              - "chain"
+              - "exercise"
+              - "workshop"
   chains:
     name: Test Chain endpoints
     steps:

@@ -44,17 +44,24 @@ metrics.info('app_info', 'Application info', version=config.BUILT_AT)
 
 # Register flask routes
 from routes.bot_routes import create_bot_routes
-from routes.conversation_routes import create_conversation_routes
-from routes.config_routes import create_config_routes
-from routes.chain_routes import create_chain_routes
-from routes.exercise_routes import create_exercise_routes
-from routes.workshop_routes import create_workshop_routes
-
 app.register_blueprint(create_bot_routes(), url_prefix='/api/bot')
+
+from routes.conversation_routes import create_conversation_routes
 app.register_blueprint(create_conversation_routes(), url_prefix='/api/conversation')
+
+from routes.echo_routes import create_echo_routes
+app.register_blueprint(create_echo_routes(agents=echo.agents), url_prefix='/api/echo')
+
+from routes.config_routes import create_config_routes
 app.register_blueprint(create_config_routes(), url_prefix='/api/config')
+
+from routes.chain_routes import create_chain_routes
 app.register_blueprint(create_chain_routes(), url_prefix='/api/chain')
+
+from routes.exercise_routes import create_exercise_routes
 app.register_blueprint(create_exercise_routes(), url_prefix='/api/exercise')
+
+from routes.workshop_routes import create_workshop_routes
 app.register_blueprint(create_workshop_routes(), url_prefix='/api/workshop')
 
 # Flask server management

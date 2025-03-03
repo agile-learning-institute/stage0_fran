@@ -1,16 +1,15 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from echo.agent import Agent
+from echo.echo import Echo
 from agents.echo_agent import create_echo_agent
-from agents.config_agent import create_config_agent
 
 class TestEchoAgent(unittest.TestCase):
     
     def setUp(self):
-        """Set up a mock bot agent."""
-        self.mock_agents = {"foo":"bar"}
-        self.mock_bot = Agent("test_bot_agent")
-        self.echo_agent = create_echo_agent(self.mock_bot, self.mock_agents)
+        """Set up a mock echo instance and initialize the agent."""
+        self.mock_echo = MagicMock(spec=Echo)
+        self.echo_agent = create_echo_agent("test_echo_agent", self.mock_echo)
         self.get_agents = self.echo_agent.actions["get_agents"]["function"]
 
     @patch("agents.echo_agent.create_token")  
@@ -21,15 +20,33 @@ class TestEchoAgent(unittest.TestCase):
         # Mock return values
         mock_create_token.return_value = "fake_token"
         mock_create_breadcrumb.return_value = "fake_breadcrumb"
-        
+        self.mock_echo.get_agents.return_value = ["agent1", "agent2"]
+
         # Call function
-        arguments = ""
-        result = self.get_agents(arguments)
-        
+        result = self.get_agents(arguments={})
+
         # Assertions
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with("fake_token")
-        self.assertEqual(result, self.mock_agents)
-                    
+        self.mock_echo.get_agents.assert_called_once()
+        self.assertEqual(result, ["agent1", "agent2"])
+
+    @patch("agents.echo_agent.create_token")  
+    @patch("agents.echo_agent.create_breadcrumb")  
+    def test_get_agents_failure(self, mock_create_breadcrumb, mock_create_token):
+        """Test that get_agents returns 'error' on exception."""
+        
+        # Mock return values
+        mock_create_token.side_effect = Exception("Token creation failed")
+        
+        # Call function
+        result = self.get_agents(arguments={})
+
+        # Assertions
+        mock_create_token.assert_called_once()
+        mock_create_breadcrumb.assert_not_called()  
+        self.mock_echo.get_agents.assert_not_called()  
+        self.assertEqual(result, "error")
+
 if __name__ == "__main__":
     unittest.main()

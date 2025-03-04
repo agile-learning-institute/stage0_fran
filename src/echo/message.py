@@ -39,7 +39,10 @@ class Message:
                 self.role = role
             else: 
                 self.role = Message.USER_ROLE
-                
+
+            if not dialog and len(content) >= 6 and ":" in content[:6]:
+                dialog, content = content.split(":", 1)
+                                
             if dialog in Message.VALID_DIALOGS:
                 self.dialog = dialog 
             else:
@@ -47,9 +50,19 @@ class Message:
                 
             if isinstance(content, str):
                 self.content = content.strip()
+                if len(self.content) == 0:
+                    self.content = "Empty Content Provided"
             else:
-                self.content = ""
+                self.content = "No Content String Provided"
 
+    def _slice_content(self, content=None):
+        # Ensure content is long enough before slicing
+        if len(content) >= 6 and ":" in content[:6]:
+            self.dialog, self.content = content.split(":", 1)
+        else:
+            self.dialog = Message.GROUP_DIALOG
+            self.content = content
+    
     def as_llm_message(self):
         """Get a message with dialog added to the front of content."""
         return {

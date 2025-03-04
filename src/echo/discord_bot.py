@@ -93,7 +93,7 @@ class DiscordBot(discord.Client):
                 response = self.handle_message(channel=channel, role=Message.USER_ROLE, dialog=Message.GROUP_DIALOG, text=content)
                 
             # Send the reply message
-            logger.debug(f"Sending response {response}.")
+            logger.info(f"Sending response {response}.")
             response = response.strip()
             if len(response) > 2000:
                 response = f"{response[:1950]}-TRUNCATED"

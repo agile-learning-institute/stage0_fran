@@ -127,5 +127,5 @@ class Echo:
             return f"Unknown action '{action_name}'. Available actions: {available_actions}"
 
         output  = agent.invoke_action(action_name, arguments)
-        logger.info(f"Agent/Action: Output - {agent_name}/{action_name}: {output}") 
+        logger.debug(f"Agent/Action: Output - {agent_name}/{action_name}: {output}") 
         return output

@@ -62,39 +62,46 @@ class DiscordBot(discord.Client):
         channel = str(channel) if channel is not None else ""
         content = message.content
         if not content: logger.warning(f"Content is None")
-        logger.info(f"Processing message for: {username}-{user_id}: channel: {channel} content: {content}")
-        logger.info(f"channel {channel} active channels {self.active_channels}")
-        logger.info(f"channel in active channels {channel in self.active_channels}")
+        logger.debug(f"Processing message for: {username}-{user_id}: channel: {channel} content: {content}")
 
         response = ""
         try:
             # Always Join DM channels if they are not already active
             if message.guild is None and channel not in self.active_channels:
-                logger.info(f"Joining DM Channel {channel}")
+                logger.debug(f"Joining DM Channel {channel}")
                 response = self.update_active_channels(action="add_channel", channel=channel)
                 await message.channel.send(response)                
                 
             # Leave Channels when requested
             if self.user in message.mentions and "leave" in content.lower():
-                logger.info(f"Leaving Channel {channel}")
+                logger.debug(f"Leaving Channel {channel}")
                 response = self.update_active_channels(action="remove_channel", channel=channel)
                 
-            # Process Message if from an active channel            
-            elif channel in self.active_channels:
-                logger.info(f"Getting LLM Response in {channel}")
-                response = self.handle_message(channel=channel, role=Message.USER_ROLE, dialog=Message.GROUP_DIALOG, text=content)
+            # Reset the Channels conversation when requested
+            elif self.user in message.mentions and "reset" in content.lower():
+                logger.debug(f"Resetting Channel Conversation {channel}")
+                response = self.reset_channel_conversation(channel=channel)
                 
             # Join Channels when requested
             elif self.user in message.mentions and "join" in content.lower():
-                logger.info(f"Joining Channel {channel}")
+                logger.debug(f"Joining Channel {channel}")
                 response = self.update_active_channels(action="add_channel", channel=channel)
 
+            # Process Message if from an active channel            
+            elif channel in self.active_channels:
+                logger.debug(f"Getting LLM Response in {channel}")
+                response = self.handle_message(channel=channel, role=Message.USER_ROLE, dialog=Message.GROUP_DIALOG, text=content)
+                
             # Send the reply message
-            logger.info(f"Sending response {response}.")
-            if len(response.strip()) > 0:
-                await message.channel.send(response.strip())
+            logger.debug(f"Sending response {response}.")
+            response = response.strip()
+            if len(response) > 2000:
+                response = f"{response[:1950]}-TRUNCATED"
+                
+            if len(response) > 0:
+                await message.channel.send(response)
 
-            logger.info(f"on_message processing complete {content}.")
+            logger.debug(f"on_message processing complete {content}.")
             return
 
         except Exception as e:
@@ -116,3 +123,17 @@ class DiscordBot(discord.Client):
                 return f"❎ Something went wrong, Try again later"
         except Exception as e:
             raise Exception(f"Failed to update active channels: {e}")
+
+    def reset_channel_conversation(self, channel=None):
+        """
+        Calls the channel reset agent action
+        """
+        try:
+            conversation =  self.handle_command(f'/conversation/reset_conversation/"{channel}"')
+            if isinstance(conversation, dict):
+                return f"✅ The conversation in channel: {channel} has been reset."
+            else:
+                logger.warning(f'/conversation/reset_conversation/"{channel}" caused an error')
+                return f"❎ Something went wrong, Try again later"
+        except Exception as e:
+            raise Exception(f"Failed to reset a conversation: {e}")

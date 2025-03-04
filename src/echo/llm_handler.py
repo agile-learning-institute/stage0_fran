@@ -1,6 +1,10 @@
-import json
 import re
+import json
+import datetime
+
+from bson import ObjectId
 from echo.message import Message
+
 import logging
 logging.basicConfig(level="DEBUG")
 logger = logging.getLogger(__name__)
@@ -34,36 +38,19 @@ class LLMHandler:
         :param dialog: The "internal" or "external" dialog this message will be posted to, defaults to external
         :return: The response to be written to the chat-channel. 
         """
-        def post_message(role: str, dialog: str, content: str):
-            """
-            Small helper function to add a message to the conversation
-            Uses the /conversation/add_message agent action
-            
-            :param from_role: Who is this message in the conversation "from" - system | agent | user
-            :param to_role: Who is this message "to" - internal (agents) | external (chat)
-            :param content: The message itself
-            :return: The full conversation (list of messages)
-            """
-            message = Message(role=role, dialog=dialog, content=content)
-            arguments = json.dumps({"channel_id": channel, "message":message.as_llm_message()}, separators=(',', ':'))
-            command = f"/conversation/add_message/{arguments}"
-            logger.debug(f"Sending the command: {command}")
-            conversation = self.handle_command(command)
-            return conversation if isinstance(conversation, list) else []
-
         # Set default dialog
         if not dialog: dialog = Message.GROUP_DIALOG
         if not role: role = Message.USER_ROLE
         
         # Step 1: Add the user message to the conversation
         logger.debug(f"Posting Message {text}")
-        messages = post_message(role=role, dialog=dialog, content=text)
+        messages = self.post_message(channel=channel, role=role, dialog=dialog, content=text)
 
         # Step 2: Check if this is an agent call using regex
         if self.agent_command_pattern.match(text):
             agent_reply = self.handle_command(text)
-            agent_reply_string = json.dumps(agent_reply, separators=(',', ':'))
-            messages = post_message(role=Message.USER_ROLE, dialog=dialog, content=agent_reply_string)
+            agent_reply_string = self.stringify(agent_reply)
+            messages = self.post_message(channel=channel, role=Message.USER_ROLE, dialog=dialog, content=agent_reply_string)
             # If this was a direct user to agent call, return the reply to the group.
             if dialog == Message.GROUP_DIALOG: return agent_reply_string
 
@@ -81,6 +68,35 @@ class LLMHandler:
 
         # Step 6: Add LLM response to conversation and return it
         logger.debug(f"Posting LLM response message to chat: {chat_reply.content}")
-        post_message(role=chat_reply.role, dialog=chat_reply.dialog, content=chat_reply.content)
+        self.post_message(channel=channel, role=chat_reply.role, dialog=chat_reply.dialog, content=chat_reply.content)
         return chat_reply.content
 
+    def post_message(self, channel=None, role=None, dialog=None, content=None):
+        """
+        Small helper function to add a message to the conversation
+        Uses the /conversation/add_message agent action
+        
+        :param from_role: Who is this message in the conversation "from" - system | agent | user
+        :param to_role: Who is this message "to" - internal (agents) | external (chat)
+        :param content: The message itself
+        :return: The full conversation (list of messages)
+        """
+        message = Message(role=role, dialog=dialog, content=content)
+        arguments = json.dumps({"channel_id": channel, "message":message.as_llm_message()}, separators=(',', ':'))
+        command = f"/conversation/add_message/{arguments}"
+        logger.debug(f"Sending the command: {command}")
+        conversation = self.handle_command(command)
+        return conversation if isinstance(conversation, list) else []
+
+    def stringify(self, obj):
+        """Recursively convert ObjectId and datetime values to strings, then minify JSON."""
+        def stringify_mongo_objects(obj):
+            if isinstance(obj, dict):  
+                return {k: stringify_mongo_objects(v) for k, v in obj.items()}
+            elif isinstance(obj, list):  
+                return [stringify_mongo_objects(i) for i in obj]
+            elif isinstance(obj, (ObjectId, datetime.datetime)):  
+                return str(obj)  
+            return obj  # Return unchanged if it's another type
+
+        return json.dumps(stringify_mongo_objects(obj), separators=(',', ':'))  

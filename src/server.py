@@ -17,9 +17,10 @@ logger.info(f"============= Starting Server Initialization, Logging at {config.L
 
 # Initialize Echo Discord Bot
 from echo.echo import Echo
-from echo.mock_llm_client import MockLLMClient
-echo = Echo(__name__, bot_id=config.FRAN_BOT_ID, model=config.FRAN_MODEL_NAME, client=MockLLMClient())
-# with default client: echo = Echo(__name__, bot_id=config.FRAN_BOT_ID, model=config.FRAN_MODEL_NAME)
+from echo.ollama_llm_client import OllamaLLMClient
+echo = Echo(__name__, bot_id=config.FRAN_BOT_ID, model=config.FRAN_MODEL_NAME, client=OllamaLLMClient())
+# from echo.mock_llm_client import MockLLMClient
+# echo = Echo(__name__, bot_id=config.FRAN_BOT_ID, model=config.FRAN_MODEL_NAME, client=MockLLMClient())
 
 # Register Config Agents
 from agents.config_agent import create_config_agent

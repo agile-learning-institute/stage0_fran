@@ -3,6 +3,9 @@
 - [Observability endpoints](#observability-endpoints)
      - [GET /api/config](#config)
      - [GET /api/health](#health)
+- [Echo endpoints](#echo-endpoints)
+     - [GET /api/agents](#get-agents)
+     - [GET /api/agents/agent/action](#get-action)
 - [/api/bot endpoints](#apibot-endpoints)
      - [GET /api/bot](#get-a-list-all-active-of-bots)
      - [GET /api/bot/{id}](#get-a-single-bot)
@@ -38,6 +41,17 @@ curl http://localhost:8580/api/config
 #### Health 
 ```sh
 curl http://localhost:8580/api/health
+```
+
+## Echo endpoints
+
+#### Get Agents 
+```sh
+curl http://localhost:8580/api/echo
+```
+#### Get Action
+```sh
+curl http://localhost:8580/api/echo/bot/get_bot
 ```
 
 ## /api/bot endpoints 

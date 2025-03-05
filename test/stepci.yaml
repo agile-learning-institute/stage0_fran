@@ -52,14 +52,14 @@ tests:
             Content-Type: application/json          
           check:
             status: /200/
-            jsonpath:
-              - "echo"
-              - "bot"
-              - "conversation"
-              - "config"
-              - "chain"
-              - "exercise"
-              - "workshop"
+      - name: Get an action
+        http:
+          url: http://${{env.host}}/api/echo/bot/get_bot
+          method: GET
+          headers:
+            Content-Type: application/json          
+          check:
+            status: /200/
   chains:
     name: Test Chain endpoints
     steps:

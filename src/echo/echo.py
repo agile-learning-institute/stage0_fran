@@ -107,12 +107,12 @@ class Echo:
             logger.info(f"Action {action_name} not found")
             return "Invalid Action"
         
-        action = agent["actions"][action_name]
+        action = agent.actions[action_name]
         return {
             "action_name": action_name, 
-            "description": action.description,
-            "arguments_schema": action.arguments_schema,
-            "output_schema": action.output_schema
+            "description": action["description"],
+            "arguments_schema": action["arguments_schema"],
+            "output_schema": action["output_schema"]
         }
 
     def parse_command(self, command: str):

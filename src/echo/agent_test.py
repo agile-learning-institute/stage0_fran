@@ -52,25 +52,6 @@ class TestEchoAgent(unittest.TestCase):
             )
         self.assertEqual(str(context.exception), "Missing required attributes for action registration")
 
-    def test_get_action_metadata(self):
-        """Ensure actions store metadata correctly."""
-        def sample_action(args):
-            return "Executed"
-
-        self.agent.register_action(
-            action_name="test_action",
-            function=sample_action,
-            description="Test description",
-            arguments_schema={"type": "object", "properties": {}},
-            output_schema={"type": "string"}
-        )
-
-        action_metadata = self.agent.get_action_metadata("test_action")
-
-        self.assertEqual(action_metadata["description"], "Test description")
-        self.assertEqual(action_metadata["arguments_schema"], {"type": "object", "properties": {}})
-        self.assertEqual(action_metadata["output_schema"], {"type": "string"})
-
     def test_invoke_registered_action(self):
         """Ensure invoking a registered action works."""
         def sample_action(args):

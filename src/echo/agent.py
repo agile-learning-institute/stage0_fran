@@ -3,9 +3,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Agent:
-    def __init__(self, name: str):
+    def __init__(self, name: str, description=""):
         """Initialize an agent with a name and an empty action registry."""
         self.name = name
+        self.description = description
         self.actions = {}
 
     def register_action(self, 
@@ -29,10 +30,6 @@ class Agent:
         """Returns a list of registered action names."""
         return list(self.actions.keys())
 
-    def get_action_metadata(self, action_name: str):
-        """Returns metadata for a given action."""
-        return self.actions.get(action_name, None)
-
     def invoke_action(self, action_name: str, arguments: dict):
         """
         Executes a registered action asynchronously.
@@ -46,19 +43,19 @@ class Agent:
         action = self.actions[action_name]["function"]
         return action(arguments)
     
-    def as_dict(self):
-        """Returns a dictionary representation of the agent and its actions."""
-        actions = []
-        for action_name, action_data in self.actions.items():
-            action_dict = {
-                "name": action_name,
-                "description": action_data["description"],
-                "arguments_schema": action_data["arguments_schema"],
-                "output_schema": action_data["output_schema"]
-            }
-            actions.append(action_dict)
+    # def as_dict(self):
+    #     """Returns a dictionary representation of the agent and its actions."""
+    #     actions = []
+    #     for action_name, action_data in self.actions.items():
+    #         action_dict = {
+    #             "name": action_name,
+    #             "description": action_data["description"],
+    #             "arguments_schema": action_data["arguments_schema"],
+    #             "output_schema": action_data["output_schema"]
+    #         }
+    #         actions.append(action_dict)
 
-        return {
-            "name": self.name,
-            "actions": actions
-        }
+    #     return {
+    #         "name": self.name,
+    #         "actions": actions
+    #     }

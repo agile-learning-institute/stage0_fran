@@ -48,7 +48,7 @@ class LLMHandler:
         if self.agent_command_pattern.match(text):
             agent_reply = self.handle_command(text)
             agent_reply_string = self.stringify(agent_reply)
-            message = Message(role=Message.USER_ROLE, dialog=Message.TOOLS_DIALOG, content=agent_reply_string)
+            message = Message(role=Message.USER_ROLE, dialog=dialog, content=agent_reply_string)
             messages = self.post_message(channel=channel, message=message)
             # If this was a direct user to agent call, return the reply to the group.
             if dialog == Message.GROUP_DIALOG: return agent_reply_string

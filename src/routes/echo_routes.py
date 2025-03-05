@@ -25,17 +25,17 @@ def create_echo_routes(echo=None):
             logger.warning(f"get_agents {type(e)} exception has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
-    # GET /api/echo - Return the agents
-    @echo_routes.route('/<string:name>', methods=['GET'])
-    def get_agent(name):
+    # GET /api/echo/agent/action - Return the agent action info
+    @echo_routes.route('/<string:agent>/<string:action>', methods=['GET'])
+    def get_action(agent, action):
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            agent = echo.get_agent(agent_name=name)
-            logger.debug(f"get_agent Success {breadcrumb}")
-            return jsonify(agent), 200
+            action = echo.get_action(agent_name=agent, action_name=action)
+            logger.debug(f"get_action Success {breadcrumb}")
+            return jsonify(action), 200
         except Exception as e:
-            logger.warning(f"get_agent {type(e)} exception has occurred: {e}")
+            logger.warning(f"get_action {type(e)} exception has occurred: {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
     logger.info("Echo Flask Routes Registered")

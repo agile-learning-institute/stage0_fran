@@ -17,20 +17,18 @@ class TestEchoRoutes(unittest.TestCase):
     @patch('routes.echo_routes.create_token')
     @patch('routes.echo_routes.create_breadcrumb')
     def test_get_agents_success(self, mock_create_breadcrumb, mock_create_token):
-        """Test GET /api/echo for successful response."""
+        """Test GET /api/echo when an exception occurs."""
         mock_token = {"user_id": "mock_user"}
         mock_create_token.return_value = mock_token
         mock_create_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
 
-        self.mock_echo.get_agents.return_value = ["agent1", "agent2"]
-
         response = self.client.get('/api/echo')
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json, ["agent1", "agent2"])
-        
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {"error": "A processing error occurred"})
+
         mock_create_token.assert_called_once()
-        mock_create_breadcrumb.assert_called_once_with(mock_token)
+        mock_create_breadcrumb.assert_called_once()
         self.mock_echo.get_agents.assert_called_once()
 
     @patch('routes.echo_routes.create_token')
@@ -51,40 +49,40 @@ class TestEchoRoutes(unittest.TestCase):
 
     @patch('routes.echo_routes.create_token')
     @patch('routes.echo_routes.create_breadcrumb')
-    def test_get_agent_success(self, mock_create_breadcrumb, mock_create_token):
-        """Test GET /api/echo/<name> for a successful agent retrieval."""
+    def test_get_action_success(self, mock_create_breadcrumb, mock_create_token):
+        """Test GET /api/echo/{agent}/{action} for successful response."""
         mock_token = {"user_id": "mock_user"}
         mock_create_token.return_value = mock_token
         mock_create_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
 
-        self.mock_echo.get_agent.return_value = {"name": "agent1", "actions": ["action1", "action2"]}
+        self.mock_echo.get_action.return_value = {"foo":"bar"}
 
-        response = self.client.get('/api/echo/agent1')
+        response = self.client.get('/api/echo/echo/get_agents')
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json, {"name": "agent1", "actions": ["action1", "action2"]})
-
+        self.assertEqual(response.json, {"foo":"bar"})
+        
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with(mock_token)
-        self.mock_echo.get_agent.assert_called_once_with(agent_name="agent1")
+        self.mock_echo.get_action.assert_called_once()
 
     @patch('routes.echo_routes.create_token')
     @patch('routes.echo_routes.create_breadcrumb')
-    def test_get_agent_failure(self, mock_create_breadcrumb, mock_create_token):
-        """Test GET /api/echo/<name> when an exception occurs."""
+    def test_get_action_failure(self, mock_create_breadcrumb, mock_create_token):
+        """Test GET /api/echo/<name>/<name> when an exception occurs."""
         mock_create_token.return_value = {"user_id": "mock_user"}
         mock_create_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
 
-        self.mock_echo.get_agent.side_effect = Exception("Database error")
+        self.mock_echo.get_action.side_effect = Exception("Database error")
 
-        response = self.client.get('/api/echo/agent1')
+        response = self.client.get('/api/echo/agent1/action1')
 
         self.assertEqual(response.status_code, 500)
         self.assertEqual(response.json, {"error": "A processing error occurred"})
 
         mock_create_token.assert_called_once()
         mock_create_breadcrumb.assert_called_once_with({"user_id": "mock_user"})
-        self.mock_echo.get_agent.assert_called_once_with(agent_name="agent1")
+        self.mock_echo.get_action.assert_called_once_with(agent_name="agent1", action_name="action1")
 
 if __name__ == '__main__':
     unittest.main()

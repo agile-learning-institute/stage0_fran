@@ -77,15 +77,43 @@ class Echo:
 
     def get_agents(self):
         """Returns a list of registered agent names."""
-        return list(self.agents.keys())
+        the_agents = []
+        for agent_key in self.agents:
+            agent = self.agents[agent_key]
+            agent_info = {
+                "agent_name": agent_key,
+                "description": agent.description,
+                "actions": []
+            }
+            for action_key in agent.actions:
+                action = agent.actions[action_key]
+                action_info = {
+                    "action_name": action_key,
+                    "description": action["description"]
+                }
+                agent_info["actions"].append(action_info)
+                
+            the_agents.append(agent_info)
+        return the_agents
 
-    def get_agent(self, agent_name=None):
+    def get_action(self, agent_name=None, action_name=None):
         """Returns a a registered agent."""
         if agent_name not in self.agents:
             logger.info(f"Agent {agent_name} not found")
-            return ""  # Silence for unknown agents
-        agent = self.agents[agent_name] 
-        return agent.as_dict()
+            return "Invalid Agent"
+
+        agent = self.agents[agent_name]
+        if action_name not in agent.get_actions():
+            logger.info(f"Action {action_name} not found")
+            return "Invalid Action"
+        
+        action = agent["actions"][action_name]
+        return {
+            "action_name": action_name, 
+            "description": action.description,
+            "arguments_schema": action.arguments_schema,
+            "output_schema": action.output_schema
+        }
 
     def parse_command(self, command: str):
         """

@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 def create_bot_agent(agent_name):
     """ Registers event handlers and commands for the Fran home channel. """
-    agent = Agent(agent_name)
+    agent = Agent(agent_name, description="The bot agent provides information about a specific Echo Bot, including the set of active channels")
     
     def get_bot(arguments):
         """Get the bot record based on the bot_id passed as arguments"""

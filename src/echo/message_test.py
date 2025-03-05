@@ -57,7 +57,7 @@ class TestMessage(unittest.TestCase):
         message = Message(role=Message.SYSTEM_ROLE, dialog=Message.TOOLS_DIALOG)
         self.assertEqual(message.role, Message.SYSTEM_ROLE)
         self.assertEqual(message.dialog, Message.TOOLS_DIALOG)
-        self.assertEqual(message.content, "")
+        self.assertEqual(message.content, "No Content String Provided")
 
     def test_as_LLM_Message(self):
         """Test the LLM Message projection """

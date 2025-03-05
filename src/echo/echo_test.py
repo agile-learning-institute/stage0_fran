@@ -18,7 +18,7 @@ class TestEcho(unittest.TestCase):
 
     def test_register_agent(self):
         """Ensure an agent is registered successfully."""
-        self.assertIn("test_agent", self.echo.get_agents())
+        self.assertEqual(len(self.echo.get_agents()), 4)
 
     def test_register_invalid_agent(self):
         """Ensure registering a non-Agent instance raises an error."""

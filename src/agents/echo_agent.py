@@ -11,7 +11,7 @@ def create_echo_agent(agent_name, echo=None):
     """ Registers event handlers and commands for the Config Agent. """
     if not isinstance(echo, Echo):
         raise Exception("create_echo_agent Error: an instance of Echo is a required parameter")
-    agent = Agent(agent_name)
+    agent = Agent(name=agent_name, description="The echo agent get's meta-data about agents and actions")
     
     def get_agents(arguments):
         """ Slash command to get agent data"""
@@ -39,57 +39,55 @@ def create_echo_agent(agent_name, echo=None):
         }
     )
 
-    def get_agent(arguments):
+    def get_action(arguments):
         """ Slash command to get agent data"""
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            agent_info = echo.get_agent(agent_name=arguments)
-            logger.info(f"get_agent Success {breadcrumb}")
-            return agent_info
+            agent = arguments["agent"]
+            action = arguments["action"]
+            action_info = echo.get_action(agent_name=agent, action_name=action)
+            logger.info(f"get_action Success {breadcrumb}")
+            return action_info
         except Exception as e:
-            logger.warning(f"get_agent Error has occurred: {e}")
+            logger.warning(f"get_action Error has occurred: {e}")
             return "error"
     agent.register_action(
-        action_name="get_agent", 
-        function=get_agent,
-        description="Get an agent with actions", 
+        action_name="get_action", 
+        function=get_action,
+        description="Get an actions with argument and output metadata", 
         arguments_schema={
-            "description": "Agent Name",
-            "type": "string",
+            "type": "object",
+            "properties": {
+                "agent": {
+                    "description": "The agent name",
+                    "type": "string"
+                },
+                "action": {
+                    "description": "The action name",
+                    "type": "string"
+                }
+            }
         },
         output_schema={
-            "description": "An agent",
+            "description": "An action",
             "type": "object",
             "properties": {
                 "name": {
-                    "description": "",
+                    "description": "Action Name",
                     "type": "string"
                 },
-                "actions": {
-                    "description": "",
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "description": "",
-                                "type": "string"
-                            },
-                            "description":{
-                                "description": "",
-                                "type": "string"
-                            },
-                            "arguments_schema": {
-                                "description": "",
-                                "type": "string"
-                            },
-                            "output_schema": {
-                                "description": "",
-                                "type": "string"
-                            }
-                        }
-                    }
+                "description":{
+                    "description": "Action Description",
+                    "type": "string"
+                },
+                "arguments_schema": {
+                    "description": "Simplified Schema for arguments",
+                    "type": "object"
+                },
+                "output_schema": {
+                    "description": "Simplified schema for output",
+                    "type": "object"
                 }
             }
         }

@@ -25,7 +25,7 @@ class LLMHandler:
         self.llm = llm_client
         self.echo_bot_name = echo_bot_name
         self.handle_command = handle_command_function
-        self.agent_command_pattern = re.compile(r"^/([^/]+)/([^/]+)(?:/(.*))?$")
+        self.agent_command_pattern = re.compile(r"^/(\S+)/(\S+)(?:/(.*))?$")
 
     def handle_message(self, channel=None, text=None, user="unknown", role=Message.USER_ROLE, dialog=Message.GROUP_DIALOG ):
         """
@@ -61,7 +61,7 @@ class LLMHandler:
         llm_reply = self.llm.chat(model=self.llm.model, messages=messages)
         logger.debug(f"LLM Reply Object: {llm_reply}")
         chat_reply = Message(llm_message=llm_reply["message"], user=self.echo_bot_name)
-        logger.info(f"LLM Chat Reply: {chat_reply.role}-{chat_reply.text[:49].strip()}...")
+        logger.debug(f"LLM Chat Reply: {chat_reply.role}-{chat_reply.text[:49].strip()}...")
 
         # Step 4: Process LLM response recursively if it's an tool message
         if chat_reply.dialog == Message.TOOLS_DIALOG:

@@ -17,6 +17,7 @@ class Echo:
     implements the handle_command function used in
     those classes to execute agent/actions.
     """
+    ECHO_AGENT_COMMAND_PATTERN = re.compile(r"^/([^/]+)/([^/]+)(?:/(.*))?$")
     
     def __init__(self, name=None, bot_id=None, model=None, client=None):
         """Initialize Echo with a default agents."""
@@ -122,8 +123,9 @@ class Echo:
         Ensures only the first two slashes separate agent and action, 
         while keeping the arguments intact.
         """
-        match = re.match(r"^/([^/]+)/([^/]+)(?:/(.*))?$", command)
+        match = self.ECHO_AGENT_COMMAND_PATTERN.match(command)
         if not match:
+            logger.warning(f"Invalid Command Requested {command}")
             raise Exception(f"Invalid command format: {command}")
 
         agent_name, action_name, arguments_str = match.groups()
@@ -132,6 +134,7 @@ class Echo:
         try:
             arguments = json.loads(arguments_str) if arguments_str else None
         except json.JSONDecodeError as e:
+            logger.warning(f"Invalid JSON Arguments {arguments_str}")
             raise Exception(f"Invalid JSON in arguments: {arguments_str}") from e
 
         return agent_name, action_name, arguments
@@ -143,7 +146,10 @@ class Echo:
         - Returns the response from the agent.
         - If invalid, returns an error message or silence (for unknown agents).
         """
-        agent_name, action_name, arguments = self.parse_command(command)
+        try:
+            agent_name, action_name, arguments = self.parse_command(command)
+        except Exception as e:
+            return f"Invalid Command Format {e}"
 
         if agent_name not in self.agents:
             logger.debug(f"Agent {agent_name} not found")

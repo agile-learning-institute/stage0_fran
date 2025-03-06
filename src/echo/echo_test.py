@@ -1,8 +1,13 @@
+import re
 import unittest
 import json
 from echo.echo import Echo
 from echo.agent import Agent
 from unittest.mock import MagicMock, Mock, patch
+
+import logging
+logging.basicConfig(level="Debug")
+logger = logging.getLogger(__name__)
 
 class TestEcho(unittest.TestCase):
 
@@ -34,9 +39,51 @@ class TestEcho(unittest.TestCase):
         self.assertEqual(action, "test_action")
         self.assertEqual(arguments, {"key": "value"})
 
+    def test_matcher1(self):
+        command = "/test_agent/test_action/some text"
+        match = Echo.ECHO_AGENT_COMMAND_PATTERN.match(command)
+        
+        self.assertIsNotNone(match, "Regex did not match the command")
+        self.assertEqual(match.group(1), "test_agent")
+        self.assertEqual(match.group(2), "test_action")
+        self.assertEqual(match.group(3), "some text")
+        
+    def test_matcher2(self):
+        command = "/test_agent/test_action/\"some text\""
+        match = Echo.ECHO_AGENT_COMMAND_PATTERN.match(command)
+        
+        self.assertIsNotNone(match, "Regex did not match the command")
+        self.assertEqual(match.group(1), "test_agent")
+        self.assertEqual(match.group(2), "test_action")
+        self.assertEqual(match.group(3), "\"some text\"")
+
+    def test_matcher3(self):
+        command = "/test_agent/test_action/some_text"
+        match = Echo.ECHO_AGENT_COMMAND_PATTERN.match(command)
+        
+        self.assertIsNotNone(match, "Regex did not match the command")
+        self.assertEqual(match.group(1), "test_agent")
+        self.assertEqual(match.group(2), "test_action")
+        self.assertEqual(match.group(3), "some_text")
+        
+    def test_matcher4(self):
+        command = '/test_agent/test_action/{invalid_json}'
+        match = Echo.ECHO_AGENT_COMMAND_PATTERN.match(command)
+        
+        self.assertIsNotNone(match, "Regex did not match the command")
+        self.assertEqual(match.group(1), "test_agent")
+        self.assertEqual(match.group(2), "test_action")
+        self.assertEqual(match.group(3), "{invalid_json}")
+
+    def test_matcher5(self):
+        command = 'Your command syntax should be just \n/test_agent/test_action/arguments'
+        match = Echo.ECHO_AGENT_COMMAND_PATTERN.match(command)
+        
+        self.assertIsNone(match)
+
     def test_parse_command_invalid_json(self):
         """Ensure command with invalid JSON raises an exception."""
-        command = "/test_agent/test_action/{invalid_json}"
+        command = "/test_agent/test_action/some text"
         with self.assertRaises(Exception):
             self.echo.parse_command(command)
     

@@ -3,73 +3,104 @@ from echo.message import Message
 
 class TestMessage(unittest.TestCase):
 
-    def test_constructor_message(self):
-        """Test message based constructor with valid message"""        
-        message = Message(message={"role":Message.SYSTEM_ROLE, "content": f"{Message.TOOLS_DIALOG}:Hi"})
-        self.assertEqual(message.role, Message.SYSTEM_ROLE)
-        self.assertEqual(message.dialog, Message.TOOLS_DIALOG)
-        self.assertEqual(message.content, "Hi")
-
-    def test_construct_message_string(self):
-        """Test message based constructor with string message"""
-        message = Message("just a string")
-        self.assertEqual(message.dialog, Message.GROUP_DIALOG)
+    def test_constructor_from_good_llm_message(self):
+        """Test llm_message based constructor with valid message"""        
+        test_text = f"From:Mike To:{Message.GROUP_DIALOG} Hi"
+        message = Message(llm_message={"role":Message.USER_ROLE, "content":test_text})
         self.assertEqual(message.role, Message.USER_ROLE)
-        self.assertEqual(message.content, "just a string")
+        self.assertEqual(message.user, "Mike")
+        self.assertEqual(message.dialog, Message.GROUP_DIALOG)
+        self.assertEqual(message.text, "Hi")
 
-    def test_construct_message_missing_role(self):
+    def test_constructor_from_bad_llm_message1(self):
+        """Test llm_message based constructor with valid message"""        
+        test_text = "To:Tools From:Someone Boo"
+        message = Message(llm_message={"role":Message.ASSISTANT_ROLE, "content":test_text})
+        self.assertEqual(message.role, Message.ASSISTANT_ROLE)
+        self.assertEqual(message.user, "unknown")
+        self.assertEqual(message.dialog, Message.GROUP_DIALOG)
+        self.assertEqual(message.text, test_text)
+
+    def test_constructor_from_bad_llm_message2(self):
+        """Test llm_message based constructor with valid message"""        
+        bad_text = "From:Mike To:Everyone Whats up"
+        message = Message(llm_message={"role":Message.ASSISTANT_ROLE, "content":bad_text})
+        self.assertEqual(message.role, Message.ASSISTANT_ROLE)
+        self.assertEqual(message.user, "Mike")
+        self.assertEqual(message.dialog, Message.GROUP_DIALOG)
+        self.assertEqual(message.text, "Whats up")
+
+    def test_constructor_from_good_encoded_text(self):
+        """Test encoded text based constructor"""
+        test_text = f"From:Mike To:{Message.GROUP_DIALOG} Hi"
+        message = Message(encoded_text=test_text)
+        self.assertEqual(message.role, Message.USER_ROLE)
+        self.assertEqual(message.user, "Mike")
+        self.assertEqual(message.dialog, Message.GROUP_DIALOG)
+        self.assertEqual(message.text, "Hi")
+
+    def test_constructor_from_good_encoded_text_with_role(self):
+        """Test encoded text based constructor"""
+        test_text = f"From:Fran To:{Message.TOOLS_DIALOG} Hi"
+        message = Message(encoded_text=test_text, role=Message.ASSISTANT_ROLE)
+        self.assertEqual(message.role, Message.ASSISTANT_ROLE)
+        self.assertEqual(message.user, "Fran")
+        self.assertEqual(message.dialog, Message.TOOLS_DIALOG)
+        self.assertEqual(message.text, "Hi")
+
+    def test_constructor_default(self):
         """Test message based constructor with message without a role"""
-        message = Message({"content":f"{Message.TOOLS_DIALOG}:Hi"})
-        self.assertEqual(message.dialog, Message.TOOLS_DIALOG)
+        message = Message()
         self.assertEqual(message.role, Message.USER_ROLE)
-        self.assertEqual(message.content, "Hi")
-
-    def test_construct_message_missing_content(self):
-        """Test message based constructor with message without content"""
-        message = Message({"role": Message.SYSTEM_ROLE})
+        self.assertEqual(message.user, "unknown")
         self.assertEqual(message.dialog, Message.GROUP_DIALOG)
-        self.assertEqual(message.role, Message.SYSTEM_ROLE)
-        self.assertEqual(message.content, "")
+        self.assertEqual(message.text, "")
 
-    def test_constructor_parts(self):
-        """Test part based constructor with valid input """
-        message = Message(role=Message.SYSTEM_ROLE, dialog=Message.TOOLS_DIALOG, content="Hello")
-        self.assertEqual(message.role, Message.SYSTEM_ROLE)
-        self.assertEqual(message.dialog, Message.TOOLS_DIALOG)
-        self.assertEqual(message.content, "Hello")
-        
-    def test_construct_parts_missing_role(self):
-        """Test parameter based constructor without a role"""
-        message = Message(dialog=Message.TOOLS_DIALOG, content="Hello")
+    def test_constructor_with_text(self):
+        """Test message based constructor with message without a role"""
+        test_text = "Hello World!"
+        message = Message(text=test_text)
         self.assertEqual(message.role, Message.USER_ROLE)
-        self.assertEqual(message.dialog, Message.TOOLS_DIALOG)
-        self.assertEqual(message.content, "Hello")
-        
-    def test_construct_parts_missing_dialog(self):
-        """Test parameter based constructor without a dialog"""
-        message = Message(role=Message.SYSTEM_ROLE, content="Hello")
-        self.assertEqual(message.role, Message.SYSTEM_ROLE)
+        self.assertEqual(message.user, "unknown")
         self.assertEqual(message.dialog, Message.GROUP_DIALOG)
-        self.assertEqual(message.content, "Hello")
-        
-    def test_construct_parts_missing_content(self):
-        """Test parameter based constructor without a content"""
-        message = Message(role=Message.SYSTEM_ROLE, dialog=Message.TOOLS_DIALOG)
-        self.assertEqual(message.role, Message.SYSTEM_ROLE)
+        self.assertEqual(message.text, test_text)
+
+    def test_constructor_with_text_and_role(self):
+        """Test message based constructor with message without a role"""
+        test_text = "Hello World!"
+        message = Message(text=test_text, role=Message.ASSISTANT_ROLE)
+        self.assertEqual(message.role, Message.ASSISTANT_ROLE)
+        self.assertEqual(message.user, "unknown")
+        self.assertEqual(message.dialog, Message.GROUP_DIALOG)
+        self.assertEqual(message.text, test_text)
+
+    def test_constructor_with_all_values(self):
+        """Test message based constructor with message without a role"""
+        test_text = "Hello World!"
+        message = Message(user="Mike", role=Message.ASSISTANT_ROLE, dialog=Message.TOOLS_DIALOG, text=test_text)
+        self.assertEqual(message.role, Message.ASSISTANT_ROLE)
+        self.assertEqual(message.user, "Mike")
         self.assertEqual(message.dialog, Message.TOOLS_DIALOG)
-        self.assertEqual(message.content, "No Content String Provided")
+        self.assertEqual(message.text, test_text)
 
     def test_as_LLM_Message(self):
         """Test the LLM Message projection """
-        message = Message(role="assistant", dialog="group", content="How can I help")
-        llm_message = {"role": "assistant", "content": "group:How can I help"}
-        self.assertEqual(message.as_llm_message(), llm_message)
+        message = Message()
+        expected_llm = {"role": Message.USER_ROLE, "content": f"From:unknown To:{Message.GROUP_DIALOG} "}
+        given_llm = message.as_llm_message()
+        self.assertEqual(expected_llm, given_llm)
         
     def test_as_dict(self):
         """Test the LLM Message projection """
-        message = Message(role="assistant", dialog="group", content="How can I help")
-        message_dict = {"role": "assistant", "dialog":"group", "content": "How can I help"}
-        self.assertEqual(message.as_dict(), message_dict)
+        message = Message()
+        expected = {
+            "role": Message.USER_ROLE, 
+            "user": "unknown",
+            "dialog": Message.GROUP_DIALOG,
+            "text": ""
+        }
+        given = message.as_dict()
+        self.assertEqual(expected, given)
 
 if __name__ == "__main__":
     unittest.main()

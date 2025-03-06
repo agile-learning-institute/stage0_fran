@@ -10,70 +10,52 @@ class Message:
     TOOLS_DIALOG = "tools"
     VALID_DIALOGS = [GROUP_DIALOG, TOOLS_DIALOG]
     
-    def __init__(self, message=None, role=None, dialog=None, content=None):
-        logger.debug(f"role: {role}, dialog: {dialog}, message: {message}, content: {content}")
-        """Initialize a message."""
-        if isinstance(message, str):
-            # Construct default message from message
-            logger.debug(f"Constructing from string {message}")
-            self.role = Message.USER_ROLE
-            self.dialog = Message.GROUP_DIALOG                
-            self.content = message.strip()
-            
-        elif isinstance(message, dict):  
-            # Construct from a message dict without a dialog property
-            logger.debug(f"Constructing from message {message}")
-            self.role = message.get("role", Message.USER_ROLE)
-            content_value = message.get("content", "").strip()
+    def __init__(self, llm_message=None, encoded_text=None, 
+                 user=None, text=None, 
+                 role=USER_ROLE, dialog=GROUP_DIALOG):
+        """
+        Initialize a message, from a llm dict, 
+        or encoded_text, or individual parameters.
+        """
+        self.user = user or "unknown"
+        self.role = role
+        self.dialog = dialog
+        self.text = text or ""
+        
+        # If an llm_message is provided use the role and parse the content
+        if llm_message:
+            self.role = llm_message["role"]
+            self.user, self.dialog, self.text = self.decode(llm_message["content"])
+        
+        # If encoded text is provided, parse the content and take role (provided or default)
+        elif encoded_text:
+            self.user, self.dialog, self.text = self.decode(encoded_text)
 
-            # Ensure content is long enough before slicing
-            if len(content_value) >= 6 and ":" in content_value[:6]:
-                self.dialog, self.content = content_value.split(":", 1)
-            else:
-                self.dialog = Message.GROUP_DIALOG
-                self.content = content_value  
-        else:
-            # Construct from individual parameters
-            logger.debug(f"Constructing from parameters {role}, {dialog}, {content}")
-            if role in Message.VALID_ROLES:
-                self.role = role
-            else: 
-                self.role = Message.USER_ROLE
+    def decode(self, content=None):
+        """Helper to decode from, to, text values from a content string"""
+        try:
+            parts = content.split(" ", 2)  # Split into 3 parts: 'From:<user>', 'To:<dialog>', and '<text>'
+            user = parts[0].split("From:")[1]
+            dialog = parts[1].split("To:")[1]
+            text = parts[2] if len(parts) > 2 else ""
+            if not dialog in self.VALID_DIALOGS: dialog=self.GROUP_DIALOG
+            return user, dialog, text
+        except (IndexError, ValueError):
+            logger.warning(ValueError(f"Invalid message format {content}"))
+            return "unknown", self.GROUP_DIALOG, content
 
-            if not dialog and len(content) >= 6 and ":" in content[:6]:
-                dialog, content = content.split(":", 1)
-                                
-            if dialog in Message.VALID_DIALOGS:
-                self.dialog = dialog 
-            else:
-                self.dialog = Message.GROUP_DIALOG
-                
-            if isinstance(content, str):
-                self.content = content.strip()
-                if len(self.content) == 0:
-                    self.content = "Empty Content Provided"
-            else:
-                self.content = "No Content String Provided"
-
-    def _slice_content(self, content=None):
-        # Ensure content is long enough before slicing
-        if len(content) >= 6 and ":" in content[:6]:
-            self.dialog, self.content = content.split(":", 1)
-        else:
-            self.dialog = Message.GROUP_DIALOG
-            self.content = content
-    
     def as_llm_message(self):
         """Get a message with dialog added to the front of content."""
         return {
             "role": self.role,
-            "content": f"{self.dialog}:{self.content}"
+            "content": f"From:{self.user} To:{self.dialog} {self.text}"
         }
             
     def as_dict(self):
         """Get a message as a plain dict for json serialization."""
         return {
             "role": self.role,
+            "user": self.user,
             "dialog": self.dialog,
-            "content": self.content
+            "text": self.text
         }

@@ -124,7 +124,7 @@ class ConversationServices:
         CYAN = "\033[36m "
         BLUE = "\033[94m"
         RESET = "\033[0m"        
-        logger.info(f"{BLUE}CONVERSATION SAVED MESSAGE for {CYAN}{channel_id}{BLUE} with role:{CYAN}{message["role"]}{BLUE}, content:{CYAN}{message["content"][:60]}...{RESET}")
+        logger.debug(f"{BLUE}CONVERSATION SAVED MESSAGE for {CYAN}{channel_id}{BLUE} with role:{CYAN}{message["role"]}{BLUE}, content:{CYAN}{message["content"][:60]}...{RESET}")
 
         return messages
 

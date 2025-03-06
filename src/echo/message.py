@@ -45,7 +45,7 @@ class Message:
             if not dialog in self.VALID_DIALOGS: dialog=self.GROUP_DIALOG
             return user, dialog, text
         except (IndexError, ValueError):
-            logger.warning(ValueError(f"Invalid message format {content}"))
+            logger.warning(ValueError(f"Invalid message format \"{content[:20]}...\""))
             return user, dialog, content
 
     def as_llm_message(self):

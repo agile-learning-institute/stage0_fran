@@ -109,6 +109,7 @@ class ConversationServices:
         if len(conversation["messages"]) > 1000: #TODO: Add config.MAX_MESSAGES
             conversation = ConversationServices.reset_conversation(channel_id=channel_id, token=token, breadcrumb=breadcrumb)
         
+        # Update Conversation - push message onto messages
         match = {"$and": [
             {"channel_id": channel_id},
             {"version": config.LATEST_VERSION},
@@ -118,7 +119,13 @@ class ConversationServices:
         push_data = {"messages": message}
         reply = mongo.update_document(config.CONVERSATION_COLLECTION_NAME, match=match, set_data=set_data, push_data=push_data)
         messages = reply["messages"]
-        logger.debug(f"add_message update_document last message in reply: {messages[len(messages)-1]}")
+        
+        # Log this message in a way that stands out
+        CYAN = "\033[36m "
+        BLUE = "\033[94m"
+        RESET = "\033[0m"        
+        logger.info(f"{BLUE}CONVERSATION SAVED MESSAGE for {CYAN}{channel_id}{BLUE} with role:{CYAN}{message["role"]}{BLUE}, content:{CYAN}{message["content"][:60]}...{RESET}")
+
         return messages
 
     @staticmethod

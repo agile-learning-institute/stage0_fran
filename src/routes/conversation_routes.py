@@ -1,3 +1,4 @@
+from echo.message import Message
 from flask_utils.breadcrumb import create_breadcrumb
 from flask_utils.token import create_token
 from services.conversation_services import ConversationServices
@@ -57,8 +58,8 @@ def create_conversation_routes():
         try:
             token = create_token()
             breadcrumb = create_breadcrumb(token)
-            message = request.get_json()
-            messages = ConversationServices.add_message(channel_id=channel_id, message=message, token=token, breadcrumb=breadcrumb)
+            message = Message(llm_message=request.get_json(), user=token["user_id"])
+            messages = ConversationServices.add_message(channel_id=channel_id, message=message.as_llm_message(), token=token, breadcrumb=breadcrumb)
             logger.debug(f"add_message Successful {breadcrumb}")
             return jsonify(messages), 200
         except Exception as e:

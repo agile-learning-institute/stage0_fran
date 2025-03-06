@@ -119,6 +119,19 @@ class TestMessage(unittest.TestCase):
         self.assertEqual(message.dialog, Message.TOOLS_DIALOG)
         self.assertEqual(message.text, test_text)
 
+    def test_constructor_for_route1(self):
+        """Test message based constructor with plain"""
+        test_text = "Hello World!"
+        message = Message(encoded_text=test_text, user="Mike")
+        self.assertEqual(message.role, Message.USER_ROLE)
+        self.assertEqual(message.user, "Mike")
+        self.assertEqual(message.dialog, Message.GROUP_DIALOG)
+        self.assertEqual(message.text, test_text)
+        
+        llm_message = message.as_llm_message()
+        self.assertEqual(llm_message["role"], Message.USER_ROLE)
+        self.assertEqual(llm_message["content"], f"From:Mike To:{Message.GROUP_DIALOG} Hello World!")
+
     def test_as_LLM_Message(self):
         """Test the LLM Message projection """
         message = Message()

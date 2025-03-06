@@ -34,10 +34,10 @@ while IFS=, read -r role from to text; do
                   '{role: $role, content: ("From:" + $from + ", To:" + $to + " " + $text)}')
 
     # Make API request
-    curl -X POST "http://localhost:8580/api/conversation/$CHANNEL_ID/message" \
+    curl -s -X POST "http://localhost:8580/api/conversation/$CHANNEL_ID/message" \
          -H "Content-Type: application/json" \
-         -d "$JSON_DATA" 2>&1 /dev/null
+         -d "$JSON_DATA" > /dev/null
 
-    echo "Sent message: $JSON_DATA"
+    echo "$role sent message as $from to $to message $text"
 
 done < <(tail -n +2 "$CSV_FILE")  # Skip header row

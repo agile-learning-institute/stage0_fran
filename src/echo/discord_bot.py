@@ -90,7 +90,7 @@ class DiscordBot(discord.Client):
             # Process Message if from an active channel            
             elif channel in self.active_channels:
                 logger.debug(f"Getting LLM Response in {channel}")
-                response = self.handle_message(channel=channel, role=Message.USER_ROLE, dialog=Message.GROUP_DIALOG, text=content)
+                response = self.handle_message(channel=channel, user=username, role=Message.USER_ROLE, dialog=Message.GROUP_DIALOG, text=content)
                 
             # Send the reply message
             logger.debug(f"Sending response {response}.")

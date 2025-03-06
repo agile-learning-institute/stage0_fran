@@ -35,6 +35,7 @@ class Echo:
 
         # Initialize LLM Conversation Handler
         self.llm_handler = LLMHandler(
+            echo_bot_name=self.name,
             handle_command_function=self.handle_command, 
             llm_client=self.llm_client
         )

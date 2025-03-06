@@ -48,6 +48,42 @@ class TestMessage(unittest.TestCase):
         self.assertEqual(message.dialog, Message.TOOLS_DIALOG)
         self.assertEqual(message.text, "Hi")
 
+    def test_constructor_bad_encoded_text_with_role(self):
+        """Test encoded text based constructor"""
+        test_text = f"From:Fran To: {Message.TOOLS_DIALOG} Hi"
+        message = Message(encoded_text=test_text, role=Message.ASSISTANT_ROLE)
+        self.assertEqual(message.role, Message.ASSISTANT_ROLE)
+        self.assertEqual(message.user, "Fran")
+        self.assertEqual(message.dialog, Message.GROUP_DIALOG)
+        self.assertEqual(message.text, "tools Hi")
+
+    def test_constructor_bad_encoded_text_with_defaults(self):
+        """Test encoded text based constructor"""
+        test_text = "This is a bad message"
+        message = Message(encoded_text=test_text, role=Message.ASSISTANT_ROLE, dialog=Message.TOOLS_DIALOG, user="test_user")
+        self.assertEqual(message.role, Message.ASSISTANT_ROLE)
+        self.assertEqual(message.user, "test_user")
+        self.assertEqual(message.dialog, Message.TOOLS_DIALOG)
+        self.assertEqual(message.text, test_text)
+
+    def test_constructor_semi_bad_encoded_text_with_defaults(self):
+        """Test encoded text based constructor"""
+        test_text = "From:RealUser This is a bad message"
+        message = Message(encoded_text=test_text, role=Message.ASSISTANT_ROLE, dialog=Message.TOOLS_DIALOG, user="test_user")
+        self.assertEqual(message.role, Message.ASSISTANT_ROLE)
+        self.assertEqual(message.user, "RealUser")
+        self.assertEqual(message.dialog, Message.TOOLS_DIALOG)
+        self.assertEqual(message.text, test_text)
+
+    def test_constructor_good_encoded_text_with_defaults(self):
+        """Test encoded text based constructor"""
+        test_text = "From:RealUser To:group This is a good message"
+        message = Message(encoded_text=test_text, role=Message.ASSISTANT_ROLE, dialog=Message.TOOLS_DIALOG, user="test_user")
+        self.assertEqual(message.role, Message.ASSISTANT_ROLE)
+        self.assertEqual(message.user, "RealUser")
+        self.assertEqual(message.dialog, Message.GROUP_DIALOG)
+        self.assertEqual(message.text, "This is a good message")
+
     def test_constructor_default(self):
         """Test message based constructor with message without a role"""
         message = Message()

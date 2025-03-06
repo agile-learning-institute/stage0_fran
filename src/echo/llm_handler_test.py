@@ -13,7 +13,7 @@ class TestLLMHandler(unittest.TestCase):
         self.mock_handle_command = MagicMock()
         self.mock_llm_client = MagicMock()
         self.mock_llm_client.model = "test-model"
-        self.llm_handler = LLMHandler(handle_command_function=self.mock_handle_command, llm_client=self.mock_llm_client)
+        self.llm_handler = LLMHandler(echo_bot_name="TEST_BOT", handle_command_function=self.mock_handle_command, llm_client=self.mock_llm_client)
 
     def test_stringify(self):
         """Make sure a simple raw string is returned quoted."""
@@ -50,11 +50,11 @@ class TestLLMHandler(unittest.TestCase):
     def test_handle_simple_message(self):
         """Ensure simple agent call falls through."""
         # Arrange
-        message1 = {"role": Message.USER_ROLE, "content": f"{Message.GROUP_DIALOG}:Simple Message"}
-        message2 = {"role": Message.ASSISTANT_ROLE, "content": f"{Message.GROUP_DIALOG}:LLM Response"}
+        message1 = {"role": Message.USER_ROLE, "content": f"From:unknown To:{Message.GROUP_DIALOG} Simple Message"}
+        message2 = {"role": Message.ASSISTANT_ROLE, "content": f"From:TEST_BOT To:{Message.GROUP_DIALOG} LLM Response"}
         message1_add = {"channel_id": "CHANNEL_1", "message": message1}
         message2_add = {"channel_id": "CHANNEL_1", "message": message2}
-        llm_response = {"message": {"role": Message.ASSISTANT_ROLE, "content": "LLM Response"}}
+        llm_response = {"message": {"role": Message.ASSISTANT_ROLE, "content": f"From:TEST_BOT To:{Message.GROUP_DIALOG} LLM Response"}}
         
         self.mock_handle_command.side_effect = [
             [message1],
@@ -75,8 +75,8 @@ class TestLLMHandler(unittest.TestCase):
         """Ensure user making agent call messages are correctly processed."""
         # Arrange
         agent_response = "Test Agent - Action Response"
-        message1 = {"role": Message.USER_ROLE, "content": f"{Message.GROUP_DIALOG}:/test_agent/test_action"}
-        message2 = {"role": Message.USER_ROLE, "content": f'{Message.GROUP_DIALOG}:"{agent_response}"'}
+        message1 = {"role": Message.USER_ROLE, "content": f"From:unknown To:{Message.GROUP_DIALOG} /test_agent/test_action"}
+        message2 = {"role": Message.USER_ROLE, "content": f"From:test_agent To:{Message.GROUP_DIALOG} \"{agent_response}\""}
         message_add1 = {"channel_id": "CHANNEL_1", "message": message1}
         message_add2 = {"channel_id": "CHANNEL_1", "message": message2}
         
@@ -101,17 +101,17 @@ class TestLLMHandler(unittest.TestCase):
         agent_reply = ["string1", "string2"]
 
         # Conversation
-        text1 = "please execute the test command"
-        text2 = "/test_agent/test_command"
-        text3 = "[\"string1\",\"string2\"]"
-        text4 = "Looks like string1, and string2"
+        text1 = "From:unknown To:group please execute the test command"
+        text2 = "From:Echo To:tools /test_agent/test_command"
+        text3 = "From:test_agent To:tools [\"string1\",\"string2\"]"
+        text4 = "From:Echo To:group Looks like string1, and string2"
 
-        message1 =             {"role": Message.USER_ROLE,      "content": f"{Message.GROUP_DIALOG}:{text1}"}
-        llm_rep1 = {"message": {"role": Message.ASSISTANT_ROLE, "content": f"{Message.TOOLS_DIALOG}:{text2}"}}
-        message2 =             {"role": Message.ASSISTANT_ROLE, "content": f"{Message.TOOLS_DIALOG}:{text2}"}
-        message3 =             {"role": Message.USER_ROLE,      "content": f"{Message.TOOLS_DIALOG}:{text3}"}
-        llm_rep2 = {"message": {"role": Message.ASSISTANT_ROLE, "content": f"{Message.GROUP_DIALOG}:{text4}"}}
-        message4 =             {"role": Message.ASSISTANT_ROLE, "content": f"{Message.GROUP_DIALOG}:{text4}"}
+        message1 =             {"role": Message.USER_ROLE,      "content": text1}
+        llm_rep1 = {"message": {"role": Message.ASSISTANT_ROLE, "content": text2}}
+        message2 =             {"role": Message.ASSISTANT_ROLE, "content": text2}
+        message3 =             {"role": Message.USER_ROLE,      "content": text3}
+        llm_rep2 = {"message": {"role": Message.ASSISTANT_ROLE, "content": text4}}
+        message4 =             {"role": Message.ASSISTANT_ROLE, "content": text4}
         
         message_add1 = f"/conversation/add_message/{json.dumps({"channel_id": "CHANNEL_1", "message":message1}, separators=(',', ':'))}"
         message_add2 = f"/conversation/add_message/{json.dumps({"channel_id": "CHANNEL_1", "message":message2}, separators=(',', ':'))}"
@@ -130,10 +130,9 @@ class TestLLMHandler(unittest.TestCase):
         ]
 
         # Act
-        result = self.llm_handler.handle_message(channel="CHANNEL_1", text=text1)
-
+        result = self.llm_handler.handle_message(channel="CHANNEL_1", text="please execute the test command")
         # Assert
-        self.assertEqual(result, text4)
+        self.assertEqual(result, "Looks like string1, and string2")
         self.mock_handle_command.assert_any_call(message_add1)
         self.mock_handle_command.assert_any_call(message_add2)
         self.mock_handle_command.assert_any_call(message_add3)
@@ -147,22 +146,22 @@ class TestLLMHandler(unittest.TestCase):
         agent_reply2 = {"foo": "bar"}
 
         # Conversation
-        text1 = "please execute the complex command" # from user:mike to group
-        text2 = "/test_agent/test_command1"          # from assistant:fran to tools
-        text3 = "[\"string1\",\"string2\"]"          # from user:test_agent to tools
-        text4 = "/test_agent/test_command2"          # from assistant:fran to tools
-        text5 = "{\"foo\":\"bar\"}"                  # from user:test_agent to tools
-        text6 = "Looks like foo is bar"              # from assistant:fran to group
+        text1 = "From:mike To:group please execute the complex command" 
+        text2 = "From:TEST_BOT To:tools /test_agent/test_command1"
+        text3 = "From:test_agent To:tools [\"string1\",\"string2\"]"
+        text4 = "From:TEST_BOT To:tools /test_agent/test_command2"
+        text5 = "From:test_agent To:tools {\"foo\":\"bar\"}"
+        text6 = "From:TEST_BOT To:group Looks like foo is bar"
 
-        message1 =             {"role": Message.USER_ROLE,      "content": f"{Message.GROUP_DIALOG}:{text1}"}
-        llm_rep1 = {"message": {"role": Message.ASSISTANT_ROLE, "content": f"{Message.TOOLS_DIALOG}:{text2}"}}
-        message2 =             {"role": Message.ASSISTANT_ROLE, "content": f"{Message.TOOLS_DIALOG}:{text2}"}
-        message3 =             {"role": Message.USER_ROLE,      "content": f"{Message.TOOLS_DIALOG}:{text3}"}
-        llm_rep2 = {"message": {"role": Message.ASSISTANT_ROLE, "content": f"{Message.TOOLS_DIALOG}:{text4}"}}
-        message4 =             {"role": Message.ASSISTANT_ROLE, "content": f"{Message.TOOLS_DIALOG}:{text4}"}
-        message5 =             {"role": Message.USER_ROLE,      "content": f"{Message.TOOLS_DIALOG}:{text5}"}
-        llm_rep3 = {"message": {"role": Message.ASSISTANT_ROLE, "content": f"{Message.GROUP_DIALOG}:{text6}"}}
-        message6 =             {"role": Message.ASSISTANT_ROLE, "content": f"{Message.GROUP_DIALOG}:{text6}"}
+        message1 =             {"role": Message.USER_ROLE,      "content": text1}
+        llm_rep1 = {"message": {"role": Message.ASSISTANT_ROLE, "content": text2}}
+        message2 =             {"role": Message.ASSISTANT_ROLE, "content": text2}
+        message3 =             {"role": Message.USER_ROLE,      "content": text3}
+        llm_rep2 = {"message": {"role": Message.ASSISTANT_ROLE, "content": text4}}
+        message4 =             {"role": Message.ASSISTANT_ROLE, "content": text4}
+        message5 =             {"role": Message.USER_ROLE,      "content": text5}
+        llm_rep3 = {"message": {"role": Message.ASSISTANT_ROLE, "content": text6}}
+        message6 =             {"role": Message.ASSISTANT_ROLE, "content": text6}
         
         message_add1 = f"/conversation/add_message/{json.dumps({"channel_id": "CHANNEL_1", "message":message1}, separators=(',', ':'))}"
         message_add2 = f"/conversation/add_message/{json.dumps({"channel_id": "CHANNEL_1", "message":message2}, separators=(',', ':'))}"
@@ -189,7 +188,7 @@ class TestLLMHandler(unittest.TestCase):
         result = self.llm_handler.handle_message(channel="CHANNEL_1", text=text1)
 
         # Assert
-        self.assertEqual(result, text6)
+        self.assertEqual(result, "Looks like foo is bar")
         self.mock_handle_command.assert_any_call(message_add1)
         self.mock_handle_command.assert_any_call(message_add2)
         self.mock_handle_command.assert_any_call(message_add3)

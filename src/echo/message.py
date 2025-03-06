@@ -10,7 +10,9 @@ class Message:
     TOOLS_DIALOG = "tools"
     VALID_DIALOGS = [GROUP_DIALOG, TOOLS_DIALOG]
     
-    def __init__(self, llm_message=None, encoded_text=None, 
+    def __init__(self, 
+                 llm_message=None, ## Dict with role and content properties
+                 encoded_text=None, ## String with From: To: structure
                  user="unknown", text="", 
                  role=USER_ROLE, dialog=GROUP_DIALOG):
         """
@@ -25,13 +27,15 @@ class Message:
         # If an llm_message is provided use the role and parse the content
         if llm_message:
             self.role = llm_message["role"]
-            self.user, self.dialog, self.text = self.decode(llm_message["content"])
+            self.user, self.dialog, self.text = self.decode(
+                user=self.user, dialog=self.dialog, content=llm_message["content"])
         
         # If encoded text is provided, parse the content and take role (provided or default)
         elif encoded_text:
-            self.user, self.dialog, self.text = self.decode(encoded_text)
+            self.user, self.dialog, self.text = self.decode(
+                user=self.user, dialog=self.dialog, content=encoded_text)
 
-    def decode(self, content=None):
+    def decode(self, user=None, dialog=None, content=None):
         """Helper to decode from, to, text values from a content string"""
         try:
             parts = content.split(" ", 2)  # Split into 3 parts: 'From:<user>', 'To:<dialog>', and '<text>'
@@ -42,7 +46,7 @@ class Message:
             return user, dialog, text
         except (IndexError, ValueError):
             logger.warning(ValueError(f"Invalid message format {content}"))
-            return "unknown", self.GROUP_DIALOG, content
+            return user, dialog, content
 
     def as_llm_message(self):
         """Get a message with dialog added to the front of content."""

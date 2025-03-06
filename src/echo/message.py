@@ -11,16 +11,16 @@ class Message:
     VALID_DIALOGS = [GROUP_DIALOG, TOOLS_DIALOG]
     
     def __init__(self, llm_message=None, encoded_text=None, 
-                 user=None, text=None, 
+                 user="unknown", text="", 
                  role=USER_ROLE, dialog=GROUP_DIALOG):
         """
         Initialize a message, from a llm dict, 
         or encoded_text, or individual parameters.
         """
-        self.user = user or "unknown"
+        self.user = user
         self.role = role
         self.dialog = dialog
-        self.text = text or ""
+        self.text = text
         
         # If an llm_message is provided use the role and parse the content
         if llm_message:

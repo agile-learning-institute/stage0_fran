@@ -5,10 +5,10 @@ class TestMessage(unittest.TestCase):
 
     def test_constructor_from_good_llm_message(self):
         """Test llm_message based constructor with valid message"""        
-        test_text = f"From:Mike To:{Message.GROUP_DIALOG} Hi"
+        test_text = f"From:flatballflyer-1052627280754647040 To:{Message.GROUP_DIALOG} Hi"
         message = Message(llm_message={"role":Message.USER_ROLE, "content":test_text})
         self.assertEqual(message.role, Message.USER_ROLE)
-        self.assertEqual(message.user, "Mike")
+        self.assertEqual(message.user, "flatballflyer-1052627280754647040")
         self.assertEqual(message.dialog, Message.GROUP_DIALOG)
         self.assertEqual(message.text, "Hi")
 

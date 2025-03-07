@@ -8,7 +8,8 @@ class Message:
     VALID_ROLES = [USER_ROLE, ASSISTANT_ROLE, SYSTEM_ROLE]
     GROUP_DIALOG = "group"
     TOOLS_DIALOG = "tools"
-    VALID_DIALOGS = [GROUP_DIALOG, TOOLS_DIALOG]
+    INTERNAL_DIALOG = "you"
+    VALID_DIALOGS = [GROUP_DIALOG, TOOLS_DIALOG, INTERNAL_DIALOG]
     
     def __init__(self, 
                  llm_message=None, ## Dict with role and content properties

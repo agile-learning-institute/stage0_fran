@@ -7,7 +7,6 @@ from src.mongo_utils.mongo_io import MongoIO
 logger = logging.getLogger(__name__)
 
 class ConversationServices:
-
     @staticmethod 
     def _check_user_access(token):
         """Role Based Access Control logic"""
@@ -120,20 +119,21 @@ class ConversationServices:
         reply = mongo.update_document(config.CONVERSATION_COLLECTION_NAME, match=match, set_data=set_data, push_data=push_data)
         messages = reply["messages"]
         
-        # Log this message in a way that stands out
+        # Log this message in a way that stands out using ASCII Color codes
         CYAN = "\033[36m "
         BLUE = "\033[94m"
         RESET = "\033[0m"        
-        logger.info(f"{BLUE}CONVERSATION SAVED MESSAGE for {CYAN}{channel_id}{BLUE} with role:{CYAN}{message["role"]}{BLUE}, content:{CYAN}{message["content"][:60]}...{RESET}")
+        logger.info(f"{BLUE}Message added to:{CYAN}{channel_id}{BLUE} with role:{CYAN}{message["role"]}{BLUE}, content:{CYAN}{message["content"][:60]}{RESET}")
 
         return messages
 
     @staticmethod
     def reset_conversation(channel_id=None, token=None, breadcrumb=None):
-        """Move the active conversation to full and set the version string"""
+        """Move the active conversation to complete and set the version string"""
         ConversationServices._check_user_access(token)
         config = Config.get_instance()
         mongo = MongoIO.get_instance()
+        reply = {}
         
         match = {"$and": [
             {"channel_id": channel_id},
@@ -145,7 +145,13 @@ class ConversationServices:
             "status": config.COMPLETED_STATUS,
             "last_saved": breadcrumb
         }
-        reply = mongo.update_document(config.CONVERSATION_COLLECTION_NAME, match=match, set_data=set_data)
+        reply = mongo.update_document(config.CONVERSATION_COLLECTION_NAME, match=match, set_data=set_data) or "Nothing to reset"
+
+        # Log this event in a way that stands out using ASCII Color codes
+        CYAN = "\033[36m "
+        BLUE = "\033[94m"
+        RESET = "\033[0m"        
+        logger.info(f"{BLUE}Conversation:{CYAN}{channel_id}{BLUE} has been reset{RESET}")
         return reply
 
     @staticmethod
@@ -181,5 +187,11 @@ class ConversationServices:
         }
         push_data = {"messages": {"$each": source_conversation["messages"]}}
         target_conversation = mongo.update_document(config.CONVERSATION_COLLECTION_NAME, match=match, set_data=set_data, push_data=push_data)
+
+        # Log this message in a way that stands out using ASCII Color codes
+        CYAN = "\033[36m "
+        BLUE = "\033[94m"
+        RESET = "\033[0m"        
+        logger.info(f"{BLUE}Conversation:{CYAN}{named_conversation}{BLUE} has loaded {CYAN}{len(source_conversation["messages"])}{BLUE} messages into {channel_id}{RESET}")
         return target_conversation
 

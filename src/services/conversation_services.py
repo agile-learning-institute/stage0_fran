@@ -148,3 +148,38 @@ class ConversationServices:
         reply = mongo.update_document(config.CONVERSATION_COLLECTION_NAME, match=match, set_data=set_data)
         return reply
 
+    @staticmethod
+    def load_named_conversation(channel_id=None, named_conversation=None, token=None, breadcrumb=None):
+        """Move the active conversation to full and set the version string"""
+        ConversationServices._check_user_access(token)
+        config = Config.get_instance()
+        mongo = MongoIO.get_instance()
+        
+        # Get the named conversation
+        match = {"$and": [
+            {"channel_id": named_conversation},
+            {"version": config.LATEST_VERSION},
+            {"status": config.NAMED_STATUS}
+        ]}
+        source_conversation_list = mongo.get_documents(config.CONVERSATION_COLLECTION_NAME, match=match)
+        if not source_conversation_list or len(source_conversation_list) == 0:
+            raise Exception(f"Named Conversation {named_conversation} was not found")
+        if len(source_conversation_list) > 1:
+            logger.warning(f"Non-Unique Named Conversation! {len(source_conversation_list)} conversations named {named_conversation} were found")
+        source_conversation = source_conversation_list[0]
+        
+        # Add the Messages from the source to the Channel Conversation
+        # Make sure the target conversation exists first. 
+        target_conversation = ConversationServices.get_conversation(channel_id=channel_id, token=token, breadcrumb=breadcrumb)
+        match = {"$and": [
+            {"channel_id": channel_id},
+            {"version": config.LATEST_VERSION},
+            {"status": config.ACTIVE_STATUS}
+        ]}
+        set_data = {
+            "last_saved": breadcrumb
+        }
+        push_data = {"messages": {"$each": source_conversation["messages"]}}
+        target_conversation = mongo.update_document(config.CONVERSATION_COLLECTION_NAME, match=match, set_data=set_data, push_data=push_data)
+        return target_conversation
+

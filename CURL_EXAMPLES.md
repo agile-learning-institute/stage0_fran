@@ -116,6 +116,12 @@ This will update the version, and set the status to complete, leaving no active 
 curl -X POST http://localhost:8580/api/conversation/DISCORD_01/reset \
      -H "Content-Type: application/json" 
 ```
+#### Load a conversation
+This will copy all the messages from a named conversation (i.e. Echo) into the SOME_CHANNEL conversation
+```sh
+curl -X POST http://localhost:8580/api/conversation/SOME_CHANNEL/load/Echo \
+     -H "Content-Type: application/json" 
+```
 
 ## /api/exercise endpoints
 

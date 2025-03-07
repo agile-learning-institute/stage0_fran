@@ -185,5 +185,38 @@ def create_conversation_agent(agent_name):
        output_schema=conversation_schema
     )
         
+    def load_personality(arguments):
+        try:
+            token = create_token()
+            breadcrumb = create_breadcrumb(token)
+            conversation = ConversationServices.load_named_conversation(
+                channel_id=arguments["channel_id"],
+                named_conversation=arguments["named_conversation"],
+                token=token, breadcrumb=breadcrumb)
+            logger.info(f"load_personality Successful {breadcrumb}")
+            return conversation
+        except Exception as e:
+            logger.warning(f"load_personality Error has occurred {e}")
+            return "error"
+    agent.register_action(
+        action_name="load_personality", 
+        function=load_personality,
+        description="Load the named conversation into the provided channel", 
+        arguments_schema={
+            "type": "object",
+            "properties":{
+                "channel_id": {
+                    "description": "A channel_id",
+                    "type": "string" 
+                },
+                "named_conversation": {
+                    "description": "The named conversation to load",
+                    "type": "string" 
+                }
+            }
+        },
+       output_schema=conversation_schema
+    )
+
     logger.info("Registered conversation agent action handlers.")
     return agent

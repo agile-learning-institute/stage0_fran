@@ -79,5 +79,21 @@ def create_conversation_routes():
             logger.warning(f"reset_conversation processing error occurred {e}")
             return jsonify({"error": "A processing error occurred"}), 500
         
+    # POST /api/conversation/{channel_id}/load/{named_conversation} - Load all the messages from the named conversation to the channel conversation
+    @conversation_routes.route('/<string:channel_id>/load/<string:named_conversation>', methods=['POST'])
+    def load_conversation(channel_id, named_conversation):
+        try:
+            token = create_token()
+            breadcrumb = create_breadcrumb(token)
+            messages = ConversationServices.load_named_conversation(
+                channel_id=channel_id, 
+                named_conversation=named_conversation, 
+                token=token, breadcrumb=breadcrumb)
+            logger.debug(f"load_conversation successful {breadcrumb}")
+            return jsonify(messages), 200
+        except Exception as e:
+            logger.warning(f"load_conversation processing error occurred {e}")
+            return jsonify({"error": "A processing error occurred"}), 500
+
     logger.info("Conversation Flask Routes Registered")
     return conversation_routes

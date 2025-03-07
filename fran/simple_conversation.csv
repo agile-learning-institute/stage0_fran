@@ -1,6 +1,6 @@
 Role, From, To, Text
 user,flatballflyer,group,Hi Fran
-assistant,Fran,group,"Hi flatball flyer, what can I help you with today?"
+assistant,Fran,group,"Hi flatballflyer, what can I help you with today?"
 user,flatballflyer,group,I'd like to know what agents you have access to
 assistant,Fran,tools,/echo/get_agents
 user,echo,tools,{long json message}
@@ -19,4 +19,3 @@ user,flatballflyer,group,"Awesome, let's create a new workshop from the kick-off
 assistant,Fran,tools,"/workshop/add_workshop/{""chain"":""kick-off""}"
 user,workshop,tools,{workshop object}
 assistant,Fran,group,"We've created the workshop, you should take note of the ID: blalbabaldskf"
-,,,

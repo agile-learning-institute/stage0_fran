@@ -157,7 +157,7 @@ class DiscordBot(discord.Client):
             if isinstance(conversation, dict):
                 return f"✅ The conversation {named_conversation} has been loaded into this channel ({channel})"
             else:
-                logger.warning(f'/conversation/reset_conversation/"{channel}" caused an error')
+                logger.warning(f'/conversation/load_personality/"{arguments}" caused an error')
                 return f"❎ Something went wrong, Try again later"
         except Exception as e:
             raise Exception(f"Failed to reset a conversation: {e}")

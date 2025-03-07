@@ -4,8 +4,9 @@
      - [GET /api/config](#config)
      - [GET /api/health](#health)
 - [Echo endpoints](#echo-endpoints)
-     - [GET /api/agents](#get-agents)
-     - [GET /api/agents/agent/action](#get-action)
+     - [GET /api/echo](#get-agents)
+     - [GET /api/echo/agent/action](#get-action)
+     - [POST /api/echo/message/channel_id](#process-a-message)
 - [/api/bot endpoints](#apibot-endpoints)
      - [GET /api/bot](#get-a-list-all-active-of-bots)
      - [GET /api/bot/{id}](#get-a-single-bot)
@@ -52,6 +53,13 @@ curl http://localhost:8580/api/echo
 #### Get Action
 ```sh
 curl http://localhost:8580/api/echo/bot/get_bot
+```
+#### Process a message
+This will send a message through the same processing that happens on Discord and return the reply.
+```sh
+curl -X POST http://localhost:8580/api/echo/message/SOME_CHANNEL \
+     -H "Content-Type: application/json" 
+     -d '{"user": "mike", "text": "This is a new message"}'
 ```
 
 ## /api/bot endpoints 

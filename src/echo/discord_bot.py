@@ -82,6 +82,12 @@ class DiscordBot(discord.Client):
                 logger.debug(f"Resetting Channel Conversation {channel}")
                 response = self.reset_channel_conversation(channel=channel)
                 
+            # Load a named conversation into this Channels conversation when requested
+            elif self.user in message.mentions and "load" in content.lower():
+                name = content.split()[-1] 
+                logger.debug(f"Loading Conversation {name} Conversation {channel}")
+                response = self.load_named_channel(channel=channel, named_conversation=name)
+                
             # Join Channels when requested
             elif self.user in message.mentions and "join" in content.lower():
                 logger.debug(f"Joining Channel {channel}")
@@ -132,6 +138,24 @@ class DiscordBot(discord.Client):
             conversation =  self.handle_command(f'/conversation/reset_conversation/"{channel}"')
             if isinstance(conversation, dict):
                 return f"✅ The conversation in channel: {channel} has been reset."
+            else:
+                logger.warning(f'/conversation/reset_conversation/"{channel}" caused an error')
+                return f"❎ Something went wrong, Try again later"
+        except Exception as e:
+            raise Exception(f"Failed to reset a conversation: {e}")
+
+    def load_named_channel(self, channel=None, named_conversation=None):
+        """
+        Calls the load_personality agent action
+        """
+        try:
+            arguments = json.dumps({
+                "channel_id": channel,
+                "named_conversation": named_conversation
+            }, separators=(',', ':'))
+            conversation =  self.handle_command(f'/conversation/load_personality/{arguments}')
+            if isinstance(conversation, dict):
+                return f"✅ The conversation {named_conversation} has been loaded into this channel ({channel})"
             else:
                 logger.warning(f'/conversation/reset_conversation/"{channel}" caused an error')
                 return f"❎ Something went wrong, Try again later"

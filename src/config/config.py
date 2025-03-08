@@ -24,7 +24,6 @@ class Config:
             self.LOGGING_LEVEL = ''
             self.LATEST_VERSION = ''
             self.ACTIVE_STATUS = ''
-            self.NAMED_STATUS = ''
             self.ARCHIVED_STATUS = ''
             self.PENDING_STATUS = ''
             self.COMPLETED_STATUS = ''
@@ -52,7 +51,6 @@ class Config:
                 "LOGGING_LEVEL": "INFO", 
                 "LATEST_VERSION": "latest",
                 "ACTIVE_STATUS": "active",
-                "NAMED_STATUS": "named",
                 "ARCHIVED_STATUS": "archived",
                 "PENDING_STATUS": "pending",
                 "COMPLETED_STATUS": "complete",

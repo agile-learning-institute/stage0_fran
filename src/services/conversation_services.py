@@ -165,7 +165,7 @@ class ConversationServices:
         match = {"$and": [
             {"channel_id": named_conversation},
             {"version": config.LATEST_VERSION},
-            {"status": config.NAMED_STATUS}
+            {"status": config.ACTIVE_STATUS}
         ]}
         source_conversation_list = mongo.get_documents(config.CONVERSATION_COLLECTION_NAME, match=match)
         if not source_conversation_list or len(source_conversation_list) == 0:

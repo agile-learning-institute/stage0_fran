@@ -155,7 +155,7 @@ class DiscordBot(discord.Client):
             }, separators=(',', ':'))
             conversation =  self.handle_command(f'/conversation/load_personality/{arguments}')
             if isinstance(conversation, dict):
-                return f"✅ The conversation {named_conversation} has been loaded into this channel ({channel})"
+                return f"✅ The {named_conversation} personality has been loaded into this conversation. ({channel})"
             else:
                 logger.warning(f'/conversation/load_personality/"{arguments}" caused an error')
                 return f"❎ Something went wrong, Try again later"

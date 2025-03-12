@@ -3,7 +3,9 @@
   "python.testing.pytestEnabled": false,
   "python.testing.unittestArgs": [
     "-v",
-    "-s", "./src",
-    "-p", "*_test.py"
+    "-s",
+    ".",
+    "-p",
+    "test_*.py"
   ]
 }

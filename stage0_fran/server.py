@@ -23,9 +23,9 @@ echo = Echo("Fran", bot_id=config.FRAN_BOT_ID, model=config.FRAN_MODEL_NAME, cli
 
 # Register Config Agents
 from stage0_py_utils import create_config_agent
-from agents.chain_agent import create_chain_agent
-from agents.exercise_agent import create_exercise_agent
-from agents.workshop_agent import create_workshop_agent
+from stage0_fran.agents.chain_agent import create_chain_agent
+from stage0_fran.agents.exercise_agent import create_exercise_agent
+from stage0_fran.agents.workshop_agent import create_workshop_agent
 
 echo.register_agent(create_config_agent(agent_name="config"))
 echo.register_agent(create_chain_agent(agent_name="chain"))
@@ -48,9 +48,9 @@ from stage0_py_utils import create_bot_routes
 from stage0_py_utils import create_conversation_routes
 from stage0_py_utils import create_echo_routes
 from stage0_py_utils import create_config_routes
-from routes.chain_routes import create_chain_routes
-from routes.exercise_routes import create_exercise_routes
-from routes.workshop_routes import create_workshop_routes
+from stage0_fran.routes.chain_routes import create_chain_routes
+from stage0_fran.routes.exercise_routes import create_exercise_routes
+from stage0_fran.routes.workshop_routes import create_workshop_routes
 
 app.register_blueprint(create_bot_routes(), url_prefix='/api/bot')
 app.register_blueprint(create_conversation_routes(), url_prefix='/api/conversation')

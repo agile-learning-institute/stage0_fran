@@ -329,12 +329,12 @@ tests:
             Content-Type: application/json          
           json:
             role: user
-            content: group:Why is the sky blue?
+            content: From:Mike To:group Why is the sky blue?
           check:
             status: /200/
             jsonpath:
               - role: user
-                content: group:Why is the sky blue?
+                content: From:Mike To:group Why is the sky blue?
       - name: Add another message to NEW_CHANNEL_01
         http:
           url: http://${{env.host}}/api/conversation/NEW_CHANNEL_01/message
@@ -343,13 +343,13 @@ tests:
             Content-Type: application/json          
           json:
             role: assistant
-            content: group:Because it reflects blue light
+            content: From:Fran To:group Because it reflects blue light
           check:
             status: /200/
             jsonpath:
-              - content: group:Why is the sky blue?
+              - content: From:Mike To:group Why is the sky blue?
                 role: user
-              - content: group:Because it reflects blue light
+              - content: From:Fran To:group Because it reflects blue light
                 role: assistant
       - name: Roll Over the NEW_CHANNEL_01
         http:
@@ -361,9 +361,9 @@ tests:
             status: complete
             channel_id: NEW_CHANNEL_01
             messages:
-              - content: group:Why is the sky blue?
+              - content: From:aaaa00000000000000000001 To:group Why is the sky blue?
                 role: user
-              - content: group:Because it reflects blue light
+              - content: From:Mike To:group Because it reflects blue light
                 role: assistant
       - name: Create a mew NEW_CHANNEL_01 with add message, verify it's new
         http:
@@ -373,12 +373,12 @@ tests:
             Content-Type: application/json          
           json:
             role: assistant
-            content: group:A fresh discussion
+            content: From:Mike To:group A fresh discussion
           check:
             status: /200/
             jsonpath:
               - role: assistant
-                content: group:A fresh discussion
+                content: From:Mike To:group A fresh discussion
       - name: Reset NEW_CHANNEL_01 to housekeep
         http:
           url: http://${{env.host}}/api/conversation/NEW_CHANNEL_01/reset

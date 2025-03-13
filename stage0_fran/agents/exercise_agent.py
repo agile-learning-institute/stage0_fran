@@ -14,7 +14,7 @@ def create_exercise_agent(agent_name):
             token = create_echo_token()
             breadcrumb = create_echo_breadcrumb(token)
             exercise = ExerciseServices.get_exercises(token=token)
-            logger.info(f"get_exercises Successful")
+            logger.info(f"get_exercises Successful {str(breadcrumb["correlationId"])}")
             return exercise
         except Exception as e:
             logger.warning(f"A get_exercises Error has occurred: {e}")
@@ -48,7 +48,7 @@ def create_exercise_agent(agent_name):
             token = create_echo_token()
             breadcrumb = create_echo_breadcrumb(token)
             exercise = ExerciseServices.get_exercise(exercise_id=arguments, token=token)
-            logger.info(f"get_exercise Successful")
+            logger.info(f"get_exercise Successful {str(breadcrumb["correlationId"])}")
             return exercise
         except Exception as e:
             logger.warning(f"A get_exercise Error has occurred: {e}")

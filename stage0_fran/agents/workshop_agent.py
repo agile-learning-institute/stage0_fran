@@ -147,7 +147,7 @@ def create_workshop_agent(agent_name):
                 data=arguments["workshop"], 
                 token=token, breadcrumb=breadcrumb
             )
-            logger.info(f"add_workshop Successful")
+            logger.info(f"add_workshop Successful {str(breadcrumb["correlationId"])}")
             return workshop
         except Exception as e:
             logger.warning(f"add_workshop Error has occurred {e}")
@@ -178,7 +178,7 @@ def create_workshop_agent(agent_name):
                 workshop_id=arguments["_id"], 
                 workshop=arguments, 
                 token=token, breadcrumb=breadcrumb)
-            logger.info(f"update_workshop Successful")
+            logger.info(f"update_workshop Successful {str(breadcrumb["correlationId"])}")
             return workshop
         except Exception as e:
             logger.warning(f"update_workshop Error has occurred {e}")
@@ -199,7 +199,7 @@ def create_workshop_agent(agent_name):
                 workshop_id=arguments,
                 token=token, breadcrumb=breadcrumb
             )
-            logger.info(f"start_workshop Successful")
+            logger.info(f"start_workshop Successful {str(breadcrumb["correlationId"])}")
             return workshop
         except Exception as e:
             logger.warning(f"start_workshop Error has occurred {e}")
@@ -225,7 +225,7 @@ def create_workshop_agent(agent_name):
                 workshop_id=arguments,
                 token=token, breadcrumb=breadcrumb
             )
-            logger.info(f"advance_workshop Successful")
+            logger.info(f"advance_workshop Successful {str(breadcrumb["correlationId"])}")
             return workshop
         except Exception as e:
             logger.warning(f"advance_workshop Error has occurred {e}")
@@ -252,7 +252,7 @@ def create_workshop_agent(agent_name):
                 observation=arguments["observation"], 
                 token=token, breadcrumb=breadcrumb
             )
-            logger.info(f"add_observation Successful")
+            logger.info(f"add_observation Successful {str(breadcrumb["correlationId"])}")
             return messages
         except Exception as e:
             logger.warning(f"add_observation Error has occurred {e}")

@@ -1,10 +1,10 @@
 from stage0_py_utils import create_flask_breadcrumb, create_flask_token
 from stage0_fran.services.exercise_services import ExerciseServices
+from flask import Blueprint, Response, jsonify, request
 
 import logging
 logger = logging.getLogger(__name__)
 
-from flask import Blueprint, Response, jsonify, request
 
 # Define the Blueprint for exercise routes
 def create_exercise_routes():
@@ -17,7 +17,7 @@ def create_exercise_routes():
             token = create_flask_token()
             breadcrumb = create_flask_breadcrumb(token)
             exercises = ExerciseServices.get_exercises(token=token)
-            logger.debug(f"get_exercises Success {breadcrumb}")
+            logger.debug(f"get_exercises Success{str(breadcrumb["correlationId"])}")
             return jsonify(exercises), 200
         except Exception as e:
             logger.warning(f"get_exercises Error has occurred: {e}")
@@ -30,7 +30,7 @@ def create_exercise_routes():
             token = create_flask_token()
             breadcrumb = create_flask_breadcrumb(token)
             exercise = ExerciseServices.get_exercise(exercise_id=id, token=token)
-            logger.debug(f"get_Exercise Success {breadcrumb}")
+            logger.debug(f"get_Exercise Success{str(breadcrumb["correlationId"])}")
             return jsonify(exercise), 200
         except Exception as e:
             logger.warning(f"get_Exercise Error has occurred: {e}")

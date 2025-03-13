@@ -1,33 +1,85 @@
 # stage0_fran
 
-This repository contains the API and Discord Chatbot that supports the user interface for creating, conducting, and recording Design Thinking workshops for stage0. This API is also served as a chat agent through a discord chat-bot framework. 
+This repository contains Fran the Facilitator, an API and Echo Chatbot that supports creating, conducting, and recording Design Thinking workshops for stage0. 
 
-See [The OpenAPI](./docs/index.html) doc for information on the API and Data Structures Used. 
+This system uses the [Flask](https://flask.palletsprojects.com/en/stable/) API framework, and the [Stage0 Echo](https://github.com/agile-learning-institute/stage0_py_utils/blob/main/ECHO.md) discord chat agent framework.
 
-This system uses the [Flask](https://flask.palletsprojects.com/en/stable/) API framework, and the [Echo](./ECHO.md) discord chat agent framework.
+# Contributing
 
-# Separation of Concerns
+## Prerequisites
 
-Folder structure for source code
+- [Stage0 Developer Edition]() #TODO for now Docker
+- [Python](https://www.python.org/downloads/)
+- [Pipenv](https://pipenv.pypa.io/en/latest/installation.html)
+
+### Optional
+
+- [Mongo Compass](https://www.mongodb.com/try/download/compass) - if you want a way to look into the database
+
+## Folder structure for source code
+
+```text
+/stage0_fran        Repo Root
+│── 📁 docs           OpenAPI Documentation
+│── 📁 fran_model     Fran LLM Model & Prompts
+│── 📁 stage0_fran    The Fran server
+│   ├── 📁 agents         ECHO Agents
+│   ├── 📁 routes         Flask routes
+│   ├── 📁 services       Business Services
+│── 📁 tests          Unittest for stage0_fran
+│   ├── 📁 agents         Test for Agents
+│   ├── 📁 routes         Test for Routes
+│   ├── 📁 services       Test for Services
+│   ├── stepci.yaml       API Black Box testing
+│── README.md
 ```
-/src
-| /agents         ECHO Agent Implementations
-| /config         Implements, global configuration management
-| /echo           Implements the Echo chat agent framework
-| /echo_utils     Stage0 Echo helpers
-| /flask_utils    Stage0 Flask helpers
-| /mongo_utils    Simple Mongo IO Wrapper
-| /routes         Flask route implementations
-| /services       Business Service implementations 
-                   (support routes and agents)
+
+## Install Dependencies
+
+```bash
+pipenv install
 ```
 
-Note: /echo and bot & conversation agents/routes/services will be extracted to an Echo package. The config, config agents/routes, and *_utils folders will be extracted to stage0_api_utilities package. This will leave only agents, routes, services in this repo.
+## Run Unit Testing
 
-# Supported pipenv commands
-- ``pipenv run local`` run the server locally in dev mode
-- ``pipenv run start`` restart the backing database and run locally *TODO
-- ``pipenv run test`` run unittest testing
-- ``pipenv run stepci`` run stepci testing
-- ``pipenv run build`` build container locally 
-- ``pipenv run container`` build and run container
+```bash
+pipenv run test
+```
+NOTE: This excludes the tests with a backing service i.e. testbacking_mentorhub_mongo_io.py which can be run in vscode with the mongodb backing database running. 
+
+## {re}start the containerized database and run the API locally
+# NOTE: Not Functional till stage0 developer edition is created
+```bash
+pipenv run start
+```
+
+## Run the API locally (assumes database is already running)
+
+```bash
+pipenv run local
+```
+
+## Build and run the server Container
+This will build the new container, and {re}start the mongodb and API container together.
+NOTE: partially functional until stage0 developer edition is there
+```bash
+pipenv run container
+```
+
+## Run StepCI end-2-end testing
+NOTE: Assumes the API is running at localhost:8580
+```bash
+pipenv run stepci
+```
+
+## Evaluate a set of Fran Models and Prompts
+
+```bash
+pipenv run evaluate
+```
+
+# API Testing with CURL
+
+There are quite a few endpoints, see [CURL_EXAMPLES](./CURL_EXAMPLES.md) for all of them.
+
+The [Dockerfile](./Dockerfile) uses a 2-stage build, and supports both amd64 and arm64 architectures. 

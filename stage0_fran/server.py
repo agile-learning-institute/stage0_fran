@@ -10,8 +10,12 @@ mongo = MongoIO.get_instance()
 
 # Initialize Logging
 import logging
-logging.basicConfig(level=config.LOGGING_LEVEL)
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=config.LOGGING_LEVEL)
+logging.getLogger("stage0_py_utils").setLevel(level=config.LOGGING_LEVEL)  # Manually set logging for stage0_py_utils
+logging.getLogger("pymongo").setLevel(logging.WARNING)  # suppress `pymongo` logs
+logging.getLogger("httpcore").setLevel(logging.WARNING)  # suppress `httpcore` logs
+logging.getLogger("httpx").setLevel(logging.WARNING)  # suppress `httpx` logs
 logger.info(f"============= Starting Server Initialization, Logging at {config.LOGGING_LEVEL}===============")
 
 # Initialize Echo Discord Bot

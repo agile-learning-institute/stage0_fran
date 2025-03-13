@@ -38,6 +38,6 @@ while IFS=, read -r role from to text; do
          -H "Content-Type: application/json" \
          -d "$JSON_DATA" > /dev/null
 
-    echo "$role sent message as $from to $to message $text"
+    # echo "$role sent message as $from to $to message $text"
 
 done < <(tail -n +2 "$CSV_FILE")  # Skip header row

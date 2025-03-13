@@ -87,7 +87,7 @@ def create_workshop_agent(agent_name):
             token = create_echo_token()
             breadcrumb = create_echo_breadcrumb(token)
             workshops = WorkshopServices.get_workshops(query=arguments, token=token)
-            logger.info(f"Get workshops Success {breadcrumb}")
+            logger.info(f"Get workshops Success")
             return workshops
         except Exception as e:
             logger.warning(f"Get workshops Error has occurred: {e}")
@@ -122,7 +122,7 @@ def create_workshop_agent(agent_name):
             token = create_echo_token()
             breadcrumb = create_echo_breadcrumb(token)
             workshop = WorkshopServices.get_workshop(workshop_id=arguments, token=token)
-            logger.info(f"Get workshop Success {breadcrumb}")
+            logger.info(f"Get workshop Success")
             return workshop
         except Exception as e:
             logger.warning(f"Get workshop Error has occurred: {e}")
@@ -147,7 +147,7 @@ def create_workshop_agent(agent_name):
                 data=arguments["workshop"], 
                 token=token, breadcrumb=breadcrumb
             )
-            logger.info(f"add_workshop Successful {breadcrumb}")
+            logger.info(f"add_workshop Successful")
             return workshop
         except Exception as e:
             logger.warning(f"add_workshop Error has occurred {e}")
@@ -178,7 +178,7 @@ def create_workshop_agent(agent_name):
                 workshop_id=arguments["_id"], 
                 workshop=arguments, 
                 token=token, breadcrumb=breadcrumb)
-            logger.info(f"update_workshop Successful {breadcrumb}")
+            logger.info(f"update_workshop Successful")
             return workshop
         except Exception as e:
             logger.warning(f"update_workshop Error has occurred {e}")
@@ -199,7 +199,7 @@ def create_workshop_agent(agent_name):
                 workshop_id=arguments,
                 token=token, breadcrumb=breadcrumb
             )
-            logger.info(f"start_workshop Successful {breadcrumb}")
+            logger.info(f"start_workshop Successful")
             return workshop
         except Exception as e:
             logger.warning(f"start_workshop Error has occurred {e}")
@@ -225,7 +225,7 @@ def create_workshop_agent(agent_name):
                 workshop_id=arguments,
                 token=token, breadcrumb=breadcrumb
             )
-            logger.info(f"advance_workshop Successful {breadcrumb}")
+            logger.info(f"advance_workshop Successful")
             return workshop
         except Exception as e:
             logger.warning(f"advance_workshop Error has occurred {e}")
@@ -252,7 +252,7 @@ def create_workshop_agent(agent_name):
                 observation=arguments["observation"], 
                 token=token, breadcrumb=breadcrumb
             )
-            logger.info(f"add_observation Successful {breadcrumb}")
+            logger.info(f"add_observation Successful")
             return messages
         except Exception as e:
             logger.warning(f"add_observation Error has occurred {e}")

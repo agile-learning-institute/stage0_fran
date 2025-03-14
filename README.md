@@ -66,6 +66,12 @@ NOTE: partially functional until stage0 developer edition is there
 pipenv run container
 ```
 
+## Initialize personalities from their Profiles
+NOTE: Assumes the API is running at localhost:8580
+```bash
+pipenv run initialize
+```
+
 ## Run StepCI end-2-end testing
 NOTE: Assumes the API is running at localhost:8580
 ```bash

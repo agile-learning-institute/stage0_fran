@@ -1,7 +1,7 @@
 #!/bin/bash
 
-./start_conversation.sh echo ./prompts/echo.csv
-./start_conversation.sh exercise ./prompts/exercise.csv
-./start_conversation.sh fran_base ./prompts/fran_base.csv
-./start_conversation.sh fran ./prompts/fran.csv
-./start_conversation.sh tools ./prompts/tools.csv
+./fran_model/initialize_conversation.sh echo ./fran_model/prompts/echo.csv
+./fran_model/initialize_conversation.sh exercise ./fran_model/prompts/exercise.csv
+./fran_model/initialize_conversation.sh fran_base ./fran_model/prompts/fran_base.csv
+./fran_model/initialize_conversation.sh fran ./fran_model/prompts/fran.csv
+./fran_model/initialize_conversation.sh tools ./fran_model/prompts/tools.csv

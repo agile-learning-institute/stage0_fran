@@ -14,7 +14,7 @@ def create_chain_agent(agent_name):
             token = create_echo_token()
             breadcrumb = create_echo_breadcrumb(token)
             chain = ChainServices.get_chains(token=token)
-            logger.info(f"get_chains Successful  {str(breadcrumb["correlationId"])}")
+            logger.info(f"get_chains Successful  {str(breadcrumb["atTime"])}, {breadcrumb["correlationId"]}")
             return chain
         except Exception as e:
             logger.warning(f"A get_chains Error has occurred: {e}")
@@ -23,7 +23,9 @@ def create_chain_agent(agent_name):
         action_name = "get_chains", 
         function = get_chains,
         description = "Get a list of chains", 
-        arguments_schema = {"None"},
+        arguments_schema = {
+            "description": "No arguments required"
+        },
         output_schema = {
             "title": "Chains",
             "description": "Stage0 Exercise Chains",
@@ -46,7 +48,7 @@ def create_chain_agent(agent_name):
             token = create_echo_token()
             breadcrumb = create_echo_breadcrumb(token)
             chain = ChainServices.get_chain(chain_id=arguments, token=token)
-            logger.info(f"get_chain Successful  {str(breadcrumb["correlationId"])}")
+            logger.info(f"get_chain Successful  {str(breadcrumb["atTime"])}, {breadcrumb["correlationId"]}")
             return chain
         except Exception as e:
             logger.warning(f"A get_chain Error has occurred: {e}")

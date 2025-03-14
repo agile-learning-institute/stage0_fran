@@ -17,7 +17,7 @@ def create_chain_routes():
             token = create_flask_token()
             breadcrumb = create_flask_breadcrumb(token)
             chains = ChainServices.get_chains(token=token)
-            logger.debug(f"get_chains Success {str(breadcrumb["correlationId"])}")
+            logger.info(f"get_chains Success {str(breadcrumb["atTime"])}, {breadcrumb["correlationId"]}")
             return jsonify(chains), 200
         except Exception as e:
             logger.warning(f"get_chains Error has occurred: {e}")
@@ -30,7 +30,7 @@ def create_chain_routes():
             token = create_flask_token()
             breadcrumb = create_flask_breadcrumb(token)
             chain = ChainServices.get_chain(chain_id=id, token=token)
-            logger.debug(f"get_chain Success{str(breadcrumb["correlationId"])}")
+            logger.info(f"get_chain Success {str(breadcrumb["atTime"])}, {breadcrumb["correlationId"]}")
             return jsonify(chain), 200
         except Exception as e:
             logger.warning(f"get_chain Error has occurred: {e}")

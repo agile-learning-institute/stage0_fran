@@ -17,7 +17,7 @@ def create_exercise_routes():
             token = create_flask_token()
             breadcrumb = create_flask_breadcrumb(token)
             exercises = ExerciseServices.get_exercises(token=token)
-            logger.debug(f"get_exercises Success{str(breadcrumb["correlationId"])}")
+            logger.debug(f"get_exercises Success {str(breadcrumb["atTime"])}, {breadcrumb["correlationId"]}")
             return jsonify(exercises), 200
         except Exception as e:
             logger.warning(f"get_exercises Error has occurred: {e}")
@@ -30,7 +30,7 @@ def create_exercise_routes():
             token = create_flask_token()
             breadcrumb = create_flask_breadcrumb(token)
             exercise = ExerciseServices.get_exercise(exercise_id=id, token=token)
-            logger.debug(f"get_Exercise Success{str(breadcrumb["correlationId"])}")
+            logger.debug(f"get_Exercise Success {str(breadcrumb["atTime"])}, {breadcrumb["correlationId"]}")
             return jsonify(exercise), 200
         except Exception as e:
             logger.warning(f"get_Exercise Error has occurred: {e}")

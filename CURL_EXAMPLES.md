@@ -23,6 +23,7 @@
      - [POST /api/conversation/{channel_id}/message](#add-a-message-to-a-conversation)
      - [POST /api/conversation/{channel_id}/reset](#reset-a-conversation)
      - [POST /api/conversation/{channel_id}/load/{from_id}](#load-a-conversation)
+     - [POST /api/conversation/{channel_id}/initialize](#initialize-a-conversation-from-a-csv-file)
 - [/api/exercise endpoints](#apiexercise-endpoints)
      - [GET /api/exercise](#get-a-list-of-all-active-exercises)
      - [GET /api/exercise/{id}](#get-a-single-exercise)
@@ -131,6 +132,14 @@ This will copy all the messages from a named conversation (i.e. Echo) into the S
 ```sh
 curl -X POST http://localhost:8580/api/conversation/SOME_CHANNEL/load/Echo \
      -H "Content-Type: application/json" 
+```
+
+#### Initialize a conversation from a CSV file.
+This will reset the conversation an then load all the rows from a csv file into the new conversation.
+```sh
+curl -X POST "http://localhost:8580/api/conversation/SOME_CHANNEL/initialize" \
+     -H "Content-Type: text/csv" \
+     --data-binary "@./fran_model/prompts/echo.csv"
 ```
 
 ## /api/exercise endpoints

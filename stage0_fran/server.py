@@ -10,23 +10,8 @@ mongo = MongoIO.get_instance()
 
 # Initialize Logging
 import logging
-
-# Reset logging handlers
-for handler in logging.root.handlers[:]:
-    logging.root.removeHandler(handler)
-
-# Configure logging
-logging.basicConfig(
-    level=config.LOGGING_LEVEL,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S"
-)
-
-# Suppress http logging
-logging.getLogger("httpcore").setLevel(logging.WARNING)  
-logging.getLogger("httpx").setLevel(logging.WARNING)  
 logger = logging.getLogger(__name__)
-logger.info(f"============= Starting Server Initialization, Logging at {config.LOGGING_LEVEL}===============")
+logger.info(f"============= Starting Server Initialization ===============")
 
 # Initialize Echo Discord Bot
 from stage0_py_utils import Echo
@@ -45,6 +30,7 @@ echo.register_agent(create_config_agent(agent_name="config"))
 echo.register_agent(create_chain_agent(agent_name="chain"))
 echo.register_agent(create_exercise_agent(agent_name="exercise"))
 echo.register_agent(create_workshop_agent(agent_name="workshop"))
+logger.info(f"============= Agents Initialized ===============")
 
 # Initialize Flask App
 from flask import Flask
@@ -73,8 +59,9 @@ app.register_blueprint(create_config_routes(), url_prefix='/api/config')
 app.register_blueprint(create_chain_routes(), url_prefix='/api/chain')
 app.register_blueprint(create_exercise_routes(), url_prefix='/api/exercise')
 app.register_blueprint(create_workshop_routes(), url_prefix='/api/workshop')
+logger.info(f"============= Routes Registered ===============")
 
-# Flask server management
+# Flask server run's in it's own thread
 server = make_server("0.0.0.0", config.FRAN_API_PORT, app)
 flask_thread = threading.Thread(target=server.serve_forever)
 

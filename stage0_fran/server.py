@@ -10,7 +10,9 @@ mongo = MongoIO.get_instance()
 
 # Initialize Logging
 import logging
+logging.getLogger("werkzeug").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
+
 logger.info(f"============= Starting Server Initialization ===============")
 
 # Initialize Echo Discord Bot

@@ -21,7 +21,8 @@ class TestExerciseAgent(unittest.TestCase):
        
         # Mock return values
         mock_create_echo_token.return_value = "fake_token"
-        mock_create_echo_breadcrumb.return_value = "fake_breadcrumb"
+        fake_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_echo_breadcrumb.return_value = fake_breadcrumb
         mock_get_exercises.return_value = "exercises_list"
         
         # Call function
@@ -42,7 +43,8 @@ class TestExerciseAgent(unittest.TestCase):
         
         # Mock return values
         mock_create_echo_token.return_value = "fake_token"
-        mock_create_echo_breadcrumb.return_value = "fake_breadcrumb"
+        fake_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_echo_breadcrumb.return_value = fake_breadcrumb
         mock_get_exercises.side_effect = Exception("Test Exception")
         
         # Call function
@@ -63,7 +65,8 @@ class TestExerciseAgent(unittest.TestCase):
        
         # Mock return values
         mock_create_echo_token.return_value = "fake_token"
-        mock_create_echo_breadcrumb.return_value = "fake_breadcrumb"
+        fake_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_echo_breadcrumb.return_value = fake_breadcrumb
         mock_get_exercise.return_value = "a_exercise"
         
         # Call function
@@ -84,7 +87,8 @@ class TestExerciseAgent(unittest.TestCase):
         
         # Mock return values
         mock_create_echo_token.return_value = "fake_token"
-        mock_create_echo_breadcrumb.return_value = "fake_breadcrumb"
+        fake_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_echo_breadcrumb.return_value = fake_breadcrumb
         mock_get_exercise.side_effect = Exception("Test Exception")
         
         # Call function

@@ -18,7 +18,7 @@ class TestExerciseRoutes(unittest.TestCase):
         # Arrange
         mock_token = {"user_id": "mock_user"}
         mock_create_flask_token.return_value = mock_token
-        mock_breadcrumb = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
         mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_exercises = [{"id": "exercise1", "name": "Test Exercise"}]
         mock_get_exercises.return_value = mock_exercises
@@ -39,7 +39,8 @@ class TestExerciseRoutes(unittest.TestCase):
     def test_get_exercises_failure(self, mock_get_exercises, mock_create_flask_breadcrumb, mock_create_flask_token):
         """Test GET /api/exercise when an exception is raised."""
         mock_create_flask_token.return_value = {"user_id": "mock_user"}
-        mock_create_flask_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_get_exercises.side_effect = Exception("Database error")
 
         response = self.client.get('/api/exercise')
@@ -55,7 +56,7 @@ class TestExerciseRoutes(unittest.TestCase):
         # Arrange
         mock_token = {"user_id": "mock_user"}
         mock_create_flask_token.return_value = mock_token
-        mock_breadcrumb = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
         mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_exercise = {"id": "exercise1", "name": "Test Exercise"}
         mock_get_exercise.return_value = mock_exercise
@@ -76,7 +77,8 @@ class TestExerciseRoutes(unittest.TestCase):
     def test_get_exercise_failure(self, mock_get_exercise, mock_create_flask_breadcrumb, mock_create_flask_token):
         """Test GET /api/exercise/{id} when an exception is raised."""
         mock_create_flask_token.return_value = {"user_id": "mock_user"}
-        mock_create_flask_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_get_exercise.side_effect = Exception("Database error")
 
         response = self.client.get('/api/exercise/exercise1')

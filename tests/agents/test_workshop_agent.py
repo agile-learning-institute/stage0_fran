@@ -26,7 +26,8 @@ class TestWorkshopAgent(unittest.TestCase):
        
         # Mock return values
         mock_create_echo_token.return_value = "fake_token"
-        mock_create_echo_breadcrumb.return_value = "fake_breadcrumb"
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_echo_breadcrumb.return_value = mock_breadcrumb
         mock_get_workshops.return_value = "workshops_list"
         
         # Call function
@@ -47,7 +48,8 @@ class TestWorkshopAgent(unittest.TestCase):
         
         # Mock return values
         mock_create_echo_token.return_value = "fake_token"
-        mock_create_echo_breadcrumb.return_value = "fake_breadcrumb"
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_echo_breadcrumb.return_value = mock_breadcrumb
         mock_get_workshops.side_effect = Exception("Test Exception")
         
         # Call function
@@ -68,7 +70,8 @@ class TestWorkshopAgent(unittest.TestCase):
        
         # Mock return values
         mock_create_echo_token.return_value = "fake_token"
-        mock_create_echo_breadcrumb.return_value = "fake_breadcrumb"
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_echo_breadcrumb.return_value = mock_breadcrumb
         mock_get_workshop.return_value = "a_workshop"
         
         # Call function
@@ -89,7 +92,8 @@ class TestWorkshopAgent(unittest.TestCase):
         
         # Mock return values
         mock_create_echo_token.return_value = "fake_token"
-        mock_create_echo_breadcrumb.return_value = "fake_breadcrumb"
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_echo_breadcrumb.return_value = mock_breadcrumb
         mock_get_workshop.side_effect = Exception("Test Exception")
         
         # Call function
@@ -110,7 +114,8 @@ class TestWorkshopAgent(unittest.TestCase):
        
         # Mock return values
         mock_create_echo_token.return_value = "fake_token"
-        mock_create_echo_breadcrumb.return_value = "fake_breadcrumb"
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_echo_breadcrumb.return_value = mock_breadcrumb
         mock_update_workshop.return_value = "a_workshop"
         
         # Call function
@@ -123,7 +128,7 @@ class TestWorkshopAgent(unittest.TestCase):
         # Assertions
         mock_create_echo_token.assert_called_once()
         mock_create_echo_breadcrumb.assert_called_once_with("fake_token")
-        mock_update_workshop.assert_called_once_with(workshop_id=arguments["_id"], workshop=arguments, token="fake_token", breadcrumb="fake_breadcrumb")
+        mock_update_workshop.assert_called_once_with(workshop_id=arguments["_id"], workshop=arguments, token="fake_token", breadcrumb=mock_breadcrumb)
         self.assertEqual(result, "a_workshop")
     
     @patch("stage0_fran.agents.workshop_agent.create_echo_token")  
@@ -134,7 +139,8 @@ class TestWorkshopAgent(unittest.TestCase):
        
         # Mock return values
         mock_create_echo_token.return_value = "fake_token"
-        mock_create_echo_breadcrumb.return_value = "fake_breadcrumb"
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_echo_breadcrumb.return_value = mock_breadcrumb
         mock_update_workshop.side_effect = Exception("Test Exception")
         
         # Call function
@@ -147,7 +153,7 @@ class TestWorkshopAgent(unittest.TestCase):
         # Assertions
         mock_create_echo_token.assert_called_once()
         mock_create_echo_breadcrumb.assert_called_once_with("fake_token")
-        mock_update_workshop.assert_called_once_with(workshop_id=arguments["_id"], workshop=arguments, token="fake_token", breadcrumb="fake_breadcrumb")
+        mock_update_workshop.assert_called_once_with(workshop_id=arguments["_id"], workshop=arguments, token="fake_token", breadcrumb=mock_breadcrumb)
         self.assertEqual(result, "error")
                 
     @patch("stage0_fran.agents.workshop_agent.create_echo_token")  
@@ -158,7 +164,8 @@ class TestWorkshopAgent(unittest.TestCase):
        
         # Mock return values
         mock_create_echo_token.return_value = "fake_token"
-        mock_create_echo_breadcrumb.return_value = "fake_breadcrumb"
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_echo_breadcrumb.return_value = mock_breadcrumb
         mock_start_workshop.return_value = "a Workshop"
         
         # Call function
@@ -168,7 +175,7 @@ class TestWorkshopAgent(unittest.TestCase):
         # Assertions
         mock_create_echo_token.assert_called_once()
         mock_create_echo_breadcrumb.assert_called_once_with("fake_token")
-        mock_start_workshop.assert_called_once_with(workshop_id=arguments, token="fake_token", breadcrumb="fake_breadcrumb")
+        mock_start_workshop.assert_called_once_with(workshop_id=arguments, token="fake_token", breadcrumb=mock_breadcrumb)
         self.assertEqual(result, "a Workshop")
     
     @patch("stage0_fran.agents.workshop_agent.create_echo_token")  
@@ -179,7 +186,8 @@ class TestWorkshopAgent(unittest.TestCase):
        
         # Mock return values
         mock_create_echo_token.return_value = "fake_token"
-        mock_create_echo_breadcrumb.return_value = "fake_breadcrumb"
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_echo_breadcrumb.return_value = mock_breadcrumb
         mock_start_workshop.side_effect = Exception("Test Exception")
         
         # Call function
@@ -189,7 +197,7 @@ class TestWorkshopAgent(unittest.TestCase):
         # Assertions
         mock_create_echo_token.assert_called_once()
         mock_create_echo_breadcrumb.assert_called_once_with("fake_token")
-        mock_start_workshop.assert_called_once_with(workshop_id=arguments, token="fake_token", breadcrumb="fake_breadcrumb")
+        mock_start_workshop.assert_called_once_with(workshop_id=arguments, token="fake_token", breadcrumb=mock_breadcrumb)
         self.assertEqual(result, "error")
                             
     @patch("stage0_fran.agents.workshop_agent.create_echo_token")  
@@ -200,7 +208,8 @@ class TestWorkshopAgent(unittest.TestCase):
        
         # Mock return values
         mock_create_echo_token.return_value = "fake_token"
-        mock_create_echo_breadcrumb.return_value = "fake_breadcrumb"
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_echo_breadcrumb.return_value = mock_breadcrumb
         mock_advance_workshop.return_value = "a Workshop"
         
         # Call function
@@ -210,7 +219,7 @@ class TestWorkshopAgent(unittest.TestCase):
         # Assertions
         mock_create_echo_token.assert_called_once()
         mock_create_echo_breadcrumb.assert_called_once_with("fake_token")
-        mock_advance_workshop.assert_called_once_with(workshop_id=arguments, token="fake_token", breadcrumb="fake_breadcrumb")
+        mock_advance_workshop.assert_called_once_with(workshop_id=arguments, token="fake_token", breadcrumb=mock_breadcrumb)
         self.assertEqual(result, "a Workshop")
     
     @patch("stage0_fran.agents.workshop_agent.create_echo_token")  
@@ -221,7 +230,8 @@ class TestWorkshopAgent(unittest.TestCase):
        
         # Mock return values
         mock_create_echo_token.return_value = "fake_token"
-        mock_create_echo_breadcrumb.return_value = "fake_breadcrumb"
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_echo_breadcrumb.return_value = mock_breadcrumb
         mock_advance_workshop.side_effect = Exception("Test Exception")
         
         # Call function
@@ -231,7 +241,7 @@ class TestWorkshopAgent(unittest.TestCase):
         # Assertions
         mock_create_echo_token.assert_called_once()
         mock_create_echo_breadcrumb.assert_called_once_with("fake_token")
-        mock_advance_workshop.assert_called_once_with(workshop_id=arguments, token="fake_token", breadcrumb="fake_breadcrumb")
+        mock_advance_workshop.assert_called_once_with(workshop_id=arguments, token="fake_token", breadcrumb=mock_breadcrumb)
         self.assertEqual(result, "error")
                             
     @patch("stage0_fran.agents.workshop_agent.create_echo_token")  
@@ -242,7 +252,8 @@ class TestWorkshopAgent(unittest.TestCase):
        
         # Mock return values
         mock_create_echo_token.return_value = "fake_token"
-        mock_create_echo_breadcrumb.return_value = "fake_breadcrumb"
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_echo_breadcrumb.return_value = mock_breadcrumb
         mock_add_observation.return_value = "a Workshop"
         
         # Call function
@@ -255,7 +266,7 @@ class TestWorkshopAgent(unittest.TestCase):
         # Assertions
         mock_create_echo_token.assert_called_once()
         mock_create_echo_breadcrumb.assert_called_once_with("fake_token")
-        mock_add_observation.assert_called_once_with(workshop_id=arguments["workshop_id"], observation=arguments["observation"], token="fake_token", breadcrumb="fake_breadcrumb")
+        mock_add_observation.assert_called_once_with(workshop_id=arguments["workshop_id"], observation=arguments["observation"], token="fake_token", breadcrumb=mock_breadcrumb)
         self.assertEqual(result, "a Workshop")
     
     @patch("stage0_fran.agents.workshop_agent.create_echo_token")  
@@ -266,7 +277,8 @@ class TestWorkshopAgent(unittest.TestCase):
        
         # Mock return values
         mock_create_echo_token.return_value = "fake_token"
-        mock_create_echo_breadcrumb.return_value = "fake_breadcrumb"
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_echo_breadcrumb.return_value = mock_breadcrumb
         mock_add_observation.side_effect = Exception("Test Exception")
         
         # Call function
@@ -279,7 +291,7 @@ class TestWorkshopAgent(unittest.TestCase):
         # Assertions
         mock_create_echo_token.assert_called_once()
         mock_create_echo_breadcrumb.assert_called_once_with("fake_token")
-        mock_add_observation.assert_called_once_with(workshop_id=arguments["workshop_id"], observation=arguments["observation"], token="fake_token", breadcrumb="fake_breadcrumb")
+        mock_add_observation.assert_called_once_with(workshop_id=arguments["workshop_id"], observation=arguments["observation"], token="fake_token", breadcrumb=mock_breadcrumb)
         self.assertEqual(result, "error")
                                 
 if __name__ == "__main__":

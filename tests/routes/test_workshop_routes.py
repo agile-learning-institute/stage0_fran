@@ -18,7 +18,7 @@ class TestWorkshopRoutes(unittest.TestCase):
         # Arrange
         mock_token = {"user_id": "mock_user"}
         mock_create_flask_token.return_value = mock_token
-        mock_breadcrumb = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
         mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_workshops = [{"id": "workshop1", "name": "Test Workshop"}]
         mock_get_workshops.return_value = mock_workshops
@@ -39,7 +39,8 @@ class TestWorkshopRoutes(unittest.TestCase):
     def test_get_workshops_failure(self, mock_get_workshops, mock_create_flask_breadcrumb, mock_create_flask_token):
         """Test GET /api/workshop when an exception is raised."""
         mock_create_flask_token.return_value = {"user_id": "mock_user"}
-        mock_create_flask_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_get_workshops.side_effect = Exception("Database error")
 
         response = self.client.get('/api/workshop')
@@ -55,7 +56,7 @@ class TestWorkshopRoutes(unittest.TestCase):
         # Arrange
         mock_token = {"user_id": "mock_user"}
         mock_create_flask_token.return_value = mock_token
-        mock_breadcrumb = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
         mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_workshop = {"id": "workshop1", "name": "Test Workshop"}
         mock_get_workshop.return_value = mock_workshop
@@ -76,7 +77,8 @@ class TestWorkshopRoutes(unittest.TestCase):
     def test_get_workshop_failure(self, mock_get_workshop, mock_create_flask_breadcrumb, mock_create_flask_token):
         """Test GET /api/workshop/{id} when an exception is raised."""
         mock_create_flask_token.return_value = {"user_id": "mock_user"}
-        mock_create_flask_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_get_workshop.side_effect = Exception("Database error")
 
         response = self.client.get('/api/workshop/workshop1')
@@ -92,7 +94,7 @@ class TestWorkshopRoutes(unittest.TestCase):
         # Arrange
         mock_token = {"user_id": "mock_user"}
         mock_create_flask_token.return_value = mock_token
-        mock_breadcrumb = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
         mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_workshop = {"id": "workshop1", "name": "Test Workshop"}
         mock_add_workshop.return_value = mock_workshop
@@ -114,7 +116,8 @@ class TestWorkshopRoutes(unittest.TestCase):
     def test_add_workshop_failure(self, mock_add_workshop, mock_create_flask_breadcrumb, mock_create_flask_token):
         """Test POST /api/workshop when an exception is raised."""
         mock_create_flask_token.return_value = {"user_id": "mock_user"}
-        mock_create_flask_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_add_workshop.side_effect = Exception("Database error")
         new_workshop = {"foo":"bar"}
 
@@ -131,7 +134,7 @@ class TestWorkshopRoutes(unittest.TestCase):
         # Arrange
         mock_token = {"user_id": "mock_user"}
         mock_create_flask_token.return_value = mock_token
-        mock_breadcrumb = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
         mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_workshop = {"id": "workshop1", "foo": "bar"}
         mock_update_workshop.return_value = mock_workshop
@@ -153,7 +156,8 @@ class TestWorkshopRoutes(unittest.TestCase):
     def test_update_workshop_failure(self, mock_update_workshop, mock_create_flask_breadcrumb, mock_create_flask_token):
         """Test PATCH /api/workshop/{id} when an exception is raised."""
         mock_create_flask_token.return_value = {"user_id": "mock_user"}
-        mock_create_flask_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_update_workshop.side_effect = Exception("Database error")
 
         response = self.client.patch('/api/workshop/workshop1', json={})
@@ -169,7 +173,7 @@ class TestWorkshopRoutes(unittest.TestCase):
         # Arrange
         mock_token = {"user_id": "mock_user"}
         mock_create_flask_token.return_value = mock_token
-        mock_breadcrumb = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
         mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_workshop = {"foo":"bar"}
         mock_start_workshop.return_value = mock_workshop
@@ -190,7 +194,8 @@ class TestWorkshopRoutes(unittest.TestCase):
     def test_start_workshop_failure(self, mock_start_workshop, mock_create_flask_breadcrumb, mock_create_flask_token):
         """Test POST /api/workshop/{id}/start when an exception is raised."""
         mock_create_flask_token.return_value = {"user_id": "mock_user"}
-        mock_create_flask_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_start_workshop.side_effect = Exception("Database error")
 
         response = self.client.post('/api/workshop/workshop1/start')
@@ -206,7 +211,7 @@ class TestWorkshopRoutes(unittest.TestCase):
         # Arrange
         mock_token = {"user_id": "mock_user"}
         mock_create_flask_token.return_value = mock_token
-        mock_breadcrumb = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
         mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_workshop = {"foo":"bar"}
         mock_advance_workshop.return_value = mock_workshop
@@ -227,7 +232,8 @@ class TestWorkshopRoutes(unittest.TestCase):
     def test_advance_workshop_failure(self, mock_advance_workshop, mock_create_flask_breadcrumb, mock_create_flask_token):
         """Test POST /api/workshop/{id}/start when an exception is raised."""
         mock_create_flask_token.return_value = {"user_id": "mock_user"}
-        mock_create_flask_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_advance_workshop.side_effect = Exception("Database error")
 
         response = self.client.post('/api/workshop/workshop1/next')
@@ -243,7 +249,7 @@ class TestWorkshopRoutes(unittest.TestCase):
         # Arrange
         mock_token = {"user_id": "mock_user"}
         mock_create_flask_token.return_value = mock_token
-        mock_breadcrumb = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
         mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_observation = {"foo":"bar"}
         mock_workshop = {"id": "workshop1", "foo": "bar"}
@@ -265,7 +271,8 @@ class TestWorkshopRoutes(unittest.TestCase):
     def test_add_observation_failure(self, mock_add_observation, mock_create_flask_breadcrumb, mock_create_flask_token):
         """Test POST /api/workshop/{id}/observation when an exception is raised."""
         mock_create_flask_token.return_value = {"user_id": "mock_user"}
-        mock_create_flask_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
+        mock_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_flask_breadcrumb.return_value = mock_breadcrumb
         mock_add_observation.side_effect = Exception("Database error")
 
         response = self.client.post('/api/workshop/workshop1/observation')

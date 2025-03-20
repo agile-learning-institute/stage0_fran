@@ -18,8 +18,8 @@ class TestChainRoutes(unittest.TestCase):
         # Arrange
         mock_token = {"user_id": "mock_user"}
         mock_create_flask_token.return_value = mock_token
-        mock_breadcrumb = {"breadcrumb": "mock_breadcrumb"}
-        mock_create_flask_breadcrumb.return_value = mock_breadcrumb
+        fake_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_flask_breadcrumb.return_value = fake_breadcrumb
         mock_chains = [{"id": "chain1", "name": "Test Chain"}]
         mock_get_chains.return_value = mock_chains
 
@@ -39,7 +39,8 @@ class TestChainRoutes(unittest.TestCase):
     def test_get_chains_failure(self, mock_get_chains, mock_create_flask_breadcrumb, mock_create_flask_token):
         """Test GET /api/chain when an exception is raised."""
         mock_create_flask_token.return_value = {"user_id": "mock_user"}
-        mock_create_flask_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
+        fake_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_flask_breadcrumb.return_value = fake_breadcrumb
         mock_get_chains.side_effect = Exception("Database error")
 
         response = self.client.get('/api/chain')
@@ -55,8 +56,8 @@ class TestChainRoutes(unittest.TestCase):
         # Arrange
         mock_token = {"user_id": "mock_user"}
         mock_create_flask_token.return_value = mock_token
-        mock_breadcrumb = {"breadcrumb": "mock_breadcrumb"}
-        mock_create_flask_breadcrumb.return_value = mock_breadcrumb
+        fake_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_flask_breadcrumb.return_value = fake_breadcrumb
         mock_chain = {"id": "chain1", "name": "Test Chain"}
         mock_get_chain.return_value = mock_chain
 
@@ -76,7 +77,8 @@ class TestChainRoutes(unittest.TestCase):
     def test_get_chain_failure(self, mock_get_chain, mock_create_flask_breadcrumb, mock_create_flask_token):
         """Test GET /api/chain/{id} when an exception is raised."""
         mock_create_flask_token.return_value = {"user_id": "mock_user"}
-        mock_create_flask_breadcrumb.return_value = {"breadcrumb": "mock_breadcrumb"}
+        fake_breadcrumb = {"atTime":"sometime", "correlationId":"correlation_ID"}
+        mock_create_flask_breadcrumb.return_value = fake_breadcrumb
         mock_get_chain.side_effect = Exception("Database error")
 
         response = self.client.get('/api/chain/chain1')

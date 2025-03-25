@@ -23,7 +23,7 @@ ollama = "*"
 flask = "*"
 prometheus-flask-exporter = "*"
 pymongo = "*"
-stage0-py-utils = {file = "../stage0_py_utils/dist/stage0_py_utils-0.1.1-py3-none-any.whl"}
+stage0-py-utils = "*"
 
 [dev-packages]
 

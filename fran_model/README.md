@@ -1,54 +1,40 @@
 # Fran LLM Related assets
 
 ## Utilities
+We use pipenv to anchor automation related to creating and testing the prompts used by the Fran chat bot. 
 
-### Load Conversation
-Used to load one conversation into another. This is how we load engineered prompts into a conversation, sometimes called "loading a personality"
-The command takes two parameters, first is the Target Channel Name, the second is a csv file with message content. See files in [personalities](./personalities/) for examples.
+### Load Prompts
 ```sh
-load_conversation.sh Echo ./personalities/echo.csv
+pipenv run initialize
 ```
-Need to figure out how to move this to the echo repo
+This uses the [start_everything.sh](./start_everything.sh) script to load the prompts/.csv files, and create the FRAN conversation from selected prompts. 
 
-### Start Conversation
-Used to reset a channel before loading the conversation. Takes the same arguments as Load Conversation
+### Run prompt evaluation pipeline
 ```sh
-start_conversation.sh Echo ./personalities/fran_base.csv
+pipenv run evaluate
 ```
-Need to figure out how to move this to the echo repo
+This will run the Echo Evaluation pipeline using the folders in ``fran_model``
 
-## Configuration
-Evaluation Pipeline configuration files
+### Run Grader evaluation pipeline
+```sh
+pipenv run grade
+```
+This will run the Echo Grader pipeline using the folders in ``fran_model``
 
-## Conversations
+## [Conversations](./conversations/)
 Conversations used for evaluation purposes. The conversation is processed message by message.
 The model generates a reply for steps were the actor is assistant, that is then graded against the value provided in the test conversation. 
 
-## Graders
+## [Grader](./grader/)
 These are the prompts used by the evaluation process when grading a response against the desired value. We are using AI to grade AI.
 
-## Prompts
+## [Prompts](./prompts/)
 Prompts are csv files that contain messages for an engineered prompt. These files are "loaded" into a conversation with the load_conversation script. 
-These files are intended to be used in a layered fashion, that can support more than just Fran, with other specialized agents to follow. To run fran you should start by loading the personalities into the system with.
-```sh
-./start_conversation.sh Fran_base ./prompts/fran_base.csv
-./start_conversation.sh Echo ./prompts/echo.csv
-./start_conversation.sh Tool ./prompts/tool.csv
-./start_conversation.sh Fran ./prompts/fran.csv
-./start_conversation.sh Exercise ./prompts/fran_exercise.csv
-```
-Each of these prompts are meant to be incremental. 
-- Fran_base establishes the name Fran
-- Echo Teaches Fran how to participate in a group conversation
-- Tool Teaches Fran how to access agent/action tools 
-- Fran Teaches Fran how to be a design thinking workshop facilitator
-- Exercise Teaches Fran how to be a design thinking exercise specialist. 
+These files are intended to be used in a layered fashion, that can support more than just Fran, with other specialized agents to follow. The prompts are:
+- echo.csv: The basic echo bot prompt
+- tools.csv: Adds the Agent/Action tools functionality 
+- fran.csv: Basic Fran prompt
+- design.csv: Fran and Stage0 Design Thinking
+- exercise.csv: Fran exercise prompt basics
 
-Once you have created the named conversations above you can load those into a new conversation with the @mention load command, the load_conversation action, or the /conversation/load api endpoint. This might be how you started a conversation in a discord channel.
-```
-@fran_the_facilitator join
-@fran_the_facilitator reset
-@fran_the_facilitator load Fran_base
-@fran_the_facilitator load Echo
-```
-That should be enough to cary on group conversations in a channel. 
+The start_everything script currently loads all of those csv files to conversations of the same name, and then loads ``design``, ``echo``, ``tools``, ``fran`` to a FRAN conversation you can use with ``@fran_the_facilitator load FRAN`` to load the full prompt in a conversation.

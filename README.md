@@ -11,6 +11,7 @@ This system uses the [Flask](https://flask.palletsprojects.com/en/stable/) API f
 - [Stage0 Developer Edition]() #TODO for now Docker
 - [Python](https://www.python.org/downloads/)
 - [Pipenv](https://pipenv.pypa.io/en/latest/installation.html)
+- [ollama](https://ollama.com/)
 
 ### Optional
 
@@ -21,7 +22,7 @@ This system uses the [Flask](https://flask.palletsprojects.com/en/stable/) API f
 ```text
 /stage0_fran        Repo Root
 │── 📁 docs           OpenAPI Documentation
-│── 📁 fran_model     Fran LLM Model & Prompts
+│── 📁 fran_model     [Fran LLM](./fran_model/README.md) Model & Prompts
 │── 📁 stage0_fran    The Fran server
 │   ├── 📁 agents         ECHO Agents
 │   ├── 📁 routes         Flask routes
@@ -66,23 +67,14 @@ NOTE: partially functional until stage0 developer edition is there
 pipenv run container
 ```
 
-## Initialize personalities from their Profiles
-NOTE: Assumes the API is running at localhost:8580
-```bash
-pipenv run initialize
-```
-
 ## Run StepCI end-2-end testing
 NOTE: Assumes the API is running at localhost:8580
 ```bash
 pipenv run stepci
 ```
 
-## Evaluate a set of Fran Models and Prompts
-
-```bash
-pipenv run evaluate
-```
+## Additional Automation
+See the [fran_model README](./fran_model/README.md) for information on additional pipenv scripts. 
 
 # API Testing with CURL
 

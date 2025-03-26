@@ -1,0 +1,69 @@
+[
+    {
+        "started_at": "2025-03-26 19:08:09.517502",
+        "model": "llama3.2:latest",
+        "prompt_files": [
+            "basic_grader.csv"
+        ],
+        "key_files": [
+            "basic_grader_key.csv"
+        ],
+        "ended_at": "2025-03-26 19:08:11.162018"
+    },
+    {
+        "given": "Hi",
+        "expected": "Hi",
+        "grade": null,
+        "min": 1.0,
+        "max": 1.0,
+        "latency": "0:00:01.152436"
+    },
+    {
+        "given": "Bad341A35adf",
+        "expected": "Good Answer",
+        "grade": null,
+        "min": 0.0,
+        "max": 0.01,
+        "latency": "0:00:00.087240"
+    },
+    {
+        "given": "Good Answer",
+        "expected": "Good Answer",
+        "grade": null,
+        "min": 0.95,
+        "max": 1.0,
+        "latency": "0:00:00.065400"
+    },
+    {
+        "given": "good answer",
+        "expected": "Good Answer",
+        "grade": null,
+        "min": 1.0,
+        "max": 1.0,
+        "latency": "0:00:00.084047"
+    },
+    {
+        "given": "good question",
+        "expected": "Good Answer",
+        "grade": null,
+        "min": 0.0,
+        "max": 0.1,
+        "latency": "0:00:00.084459"
+    },
+    {
+        "given": "Great Answer",
+        "expected": "Good Answer",
+        "grade": null,
+        "min": 0.8,
+        "max": 1.0,
+        "latency": "0:00:00.083902"
+    },
+    {
+        "given": "Great Answer Mike, that was a good answer",
+        "expected": "Good Answer",
+        "grade": null,
+        "min": 0.8,
+        "max": 1.0,
+        "latency": "0:00:00.084807"
+    }
+]

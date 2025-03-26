@@ -13,8 +13,8 @@ stepci = "stepci run ./tests/stepci.yaml"
 load = "stepci run ./tests/stepci.yaml --loadtest"
 build = "docker build --tag ghcr.io/agile-learning-institute/stage0_fran:latest ."
 container = "sh -c 's0 down && pipenv run build && s0 up curriculum-api'"
-evaluate = "sh -c 'docker run --rm -v ./fran_model:/input -v ./fran_model/config:/config -v ./fran_model/output:/output ghcr.io/agile-learning-institute/stage0_runbook_evaluate:latest'"
-grade = "sh -c 'docker run --rm -v ./fran_model:/input -v ./fran_model/config:/config -v ./fran_model/output:/output ghcr.io/agile-learning-institute/stage0_runbook_grader:latest'"
+evaluate = "sh -c 'docker run --rm -e OLLAMA_HOST=http://host.docker.internal:11434 -e CONFIG_FOLDER=/config -v ./fran_model:/input -v ./fran_model/config:/config -v ./fran_model/output:/output ghcr.io/agile-learning-institute/stage0_runbook_evaluate:latest'"
+grade = "sh -c 'docker run --rm -e OLLAMA_HOST=http://host.docker.internal:11434 -e CONFIG_FOLDER=/config -v ./fran_model:/input -v ./fran_model/config:/config -v ./fran_model/output:/output ghcr.io/agile-learning-institute/stage0_runbook_grade:latest'"
 
 [packages]
 discord = "*"

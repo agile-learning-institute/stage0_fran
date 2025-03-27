@@ -10,5 +10,4 @@
 # Build a combined prompt
 curl -s -X POST "http://localhost:8580/api/conversation/FRAN/load/design" -H "Content-Type: application/json" > /dev/null
 curl -s -X POST "http://localhost:8580/api/conversation/FRAN/load/echo" -H "Content-Type: application/json"  > /dev/null
-curl -s -X POST "http://localhost:8580/api/conversation/FRAN/load/tools" -H "Content-Type: application/json"  > /dev/null
 curl -s -X POST "http://localhost:8580/api/conversation/FRAN/load/fran" -H "Content-Type: application/json"  > /dev/null

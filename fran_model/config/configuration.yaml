@@ -1,10 +1,48 @@
-- name: Test_Suite1_lama
+- name: Test Suite 1 (Just Echo)
   model: llama3.2:latest
   grade_model: Gary:latest
   grade_by: 
   - basic_grader.csv
   prompts: 
   - echo.csv
-  - fran.csv
   conversations:
-  - "simple_conversation.csv"
+  - "echo_conversation.csv"
+- name: Test Suite 2 (With Tools)
+  model: llama3.2:latest
+  grade_model: Gary:latest
+  grade_by: 
+  - basic_grader.csv
+  prompts: 
+  - echo.csv
+  - tools.csv
+  conversations:
+  - "echo_conversation.csv"
+  - "tool_conversation.csv"
+- name: Test Suite 3 (with design)
+  model: llama3.2:latest
+  grade_model: Gary:latest
+  grade_by: 
+  - basic_grader.csv
+  prompts: 
+  - echo.csv
+  - tools.csv
+  - design.csv
+  conversations:
+  - "echo_conversation.csv"
+  - "tool_conversation.csv"
+  - "design_conversation.csv"
+- name: Test Suite 4 (with workshop)
+  model: llama3.2:latest
+  grade_model: Gary:latest
+  grade_by: 
+  - basic_grader.csv
+  prompts: 
+  - echo.csv
+  - tools.csv
+  - design.csv
+  - workshop.csv
+  conversations:
+  - "echo_conversation.csv"
+  - "tool_conversation.csv"
+  - "design_conversation.csv"
+  - "workshop_conversation.csv"

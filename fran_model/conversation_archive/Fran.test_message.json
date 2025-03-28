@@ -1,8 +1,0 @@
-{
-  "model": "FRAN",
-  "messages": [
-    {"from": "user", "to": "assistant", "content": "What are the active commands I can use?"},
-    {"from": "assistant", "to": "user", "content": "Here are the available commands:\n- /echo/agents\n- /echo/actions/{agent_name}"},
-    {"from": "user", "to": "assistant", "content": "What does /echo/agents do?"}
-  ]
-}

@@ -10,19 +10,16 @@ mongo = MongoIO.get_instance()
 
 # Initialize Logging
 import logging
-logging.getLogger("werkzeug").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
-
 logger.info(f"============= Starting Server Initialization ===============")
 
 # Initialize Echo Discord Bot
 from stage0_py_utils import Echo
 from stage0_py_utils import OllamaLLMClient
-echo = Echo("Fran", bot_id=config.FRAN_BOT_ID, model=config.FRAN_MODEL_NAME, client=OllamaLLMClient())
-# from echo.mock_llm_client import MockLLMClient
-# echo = Echo("Fran", bot_id=config.FRAN_BOT_ID, model=config.FRAN_MODEL_NAME, client=MockLLMClient())
+llm_client = OllamaLLMClient(base_url=config.OLLAMA_HOST, model=config.FRAN_MODEL_NAME)
+echo = Echo("Fran", bot_id=config.FRAN_BOT_ID, model=config.FRAN_MODEL_NAME, client=llm_client)
 
-# Register Config Agents
+# Register Agents
 from stage0_py_utils import create_config_agent
 from stage0_fran.agents.chain_agent import create_chain_agent
 from stage0_fran.agents.exercise_agent import create_exercise_agent
@@ -46,17 +43,12 @@ metrics = PrometheusMetrics(app, path='/api/health/')
 metrics.info('app_info', 'Application info', version=config.BUILT_AT)
 
 # Register flask routes
-from stage0_py_utils import create_bot_routes
-from stage0_py_utils import create_conversation_routes
-from stage0_py_utils import create_echo_routes
 from stage0_py_utils import create_config_routes
 from stage0_fran.routes.chain_routes import create_chain_routes
 from stage0_fran.routes.exercise_routes import create_exercise_routes
 from stage0_fran.routes.workshop_routes import create_workshop_routes
 
-app.register_blueprint(create_bot_routes(), url_prefix='/api/bot')
-app.register_blueprint(create_conversation_routes(), url_prefix='/api/conversation')
-app.register_blueprint(create_echo_routes(echo=echo), url_prefix='/api/echo')
+echo.register_default_routes(app=app)
 app.register_blueprint(create_config_routes(), url_prefix='/api/config')
 app.register_blueprint(create_chain_routes(), url_prefix='/api/chain')
 app.register_blueprint(create_exercise_routes(), url_prefix='/api/exercise')

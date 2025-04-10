@@ -8,6 +8,10 @@
 ./fran_model/initialize_conversation.sh exercise ./fran_model/prompts/exercise.csv
 
 # Build FRAN combined prompt
+curl -X POST http://localhost:8580/api/conversation/FRAN/reset -H "Content-Type: application/json" > /dev/null
 curl -s -X POST "http://localhost:8580/api/conversation/FRAN/load/echo" -H "Content-Type: application/json" > /dev/null
-curl -s -X POST "http://localhost:8580/api/conversation/FRAN/load/tools" -H "Content-Type: application/json"  > /dev/null
-curl -s -X POST "http://localhost:8580/api/conversation/FRAN/load/design" -H "Content-Type: application/json"  > /dev/null
+# curl -s -X POST "http://localhost:8580/api/conversation/FRAN/load/tools" -H "Content-Type: application/json"  > /dev/null
+# curl -s -X POST "http://localhost:8580/api/conversation/FRAN/load/design" -H "Content-Type: application/json"  > /dev/null
+# curl -s -X POST "http://localhost:8580/api/conversation/FRAN/load/workshop" -H "Content-Type: application/json"  > /dev/null
+# curl -s -X POST "http://localhost:8580/api/conversation/FRAN/load/exercise" -H "Content-Type: application/json"  > /dev/null
+echo FRAN personality initialized
